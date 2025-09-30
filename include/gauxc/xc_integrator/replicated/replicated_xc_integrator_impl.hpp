@@ -148,6 +148,12 @@ public:
                  const value_type* Px, int64_t ldpx, 
                  value_type* EXC, const IntegratorSettingsXC& ks_settings );
 
+  void eval_exc( int64_t m, int64_t n, const value_type* Ps, int64_t ldps,
+                 const value_type* Pz, int64_t ldpz, 
+                 const value_type* Py, int64_t ldpy, 
+                 const value_type* Px, int64_t ldpx, 
+                 value_type* EXC, const IntegratorSettingsXC& ks_settings, const bool dks_flag );
+
   void eval_exc_vxc( int64_t m, int64_t n, const value_type* P,
                      int64_t ldp, value_type* VXC, int64_t ldvxc,
                      value_type* EXC, const IntegratorSettingsXC& ks_settings ); 
