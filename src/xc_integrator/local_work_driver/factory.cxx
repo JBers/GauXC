@@ -17,7 +17,7 @@ namespace GauXC {
 LocalWorkDriverFactory::ptr_return_t
   LocalWorkDriverFactory::make_local_work_driver( ExecutionSpace ex, 
     std::string name, LocalWorkSettings settings ) {
-
+std::cout<< "hello" <<std::endl;
   std::transform( name.begin(), name.end(), name.begin(), ::toupper );
   (void)(settings);
 

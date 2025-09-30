@@ -100,6 +100,19 @@ typename ReplicatedXCIntegrator<MatrixType>::value_type
 }
 
 template <typename MatrixType>
+typename ReplicatedXCIntegrator<MatrixType>::value_type 
+  ReplicatedXCIntegrator<MatrixType>::eval_exc_( const MatrixType& Ps, const MatrixType& Pz, const MatrixType& Py, const MatrixType& Px, const bool dks_type, const IntegratorSettingsXC& ks_settings ) {
+
+  if( not pimpl_ ) GAUXC_PIMPL_NOT_INITIALIZED();
+  value_type EXC;
+  
+  const size_t n = Ps.rows();
+  pimpl_->eval_exc( n, n, Ps.data(), n, Pz.data(), n, Py.data(), n, Px.data(), n, &EXC, ks_settings, dks_flag );
+
+  return EXC;
+}
+
+template <typename MatrixType>
 typename ReplicatedXCIntegrator<MatrixType>::exc_vxc_type_rks 
   ReplicatedXCIntegrator<MatrixType>::eval_exc_vxc_( const MatrixType& P, const IntegratorSettingsXC& ks_settings ) {
 
@@ -152,6 +165,32 @@ typename ReplicatedXCIntegrator<MatrixType>::exc_vxc_type_gks
                         VXCz.data(), VXCz.rows(),
                         VXCy.data(), VXCy.rows(),
                         VXCx.data(), VXCx.rows(), &EXC, ks_settings );
+
+  return std::make_tuple( EXC, VXCs, VXCz, VXCy, VXCx);
+
+}
+
+
+template <typename MatrixType>
+typename ReplicatedXCIntegrator<MatrixType>::exc_vxc_type_dks
+  ReplicatedXCIntegrator<MatrixType>::eval_exc_vxc_( const MatrixType& Ps, const MatrixType& Pz, const MatrixType& Py, const MatrixType& Px,
+                                                     const bool dks_flag, const IntegratorSettingsXC& ks_settings) {
+
+  if( not pimpl_ ) GAUXC_PIMPL_NOT_INITIALIZED();
+  matrix_type VXCs( Ps.rows(), Ps.cols() );
+  matrix_type VXCz( Pz.rows(), Pz.cols() );
+  matrix_type VXCy( Py.rows(), Py.cols() );
+  matrix_type VXCx( Px.rows(), Px.cols() );
+  value_type  EXC;
+  std::cout<< "eval_exc_vxc_  exc_vxc_type_dks"<<std::endl;
+  pimpl_->eval_exc_vxc( Ps.rows(), Ps.cols(), Ps.data(), Ps.rows(),
+                        Pz.data(), Pz.rows(),
+                        Py.data(), Py.rows(),
+                        Px.data(), Px.rows(),
+                        VXCs.data(), VXCs.rows(),
+                        VXCz.data(), VXCz.rows(),
+                        VXCy.data(), VXCy.rows(),
+                        VXCx.data(), VXCx.rows(), &EXC, ks_settings, dks_flag );
 
   return std::make_tuple( EXC, VXCs, VXCz, VXCy, VXCx);
 

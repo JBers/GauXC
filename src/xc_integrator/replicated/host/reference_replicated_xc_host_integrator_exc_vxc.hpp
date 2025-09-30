@@ -33,7 +33,7 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
                  value_type* VXCz, int64_t ldvxcz,
                  value_type* VXCy, int64_t ldvxcy,
                  value_type* VXCx, int64_t ldvxcx,
-                 value_type* EXC, const IntegratorSettingsXC& ks_settings ) {
+                 value_type* EXC, const IntegratorSettingsXC& ks_settings, const bool dks_flag ) {
 
   const auto& basis = this->load_balancer_->basis();
 
@@ -73,7 +73,7 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
     exc_vxc_local_work_( basis, Ps, ldps, Pz, ldpz, Py, ldpy, Px, ldpx, 
                          VXCs, ldvxcs, VXCz, ldvxcz,
                          VXCy, ldvxcy, VXCx, ldvxcx, EXC, &N_EL, ks_settings,
-                         tasks.begin(), tasks.end() );
+                         tasks.begin(), tasks.end(), dks_flag );
   });
 
 
@@ -111,11 +111,12 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
                        value_type* VXCx, int64_t ldvxcx,
                        value_type* EXC, value_type *N_EL, 
                        const IntegratorSettingsXC& settings,
-                       task_iterator task_begin, task_iterator task_end) {
+                       task_iterator task_begin, task_iterator task_end, const bool dks_flag ) {
 
   const bool is_gks = (Pz != nullptr) and (Py != nullptr) and (Px != nullptr);
   const bool is_uks = (Pz != nullptr) and (Py == nullptr) and (Px == nullptr);
   const bool is_rks = not is_uks and not is_gks;
+  const bool is_dks = dks_flag;
   if (not is_rks and not is_uks and not is_gks) {
     GAUXC_GENERIC_EXCEPTION("Must Be Either RKS, UKS, or GKS!");
   }
@@ -123,7 +124,7 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
   const bool is_exc_only = (!VXCs) and (!VXCz) and (!VXCy) and (!VXCx);
   //if(is_exc_only) std::cout << "EXC ONLY" << std::endl;
 
-
+  std::cout<<"exc_vxc_local_work_ "<<std::endl;
   // Misc KS settings
   IntegratorSettingsKS ks_settings;
   if( auto* tmp = dynamic_cast<const IntegratorSettingsKS*>(&settings) ) {
@@ -421,9 +422,15 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
           dbasis_z_eval, zmat, nbe, zmat_z, nbe, den_eval, dden_x_eval, 
           dden_y_eval, dden_z_eval, gamma );
       } else if(is_gks) {
+        std::cout<<"reference_replicated_xc_host_integrator_exc_vxc.hpp Here ReferenceReplicatedXCHostIntegrator"<<std::endl;
         lwd->eval_uvvar_gga_gks( npts, nbe, basis_eval, dbasis_x_eval, dbasis_y_eval,
           dbasis_z_eval, zmat, nbe, zmat_z, nbe, zmat_x, nbe, zmat_y, nbe, den_eval, dden_x_eval,
           dden_y_eval, dden_z_eval, gamma, K, H, gks_dtol );
+      } else if(if_dks) {
+        std::cout<<"dks reference_replicated_xc_host_integrator_exc_vxc.hpp Here ReferenceReplicatedXCHostIntegrator"<<std::endl;
+        lwd->eval_uvvar_gga_dks( npts, nbe, basis_eval, dbasis_x_eval, dbasis_y_eval,
+          dbasis_z_eval, zmat, nbe, zmat_z, nbe, zmat_x, nbe, zmat_y, nbe, den_eval, dden_x_eval,
+        dden_y_eval, dden_z_eval, gamma, K, H, gks_dtol );
       }
        
      } else {
@@ -530,6 +537,11 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
                                 dbasis_y_eval, dbasis_z_eval, dden_x_eval, dden_y_eval,
                                 dden_z_eval, zmat, nbe, zmat_z, nbe, zmat_x, nbe, zmat_y, nbe,
                                 K, H);
+      } else if(is_dks) {
+        lwd->eval_zmat_gga_vxc_dks( npts, nbe, vrho, vgamma, basis_eval, dbasis_x_eval,
+                                dbasis_y_eval, dbasis_z_eval, dden_x_eval, dden_y_eval,
+                                dden_z_eval, zmat, nbe, zmat_z, nbe, zmat_x, nbe, zmat_y, nbe,
+                                K, H);
       }
        
     } else {
@@ -539,6 +551,9 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
         lwd->eval_zmat_lda_vxc_uks( npts, nbe, vrho, basis_eval, zmat, nbe, zmat_z, nbe );
       } else if(is_gks) {
         lwd->eval_zmat_lda_vxc_gks( npts, nbe, vrho, basis_eval, zmat, nbe, zmat_z, nbe, 
+                                    zmat_x, nbe, zmat_y, nbe, K);
+      } else if(is_dks) {
+        lwd->eval_zmat_lda_vxc_dks( npts, nbe, vrho, basis_eval, zmat, nbe, zmat_z, nbe, 
                                     zmat_x, nbe, zmat_y, nbe, K);
       }
     }
@@ -553,7 +568,7 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
       if(not is_rks) {
         lwd->inc_vxc( mgga_dim_scal * npts, nbf, nbe, basis_eval, submat_map, zmat_z, nbe,VXCz, ldvxcz, nbe_scr);
       }
-      if(is_gks) {
+      if(is_gks or is_dks) {
         lwd->inc_vxc( npts, nbf, nbe, basis_eval, submat_map, zmat_x, nbe, VXCy, ldvxcy,
           nbe_scr);
         lwd->inc_vxc( npts, nbf, nbe, basis_eval, submat_map, zmat_y, nbe, VXCx, ldvxcx,
@@ -608,7 +623,7 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
                  value_type* EXC, const IntegratorSettingsXC& ks_settings) {
 
   eval_exc_vxc_(m, n, P, ldp, nullptr, 0, nullptr, 0, nullptr, 0,
-    VXC, ldvxc, nullptr, 0, nullptr, 0, nullptr, 0, EXC, ks_settings);
+    VXC, ldvxc, nullptr, 0, nullptr, 0, nullptr, 0, EXC, ks_settings, false );
 
 }
 
@@ -625,8 +640,27 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
 
   eval_exc_vxc_(m, n, Ps, ldps, Pz, ldpz, nullptr, 0, nullptr, 0,
     VXCs, ldvxcs, VXCz, ldvxcz, nullptr, 0, nullptr, 0,
-    EXC, ks_settings);
+    EXC, ks_settings, false );
 
+}
+
+/// GKS EXC/VXC Driver = delegates, possibly temporary
+template <typename ValueType>
+void ReferenceReplicatedXCHostIntegrator<ValueType>::
+  eval_exc_vxc_( int64_t m, int64_t n, 
+                 const value_type* Ps, int64_t ldps,
+                 const value_type* Pz, int64_t ldpz,
+                 const value_type* Py, int64_t ldpy,
+                 const value_type* Px, int64_t ldpx,
+                 value_type* VXCs, int64_t ldvxcs,
+                 value_type* VXCz, int64_t ldvxcz,
+                 value_type* VXCy, int64_t ldvxcy,
+                 value_type* VXCx, int64_t ldvxcx,
+                 value_type* EXC, const IntegratorSettingsXC& ks_settings ) {
+
+  eval_exc_vxc_(m, n, Ps, ldps, Pz, ldpz, Py, ldpy, Px, ldpx,
+    VXCs, ldvxcs, VXCz, ldvxcz, VXCy, ldvxcy, VXCx, ldvxcx,
+    EXC, ks_settings, false );
 }
 
 } // namespace GauXC::detail

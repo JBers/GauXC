@@ -214,7 +214,24 @@ void LocalHostWorkDriver::eval_uvvar_gga_gks( size_t npts, size_t nbe,
   double* dden_z_eval, double* gamma, double* K, double* H, const double dtol ) {
 
   throw_if_invalid_pimpl(pimpl_);
+  std::cout<<"pimpl_->eval_uvvar_gga_gks local_host_work_driver"<<std::endl;
   pimpl_->eval_uvvar_gga_gks(npts, nbe, basis_eval, dbasis_x_eval, dbasis_y_eval,
+    dbasis_z_eval, Xs, ldxs, Xz, ldxz, Xx, ldxx, Xy, ldxy, den_eval, dden_x_eval, dden_y_eval, dden_z_eval,
+    gamma, K, H, dtol);
+
+}
+
+
+void LocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe,
+  const double* basis_eval, const double* dbasis_x_eval,
+  const double *dbasis_y_eval, const double* dbasis_z_eval, const double* Xs,
+  size_t ldxs, const double* Xz, size_t ldxz, const double* Xx, size_t ldxx,
+  const double* Xy, size_t ldxy, double* den_eval, double* dden_x_eval, double* dden_y_eval,
+  double* dden_z_eval, double* gamma, double* K, double* H, const double dtol ) {
+
+  throw_if_invalid_pimpl(pimpl_);
+  std::cout<<"pimpl_->eval_uvvar_gga_dks local_host_work_driver"<<std::endl;
+  pimpl_->eval_uvvar_gga_dks(npts, nbe, basis_eval, dbasis_x_eval, dbasis_y_eval,
     dbasis_z_eval, Xs, ldxs, Xz, ldxz, Xx, ldxx, Xy, ldxy, den_eval, dden_x_eval, dden_y_eval, dden_z_eval,
     gamma, K, H, dtol);
 
@@ -324,6 +341,20 @@ void LocalHostWorkDriver::eval_zmat_gga_vxc_gks( size_t npts, size_t nbe,
 
   throw_if_invalid_pimpl(pimpl_);
   pimpl_->eval_zmat_gga_vxc_gks(npts, nbe, vrho, vgamma, basis_eval, dbasis_x_eval,
+    dbasis_y_eval, dbasis_z_eval, dden_x_eval, dden_y_eval, dden_z_eval,
+    Zs, ldzs, Zz, ldzz, Zx, ldzx, Zy, ldzy, K, H);
+
+}
+
+void LocalHostWorkDriver::eval_zmat_gga_vxc_dks( size_t npts, size_t nbe,
+  const double* vrho, const double* vgamma, const double* basis_eval,
+  const double* dbasis_x_eval, const double* dbasis_y_eval,
+  const double* dbasis_z_eval, const double* dden_x_eval,
+  const double* dden_y_eval, const double* dden_z_eval, double* Zs, size_t ldzs,
+  double* Zz, size_t ldzz, double* Zx, size_t ldzx,double* Zy, size_t ldzy, double* K, double* H ) {
+
+  throw_if_invalid_pimpl(pimpl_);
+  pimpl_->eval_zmat_gga_vxc_dks(npts, nbe, vrho, vgamma, basis_eval, dbasis_x_eval,
     dbasis_y_eval, dbasis_z_eval, dden_x_eval, dden_y_eval, dden_z_eval,
     Zs, ldzs, Zz, ldzz, Zx, ldzx, Zy, ldzy, K, H);
 

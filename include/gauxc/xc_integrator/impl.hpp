@@ -8,10 +8,12 @@
 #pragma once
 
 #include <gauxc/xc_integrator/xc_integrator_impl.hpp>
+#include <iostream>
 
 // Implementations of XCIntegrator public API
 
 namespace GauXC {
+
 
 template <typename MatrixType>
 XCIntegrator<MatrixType>::XCIntegrator( std::unique_ptr<pimpl_type>&& pimpl ) :
@@ -53,6 +55,13 @@ typename XCIntegrator<MatrixType>::value_type
 }
 
 template <typename MatrixType>
+typename XCIntegrator<MatrixType>::value_type
+  XCIntegrator<MatrixType>::eval_exc( const MatrixType& Ps, const MatrixType& Pz, const MatrixType& Py, const MatrixType& Px, const bool dks_flag, const IntegratorSettingsXC& ks_settings ) {
+  if( not pimpl_ ) GAUXC_PIMPL_NOT_INITIALIZED();
+  return pimpl_->eval_exc(Ps, Pz, Py, Px, dks_flag, ks_settings);
+}
+
+template <typename MatrixType>
 typename XCIntegrator<MatrixType>::exc_vxc_type_rks
   XCIntegrator<MatrixType>::eval_exc_vxc( const MatrixType& P, const IntegratorSettingsXC& ks_settings ) {
   if( not pimpl_ ) GAUXC_PIMPL_NOT_INITIALIZED();
@@ -71,7 +80,18 @@ typename XCIntegrator<MatrixType>::exc_vxc_type_gks
   XCIntegrator<MatrixType>::eval_exc_vxc( const MatrixType& Ps, const MatrixType& Pz, const MatrixType& Py, const MatrixType& Px, 
                                           const IntegratorSettingsXC& ks_settings ) {
   if( not pimpl_ ) GAUXC_PIMPL_NOT_INITIALIZED();
+  std::cout<< " xc_integrator/impl.hpp type_gks" <<std::endl;
   return pimpl_->eval_exc_vxc(Ps, Pz, Py, Px, ks_settings);
+};
+
+template <typename MatrixType>
+typename XCIntegrator<MatrixType>::exc_vxc_type_dks
+  XCIntegrator<MatrixType>::eval_exc_vxc( const MatrixType& Ps, const MatrixType& Pz, const MatrixType& Py, const MatrixType& Px, 
+                                          const bool dks_flag, const IntegratorSettingsXC& ks_settings ) {
+  if( not pimpl_ ) GAUXC_PIMPL_NOT_INITIALIZED();
+  std::cout<< " xc_integrator/impl.hpp type_dks" <<std::endl;
+  std::cout << "dks_flag " << dks_flag << std::endl;
+  return pimpl_->eval_exc_vxc(Ps, Pz, Py, Px, dks_flag, ks_settings);
 };
 
 template <typename MatrixType>

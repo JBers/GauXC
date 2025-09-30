@@ -66,7 +66,7 @@ public:
     // Create Integrator instance
     std::transform( input_type_.begin(), input_type_.end(), input_type_.begin(), 
       ::toupper );
-
+    std::cout << "hello std::shared_ptr<integrator_type> get_shared_instance" <<std::endl;
     if( input_type_ == "REPLICATED" )
       return std::make_shared<integrator_type>( 
         ReplicatedXCIntegratorFactory<MatrixType>::make_integrator_impl(
@@ -99,7 +99,7 @@ public:
     std::shared_ptr<functional_type> func,
     std::shared_ptr<functional_type> epcfunc,
     std::shared_ptr<LoadBalancer>    lb ) {
-
+    std::cout<< "hello   std::shared_ptr<integrator_type> get_shared_instance" <<std::endl;
     // Create Local Work Driver
     auto lwd = LocalWorkDriverFactory::make_local_work_driver( ex_, 
       lwd_kernel_, local_work_settings_ );
@@ -144,7 +144,7 @@ public:
 
   template <typename... Args>
   integrator_type get_instance( Args&&... args ) {
-
+    std::cout<< "hello   integrator_type get_instance" <<std::endl;
     return integrator_type( std::move(*get_shared_instance(std::forward<Args>(args)...) ));
 
   }

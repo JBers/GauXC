@@ -8,6 +8,7 @@
 #pragma once
 
 #include <gauxc/xc_integrator.hpp>
+#include <iostream>
 
 namespace GauXC  {
 namespace detail {
@@ -23,6 +24,9 @@ public:
   using exc_vxc_type_rks   = typename XCIntegrator<MatrixType>::exc_vxc_type_rks;
   using exc_vxc_type_uks   = typename XCIntegrator<MatrixType>::exc_vxc_type_uks;
   using exc_vxc_type_gks   = typename XCIntegrator<MatrixType>::exc_vxc_type_gks;
+
+  using exc_vxc_type_dks   = typename XCIntegrator<MatrixType>::exc_vxc_type_dks;
+
   using exc_vxc_type_neo_rks   = typename XCIntegrator<MatrixType>::exc_vxc_type_neo_rks;
   using exc_vxc_type_neo_uks   = typename XCIntegrator<MatrixType>::exc_vxc_type_neo_uks;
   using exc_grad_type  = typename XCIntegrator<MatrixType>::exc_grad_type;
@@ -35,11 +39,17 @@ protected:
   virtual value_type        eval_exc_     ( const MatrixType& P, const IntegratorSettingsXC& ks_settings ) = 0;
   virtual value_type        eval_exc_     ( const MatrixType& Ps, const MatrixType& Pz, const IntegratorSettingsXC& ks_settings ) = 0;
   virtual value_type        eval_exc_     ( const MatrixType& Ps, const MatrixType& Pz, const MatrixType& Py, const MatrixType& Px, const IntegratorSettingsXC& ks_settings ) = 0;
+  virtual value_type        eval_exc_     ( const MatrixType& Ps, const MatrixType& Pz, const MatrixType& Py, const MatrixType& Px, const bool, const IntegratorSettingsXC& ks_settings ) = 0;
+
 
   virtual exc_vxc_type_rks  eval_exc_vxc_ ( const MatrixType& P, const IntegratorSettingsXC& ks_settings ) = 0;
   virtual exc_vxc_type_uks  eval_exc_vxc_ ( const MatrixType& Ps, const MatrixType& Pz, const IntegratorSettingsXC& ks_settings ) = 0;
   virtual exc_vxc_type_gks  eval_exc_vxc_ ( const MatrixType& Ps, const MatrixType& Pz, const MatrixType& Py, const MatrixType& Px, 
                                             const IntegratorSettingsXC& ks_settings ) = 0;
+
+  virtual exc_vxc_type_dks  eval_exc_vxc_ ( const MatrixType& Ps, const MatrixType& Pz, const MatrixType& Py, const MatrixType& Px, 
+                                            const bool dks_flag, const IntegratorSettingsXC& ks_settings) = 0;
+
   virtual exc_vxc_type_neo_rks  neo_eval_exc_vxc_ ( const MatrixType& elec_Ps, const MatrixType& prot_Ps, const MatrixType& prot_Pz,
                                                     const IntegratorSettingsXC& ks_settings ) = 0;
   virtual exc_vxc_type_neo_uks  neo_eval_exc_vxc_ ( const MatrixType& elec_Ps, const MatrixType& elec_Pz, const MatrixType& prot_Ps, const MatrixType& prot_Pz,
@@ -96,21 +106,38 @@ public:
     return eval_exc_(Ps, Pz, Py, Px, ks_settings);
   }
 
+  /** Integrate EXC for DKS
+   *
+   *  @param[in] P The alpha density matrix
+   *  @returns Integrated EXC 
+   */
+  value_type eval_exc( const MatrixType& Ps, const MatrixType& Pz, const MatrixType& Py, const MatrixType& Px,  const bool dks_flag, const IntegratorSettingsXC& ks_settings ) {
+    return eval_exc_(Ps, Pz, Py, Px, dks_flag, ks_settings );
+  }
+
   /** Integrate EXC / VXC (Mean field terms) for RKS
    *
    *  @param[in] P The alpha density matrix
    *  @returns EXC / VXC in a combined structure
    */
   exc_vxc_type_rks eval_exc_vxc( const MatrixType& P, const IntegratorSettingsXC& ks_settings ) {
+    std::cout<< " xc_integrator_impl.hpp" <<std::endl;
     return eval_exc_vxc_(P, ks_settings);
   }
 
   exc_vxc_type_uks eval_exc_vxc( const MatrixType& Ps, const MatrixType& Pz, const IntegratorSettingsXC& ks_settings ) {
+    std::cout<< " xc_integrator_impl.hpp" <<std::endl;
     return eval_exc_vxc_(Ps, Pz, ks_settings);
   }
 
   exc_vxc_type_gks eval_exc_vxc( const MatrixType& Ps, const MatrixType& Pz, const MatrixType& Py, const MatrixType& Px, const IntegratorSettingsXC& ks_settings ) {
+    std::cout<< " xc_integrator_impl.hpp gks" <<std::endl;
     return eval_exc_vxc_(Ps, Pz, Py, Px, ks_settings);
+  }
+
+  exc_vxc_type_dks eval_exc_vxc( const MatrixType& Ps, const MatrixType& Pz, const MatrixType& Py, const MatrixType& Px, const bool dks_flag, const IntegratorSettingsXC& ks_settings ) {
+    std::cout<< " xc_integrator_impl.hpp dks" <<std::endl;
+    return eval_exc_vxc_(Ps, Pz, Py, Px, dks_flag, ks_settings );
   }
   
   exc_vxc_type_neo_rks neo_eval_exc_vxc( const MatrixType& elec_Ps, const MatrixType& prot_Ps, const MatrixType& prot_Pz, 

@@ -51,6 +51,12 @@ protected:
                           const value_type* Px, int64_t ldpx, 
                           value_type* EXC, const IntegratorSettingsXC& ks_settings ) = 0;
 
+  virtual void eval_exc_( int64_t m, int64_t n, const value_type* Ps, int64_t ldps,
+                          const value_type* Pz, int64_t ldpz, 
+                          const value_type* Py, int64_t ldpy, 
+                          const value_type* Px, int64_t ldpx, 
+                          value_type* EXC, const IntegratorSettingsXC& ks_settings, const bool dks_flag  ) = 0;
+
   virtual void eval_exc_vxc_( int64_t m, int64_t n, const value_type* P,
                               int64_t ldp, value_type* VXC, int64_t ldvxc,
                               value_type* EXC, const IntegratorSettingsXC& ks_settings ) = 0;
@@ -74,6 +80,19 @@ protected:
                               value_type* VXCy, int64_t ldvxcy,
                               value_type* VXCx, int64_t ldvxcx,
                               value_type* EXC, const IntegratorSettingsXC& ks_settings ) = 0;
+  virtual void eval_exc_vxc_( int64_t m, int64_t n, const value_type* Ps,
+                              int64_t ldps,
+                              const value_type* Pz,
+                              int64_t ldpz,
+                              const value_type* Py,
+                              int64_t ldpy,
+                              const value_type* Px,
+                              int64_t ldpx,
+                              value_type* VXCs, int64_t ldvxcs,
+                              value_type* VXCz, int64_t ldvxcz,
+                              value_type* VXCy, int64_t ldvxcy,
+                              value_type* VXCx, int64_t ldvxcx,
+                              value_type* EXC, const IntegratorSettingsXC& ks_settings, const bool dks_flag ) = 0;
   virtual void neo_eval_exc_vxc_( int64_t elec_m, int64_t elec_mn, int64_t prot_m, int64_t prot_n,
                                   const value_type* elec_Ps, int64_t elec_ldps,
                                   const value_type* prot_Ps, int64_t prot_ldps,
@@ -153,6 +172,20 @@ public:
                      value_type* VXCy, int64_t ldvxcy,
                      value_type* VXCx, int64_t ldvxcx,
                      value_type* EXC, const IntegratorSettingsXC& ks_settings );
+
+  void eval_exc_vxc( int64_t m, int64_t n, const value_type* Ps,
+                     int64_t ldps,
+                     const value_type* Pz,
+                     int64_t ldpz,
+                     const value_type* Py,
+                     int64_t ldpy,
+                     const value_type* Px,
+                     int64_t ldpx,
+                     value_type* VXCs, int64_t ldvxcs,
+                     value_type* VXCz, int64_t ldvxcz,
+                     value_type* VXCy, int64_t ldvxcy,
+                     value_type* VXCx, int64_t ldvxcx,
+                     value_type* EXC, const IntegratorSettingsXC& ks_settings, const bool dks_flag );
   
   void neo_eval_exc_vxc( int64_t elec_m, int64_t elec_n, int64_t prot_m, int64_t prot_n,  
                          const value_type* elec_Ps, int64_t elec_ldps,
