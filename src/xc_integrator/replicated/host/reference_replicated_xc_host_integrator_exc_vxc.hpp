@@ -426,7 +426,7 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
         lwd->eval_uvvar_gga_gks( npts, nbe, basis_eval, dbasis_x_eval, dbasis_y_eval,
           dbasis_z_eval, zmat, nbe, zmat_z, nbe, zmat_x, nbe, zmat_y, nbe, den_eval, dden_x_eval,
           dden_y_eval, dden_z_eval, gamma, K, H, gks_dtol );
-      } else if(if_dks) {
+      } else if(is_dks) {
         std::cout<<"dks reference_replicated_xc_host_integrator_exc_vxc.hpp Here ReferenceReplicatedXCHostIntegrator"<<std::endl;
         lwd->eval_uvvar_gga_dks( npts, nbe, basis_eval, dbasis_x_eval, dbasis_y_eval,
           dbasis_z_eval, zmat, nbe, zmat_z, nbe, zmat_x, nbe, zmat_y, nbe, den_eval, dden_x_eval,

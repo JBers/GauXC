@@ -52,7 +52,7 @@ protected:
                       const value_type* Pz, int64_t ldpz,
                       const value_type* Py, int64_t ldpy,
                       const value_type* Px, int64_t ldpx,
-                      value_type* EXC, const IntegratorSettingsXC& ks_settings, const bool dks_type ) override;
+                      value_type* EXC, const IntegratorSettingsXC& ks_settings, const bool dks_flag ) override;
 
   /// RKS EXC/VXC
   void eval_exc_vxc_( int64_t m, int64_t n, const value_type* P, int64_t ldp, 
@@ -136,7 +136,7 @@ protected:
                             value_type* VXCy, int64_t ldvxcy,
                             value_type* VXCx, int64_t ldvxcx,
                             value_type* EXC, value_type *N_EL, const IntegratorSettingsXC& ks_settings,
-                            task_iterator task_begin, task_iterator task_end );
+                            task_iterator task_begin, task_iterator task_end, const bool dks_flag = false);
 
   void neo_exc_vxc_local_work_( const value_type* Ps, int64_t ldps,
                                 const value_type* Pz, int64_t ldpz,

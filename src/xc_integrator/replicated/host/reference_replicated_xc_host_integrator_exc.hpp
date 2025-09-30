@@ -26,6 +26,9 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
 
   const auto& basis = this->load_balancer_->basis();
 
+  bool dks_flag = false;
+
+
   // Check that P / VXC are sane
   const int64_t nbf = basis.nbf();
   if( m != n ) 
@@ -53,7 +56,7 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
     //exc_vxc_local_work_( P, ldp, VXC, ldvxc, EXC, &N_EL );
     exc_vxc_local_work_( basis, Ps, ldps, Pz, ldpz, Py, ldpy, Px, ldpx,
                          nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, 
-                         EXC, &N_EL, ks_settings, tasks.begin(), tasks.end() );
+                         EXC, &N_EL, ks_settings, tasks.begin(), tasks.end(), dks_flag );
   });
 
 
@@ -77,7 +80,7 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
              const value_type* Pz, int64_t ldpz,
              const value_type* Py, int64_t ldpy,
              const value_type* Px, int64_t ldpx,
-             value_type* EXC, const bool dks_flag, const IntegratorSettingsXC& ks_settings ) {
+             value_type* EXC, const IntegratorSettingsXC& ks_settings, const bool dks_flag ) {
 
   const auto& basis = this->load_balancer_->basis();
 
@@ -108,7 +111,7 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
     //exc_vxc_local_work_( P, ldp, VXC, ldvxc, EXC, &N_EL );
     exc_vxc_local_work_( basis, Ps, ldps, Pz, ldpz, Py, ldpy, Px, ldpx,
                          nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, 
-                         EXC, &N_EL, ks_settings, tasks.begin(), tasks.end() );
+                         EXC, &N_EL, ks_settings, tasks.begin(), tasks.end(), dks_flag );
   });
 
 
