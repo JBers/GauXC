@@ -69,7 +69,7 @@ void LocalHostWorkDriver::eval_collocation_hessian( size_t npts, size_t nshells,
     double* dbasis_y_eval, double* dbasis_z_eval, double* d2basis_xx_eval, 
     double* d2basis_xy_eval, double* d2basis_xz_eval, double* d2basis_yy_eval, 
     double* d2basis_yz_eval, double* d2basis_zz_eval ) {
-
+      std::cout<<"eval_collocation_hessian"<<std::endl;
   throw_if_invalid_pimpl(pimpl_);
   pimpl_->eval_collocation_hessian(npts, nshells, nbe, pts, basis, shell_list, basis_eval,
     dbasis_x_eval, dbasis_y_eval, dbasis_z_eval, d2basis_xx_eval, d2basis_xy_eval,
@@ -303,6 +303,17 @@ void LocalHostWorkDriver::eval_zmat_lda_vxc_gks( size_t npts, size_t nbe,
 
 }
 
+void LocalHostWorkDriver::eval_zmat_lda_vxc_dks( size_t npts, size_t nbe,
+  const double* vrho, const double* basis_eval, double* Zs, size_t ldzs,
+  double* Zz, size_t ldzz,double* Zx, size_t ldzx, double* Zy, size_t ldzy, double* K ) {
+
+  throw_if_invalid_pimpl(pimpl_);
+  pimpl_->eval_zmat_lda_vxc_dks(npts, nbe, vrho, basis_eval, Zs, ldzs,
+    Zz, ldzz, Zx, ldzx, Zy, ldzy, K);
+
+
+}
+
 
 // Eval Z Matrix GGA VXC
 void LocalHostWorkDriver::eval_zmat_gga_vxc_rks( size_t npts, size_t nbe, 
@@ -352,7 +363,7 @@ void LocalHostWorkDriver::eval_zmat_gga_vxc_dks( size_t npts, size_t nbe,
   const double* dbasis_z_eval, const double* dden_x_eval,
   const double* dden_y_eval, const double* dden_z_eval, double* Zs, size_t ldzs,
   double* Zz, size_t ldzz, double* Zx, size_t ldzx,double* Zy, size_t ldzy, double* K, double* H ) {
-
+  std::cout<<"pimpl_->eval_zmat_gga_vxc_dks"<<std::endl;
   throw_if_invalid_pimpl(pimpl_);
   pimpl_->eval_zmat_gga_vxc_dks(npts, nbe, vrho, vgamma, basis_eval, dbasis_x_eval,
     dbasis_y_eval, dbasis_z_eval, dden_x_eval, dden_y_eval, dden_z_eval,

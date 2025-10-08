@@ -213,7 +213,7 @@ namespace GauXC {
     const double* Xs, size_t ldxs, const double* Xz, size_t ldxz,
     const double* Xx, size_t ldxx, const double* Xy, size_t ldxy, double* den_eval, double* K, const double dtol) {
 
-
+    std::cout<<"ReferenceLocalHostWorkDriver::eval_uvvar_lda_dks"<<std::endl;
     auto *KZ = K; // KZ // store K in the Z matrix
     auto *KY = KZ + npts;
     auto *KX = KY + npts;
@@ -612,7 +612,7 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
    auto *HX = HY + npts;
 
    double dtolsq = dtol*dtol;
-
+      std::cout<<"break 4"<<std::endl;
    for( int32_t i = 0; i < (int32_t)npts; ++i ) {
 
       const size_t ioffs = size_t(i) * ldxs;
@@ -624,6 +624,8 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
       const auto*   Xz_i = Xz + ioffz;
       const auto*   Xx_i = Xx + ioffx;
       const auto*   Xy_i = Xy + ioffy;
+
+      // std::cout<< "Xs_i"<< *Xs_i <<std::endl;
 
       const double rhos = blas::dot( nbe, basis_eval + ioffs, 1, Xs_i, 1 );
       const double rhoz = blas::dot( nbe, basis_eval + ioffz, 1, Xz_i, 1 );
@@ -727,7 +729,7 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
 
 
     }
-
+      std::cout<<"break 5"<<std::endl;
 }
 
 
@@ -1262,6 +1264,7 @@ void ReferenceLocalHostWorkDriver::eval_zmat_gga_vxc_dks( size_t npts, size_t nb
     auto *KY = KZ + npts;
     auto *KX = KY + npts;
     std::cout<<"npts zmat: "<<npts<<std::endl;
+    std::cout<<"nbf/nbe: "<<nbf<<std::endl;
     auto *HZ = H; // KZ // store K in the Z matrix
     auto *HY = HZ + npts;
     auto *HX = HY + npts;
@@ -1275,7 +1278,7 @@ void ReferenceLocalHostWorkDriver::eval_zmat_gga_vxc_dks( size_t npts, size_t nb
     blas::lacpy( 'A', nbf, npts, basis_eval, nbf, Zz, ldzz);
     blas::lacpy( 'A', nbf, npts, basis_eval, nbf, Zx, ldzx);
     blas::lacpy( 'A', nbf, npts, basis_eval, nbf, Zy, ldzy);   
-
+      std::cout<<"break 1"<<std::endl;
     for( int32_t i = 0; i < (int32_t)npts; ++i ) {
 
       const int32_t ioff = i * nbf;
@@ -1358,7 +1361,7 @@ void ReferenceLocalHostWorkDriver::eval_zmat_gga_vxc_dks( size_t npts, size_t nb
       blas::axpy(nbf, z_fact_y, bf_z_col, 1, zy_col, 1);
 
     }
-
+      std::cout<<"break 2"<<std::endl;
 }
 
   // Increment VXC by Z
