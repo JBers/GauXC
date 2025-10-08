@@ -49,13 +49,17 @@ private:
   value_type    eval_exc_     ( const MatrixType&, const MatrixType&, const IntegratorSettingsXC& ) override;
   value_type    eval_exc_     ( const MatrixType&, const MatrixType&, const MatrixType&, const MatrixType&, const IntegratorSettingsXC& ) override;
 
-  value_type    eval_exc_     ( const MatrixType&, const MatrixType&, const MatrixType&, const MatrixType&, const bool, const IntegratorSettingsXC& ) override;
+  value_type    eval_exc_     ( const MatrixType&, const MatrixType&, const MatrixType&, const MatrixType&, 
+                                const MatrixType&, const MatrixType&, const MatrixType&, const MatrixType&, 
+                                const IntegratorSettingsXC& ) override;
 
   exc_vxc_type_rks  eval_exc_vxc_ ( const MatrixType&, const IntegratorSettingsXC& ) override;
   exc_vxc_type_uks  eval_exc_vxc_ ( const MatrixType&, const MatrixType&, const IntegratorSettingsXC&) override;
   exc_vxc_type_gks  eval_exc_vxc_ ( const MatrixType&, const MatrixType&, const MatrixType&, const MatrixType&, const IntegratorSettingsXC& ) override;
 
-  exc_vxc_type_dks  eval_exc_vxc_ ( const MatrixType&, const MatrixType&, const MatrixType&, const MatrixType&, const bool, const IntegratorSettingsXC& ) override;
+  exc_vxc_type_dks  eval_exc_vxc_ ( const MatrixType&, const MatrixType&, const MatrixType&, const MatrixType&, 
+                                    const MatrixType&, const MatrixType&, const MatrixType&, const MatrixType&, 
+                                    const IntegratorSettingsXC& ) override;
 
   exc_vxc_type_neo_rks  neo_eval_exc_vxc_ ( const MatrixType&, const MatrixType&, const MatrixType&, const IntegratorSettingsXC& ) override;
   exc_vxc_type_neo_uks  neo_eval_exc_vxc_ ( const MatrixType&, const MatrixType&, const MatrixType&, const MatrixType&, const IntegratorSettingsXC& ) override;

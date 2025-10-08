@@ -40,7 +40,7 @@ protected:
                   const value_type* Pz, int64_t ldpz,
                   value_type* EXC, const IntegratorSettingsXC& ks_settings ) override;
 
-  /// GKS EXC - also serves as the generic implementation
+  /// GKS EXC 
   void eval_exc_( int64_t m, int64_t n, const value_type* Ps, int64_t ldps,
                       const value_type* Pz, int64_t ldpz,
                       const value_type* Py, int64_t ldpy,
@@ -52,7 +52,11 @@ protected:
                       const value_type* Pz, int64_t ldpz,
                       const value_type* Py, int64_t ldpy,
                       const value_type* Px, int64_t ldpx,
-                      value_type* EXC, const IntegratorSettingsXC& ks_settings, const bool dks_flag ) override;
+                      const value_type* Ps_SS, int64_t ldps_ss,
+                      const value_type* Pz_SS, int64_t ldpz_ss,
+                      const value_type* Py_SS, int64_t ldpy_ss,
+                      const value_type* Px_SS, int64_t ldpx_ss,
+                      value_type* EXC, const IntegratorSettingsXC& ks_settings ) override;
 
   /// RKS EXC/VXC
   void eval_exc_vxc_( int64_t m, int64_t n, const value_type* P, int64_t ldp, 
@@ -67,7 +71,7 @@ protected:
                       value_type* EXC, const IntegratorSettingsXC& ks_settings ) override;
 
   
-  /// GKS EXC/VXC - also serves as the generic implementation
+  /// GKS EXC/VXC
   void eval_exc_vxc_( int64_t m, int64_t n, const value_type* Ps, int64_t ldps,
                       const value_type* Pz, int64_t ldpz,
                       const value_type* Py, int64_t ldpy,
@@ -84,11 +88,19 @@ protected:
                       const value_type* Pz, int64_t ldpz,
                       const value_type* Py, int64_t ldpy,
                       const value_type* Px, int64_t ldpx,
+                      const value_type* Ps_SS, int64_t ldps_ss,
+                      const value_type* Pz_SS, int64_t ldpz_ss,
+                      const value_type* Py_SS, int64_t ldpy_ss,
+                      const value_type* Px_SS, int64_t ldpx_ss,
                       value_type* VXCs, int64_t ldvxcs,
                       value_type* VXCz, int64_t ldvxcz,
                       value_type* VXCy, int64_t ldvxcy,
                       value_type* VXCx, int64_t ldvxcx,
-                      value_type* EXC, const IntegratorSettingsXC& ks_settings, const bool dks_flag ) override;
+                      value_type* VXCs_SS, int64_t ldvxcs_ss,
+                      value_type* VXCz_SS, int64_t ldvxcz_ss,
+                      value_type* VXCy_SS, int64_t ldvxcy_ss,
+                      value_type* VXCx_SS, int64_t ldvxcx_ss,
+                      value_type* EXC, const IntegratorSettingsXC& ks_settings ) override;
 
 
   void neo_eval_exc_vxc_( int64_t m1, int64_t n1, int64_t m2, int64_t n2, 

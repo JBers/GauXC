@@ -39,7 +39,9 @@ protected:
   virtual value_type        eval_exc_     ( const MatrixType& P, const IntegratorSettingsXC& ks_settings ) = 0;
   virtual value_type        eval_exc_     ( const MatrixType& Ps, const MatrixType& Pz, const IntegratorSettingsXC& ks_settings ) = 0;
   virtual value_type        eval_exc_     ( const MatrixType& Ps, const MatrixType& Pz, const MatrixType& Py, const MatrixType& Px, const IntegratorSettingsXC& ks_settings ) = 0;
-  virtual value_type        eval_exc_     ( const MatrixType& Ps, const MatrixType& Pz, const MatrixType& Py, const MatrixType& Px, const bool, const IntegratorSettingsXC& ks_settings ) = 0;
+  virtual value_type        eval_exc_     ( const MatrixType& Ps, const MatrixType& Pz, const MatrixType& Py, const MatrixType& Px, 
+                                            const MatrixType& Ps_SS, const MatrixType& Pz_SS, const MatrixType& Py_SS, const MatrixType& Px_SS, 
+                                            const IntegratorSettingsXC& ks_settings ) = 0;
 
 
   virtual exc_vxc_type_rks  eval_exc_vxc_ ( const MatrixType& P, const IntegratorSettingsXC& ks_settings ) = 0;
@@ -48,7 +50,8 @@ protected:
                                             const IntegratorSettingsXC& ks_settings ) = 0;
 
   virtual exc_vxc_type_dks  eval_exc_vxc_ ( const MatrixType& Ps, const MatrixType& Pz, const MatrixType& Py, const MatrixType& Px, 
-                                            const bool dks_flag, const IntegratorSettingsXC& ks_settings) = 0;
+                                            const MatrixType& Ps_SS, const MatrixType& Pz_SS, const MatrixType& Py_SS, const MatrixType& Px_SS, 
+                                            const IntegratorSettingsXC& ks_settings) = 0;
 
   virtual exc_vxc_type_neo_rks  neo_eval_exc_vxc_ ( const MatrixType& elec_Ps, const MatrixType& prot_Ps, const MatrixType& prot_Pz,
                                                     const IntegratorSettingsXC& ks_settings ) = 0;
@@ -111,8 +114,10 @@ public:
    *  @param[in] P The alpha density matrix
    *  @returns Integrated EXC 
    */
-  value_type eval_exc( const MatrixType& Ps, const MatrixType& Pz, const MatrixType& Py, const MatrixType& Px,  const bool dks_flag, const IntegratorSettingsXC& ks_settings ) {
-    return eval_exc_(Ps, Pz, Py, Px, dks_flag, ks_settings );
+  value_type eval_exc( const MatrixType& Ps, const MatrixType& Pz, const MatrixType& Py, const MatrixType& Px, 
+                       const MatrixType& Ps_SS, const MatrixType& Pz_SS, const MatrixType& Py_SS, const MatrixType& Px_SS, 
+                       const IntegratorSettingsXC& ks_settings ) {
+    return eval_exc_(Ps, Pz, Py, Px, Ps_SS, Pz_SS, Py_SS, Px_SS, ks_settings );
   }
 
   /** Integrate EXC / VXC (Mean field terms) for RKS
@@ -135,9 +140,11 @@ public:
     return eval_exc_vxc_(Ps, Pz, Py, Px, ks_settings);
   }
 
-  exc_vxc_type_dks eval_exc_vxc( const MatrixType& Ps, const MatrixType& Pz, const MatrixType& Py, const MatrixType& Px, const bool dks_flag, const IntegratorSettingsXC& ks_settings ) {
+  exc_vxc_type_dks eval_exc_vxc( const MatrixType& Ps, const MatrixType& Pz, const MatrixType& Py, const MatrixType& Px, 
+                                 const MatrixType& Ps_SS, const MatrixType& Pz_SS, const MatrixType& Py_SS, const MatrixType& Px_SS, 
+                                 const IntegratorSettingsXC& ks_settings ) {
     std::cout<< " xc_integrator_impl.hpp dks" <<std::endl;
-    return eval_exc_vxc_(Ps, Pz, Py, Px, dks_flag, ks_settings );
+    return eval_exc_vxc_(Ps, Pz, Py, Px, Ps_SS, Pz_SS, Py_SS, Px_SS, ks_settings );
   }
   
   exc_vxc_type_neo_rks neo_eval_exc_vxc( const MatrixType& elec_Ps, const MatrixType& prot_Ps, const MatrixType& prot_Pz, 

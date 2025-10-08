@@ -101,13 +101,15 @@ typename ReplicatedXCIntegrator<MatrixType>::value_type
 
 template <typename MatrixType>
 typename ReplicatedXCIntegrator<MatrixType>::value_type 
-  ReplicatedXCIntegrator<MatrixType>::eval_exc_( const MatrixType& Ps, const MatrixType& Pz, const MatrixType& Py, const MatrixType& Px, const bool dks_flag, const IntegratorSettingsXC& ks_settings ) {
-
+  ReplicatedXCIntegrator<MatrixType>::eval_exc_( const MatrixType& Ps, const MatrixType& Pz, const MatrixType& Py, const MatrixType& Px, 
+     const MatrixType& Ps_SS, const MatrixType& Pz_SS, const MatrixType& Py_SS, const MatrixType& Px_SS, const IntegratorSettingsXC& ks_settings ) {
+      //dks
   if( not pimpl_ ) GAUXC_PIMPL_NOT_INITIALIZED();
   value_type EXC;
   
   const size_t n = Ps.rows();
-  pimpl_->eval_exc( n, n, Ps.data(), n, Pz.data(), n, Py.data(), n, Px.data(), n, &EXC, ks_settings, dks_flag );
+  pimpl_->eval_exc( n, n, Ps.data(), n, Pz.data(), n, Py.data(), n, Px.data(), n,
+                    Ps_SS.data(), n, Pz_SS.data(), n, Py_SS.data(), n, Px_SS.data(), n, &EXC, ks_settings );
 
   return EXC;
 }
@@ -170,17 +172,22 @@ typename ReplicatedXCIntegrator<MatrixType>::exc_vxc_type_gks
 
 }
 
-
+// dks
 template <typename MatrixType>
 typename ReplicatedXCIntegrator<MatrixType>::exc_vxc_type_dks
   ReplicatedXCIntegrator<MatrixType>::eval_exc_vxc_( const MatrixType& Ps, const MatrixType& Pz, const MatrixType& Py, const MatrixType& Px,
-                                                     const bool dks_flag, const IntegratorSettingsXC& ks_settings) {
-
+                                                     const MatrixType& Ps_SS, const MatrixType& Pz_SS, const MatrixType& Py_SS, const MatrixType& Px_SS,
+                                                     const IntegratorSettingsXC& ks_settings) {
+  
   if( not pimpl_ ) GAUXC_PIMPL_NOT_INITIALIZED();
   matrix_type VXCs( Ps.rows(), Ps.cols() );
   matrix_type VXCz( Pz.rows(), Pz.cols() );
   matrix_type VXCy( Py.rows(), Py.cols() );
   matrix_type VXCx( Px.rows(), Px.cols() );
+  matrix_type VXCs_SS( Ps_SS.rows(), Ps_SS.cols() );
+  matrix_type VXCz_SS( Pz_SS.rows(), Pz_SS.cols() );
+  matrix_type VXCy_SS( Py_SS.rows(), Py_SS.cols() );
+  matrix_type VXCx_SS( Px_SS.rows(), Px_SS.cols() );
   value_type  EXC;
   std::cout<< "eval_exc_vxc_  exc_vxc_type_dks"<<std::endl;
   pimpl_->eval_exc_vxc( Ps.rows(), Ps.cols(), Ps.data(), Ps.rows(),
@@ -192,7 +199,7 @@ typename ReplicatedXCIntegrator<MatrixType>::exc_vxc_type_dks
                         VXCy.data(), VXCy.rows(),
                         VXCx.data(), VXCx.rows(), &EXC, ks_settings, dks_flag );
 
-  return std::make_tuple( EXC, VXCs, VXCz, VXCy, VXCx);
+  return std::make_tuple( EXC, VXCs, VXCz, VXCy, VXCx, VXCs_SS, VXCz_SS, VXCy_SS, VXCx_SS);
 
 }
 
