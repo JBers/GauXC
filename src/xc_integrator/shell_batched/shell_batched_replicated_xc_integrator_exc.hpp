@@ -133,7 +133,11 @@ void ShellBatchedReplicatedXCIntegrator<BaseIntegratorType, IncoreIntegratorType
              const value_type* Pz, int64_t ldpz,
              const value_type* Py, int64_t ldpy,
              const value_type* Px, int64_t ldpx,
-             value_type* EXC, const IntegratorSettingsXC& ks_settings, const bool dks_flag ) {
+             const value_type* Ps_SS, int64_t ldps_ss,
+             const value_type* Pz_SS, int64_t ldpz_ss,
+             const value_type* Py_SS, int64_t ldpy_ss,
+             const value_type* Px_SS, int64_t ldpx_ss,
+             value_type* EXC, const IntegratorSettingsXC& ks_settings ) {
 
 
 

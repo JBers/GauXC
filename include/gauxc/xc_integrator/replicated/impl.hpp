@@ -194,10 +194,18 @@ typename ReplicatedXCIntegrator<MatrixType>::exc_vxc_type_dks
                         Pz.data(), Pz.rows(),
                         Py.data(), Py.rows(),
                         Px.data(), Px.rows(),
+                        Ps_SS.data(), Ps_SS.rows(),
+                        Pz_SS.data(), Pz_SS.rows(),
+                        Py_SS.data(), Py_SS.rows(),
+                        Px_SS.data(), Px_SS.rows(),
                         VXCs.data(), VXCs.rows(),
                         VXCz.data(), VXCz.rows(),
                         VXCy.data(), VXCy.rows(),
-                        VXCx.data(), VXCx.rows(), &EXC, ks_settings, dks_flag );
+                        VXCx.data(), VXCx.rows(),
+                        VXCs_SS.data(), VXCs_SS.rows(),
+                        VXCz_SS.data(), VXCz_SS.rows(),
+                        VXCy_SS.data(), VXCy_SS.rows(),
+                        VXCx_SS.data(), VXCx_SS.rows(), &EXC, ks_settings );
 
   return std::make_tuple( EXC, VXCs, VXCz, VXCy, VXCx, VXCs_SS, VXCz_SS, VXCy_SS, VXCx_SS);
 
