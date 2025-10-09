@@ -16,7 +16,7 @@
 namespace GauXC::detail {
 
 /**
- *  Generic implementation of EXC/VXC for RKS/UKS/GKS
+ *  Generic implementation of EXC/VXC for RKS/UKS/GKS/DKS
  *  
  *  If passed pointers are null-y and the leading dimensions
  *  are zero, RKS/UKS are deduced. RKS/UKS drivers delegate
@@ -24,25 +24,33 @@ namespace GauXC::detail {
  */
 template <typename ValueType>
 void ReferenceReplicatedXCHostIntegrator<ValueType>::
-  eval_exc_vxc_( int64_t m, int64_t n, 
+  eval_exc_vxc_( int64_t m, int64_t n,
                  const value_type* Ps, int64_t ldps,
                  const value_type* Pz, int64_t ldpz,
                  const value_type* Py, int64_t ldpy,
                  const value_type* Px, int64_t ldpx,
+                 const value_type* Ps_SS, int64_t ldps_ss,
+                 const value_type* Pz_SS, int64_t ldpz_ss,
+                 const value_type* Py_SS, int64_t ldpy_ss,
+                 const value_type* Px_SS, int64_t ldpx_ss,
                  value_type* VXCs, int64_t ldvxcs,
                  value_type* VXCz, int64_t ldvxcz,
                  value_type* VXCy, int64_t ldvxcy,
                  value_type* VXCx, int64_t ldvxcx,
-                 value_type* EXC, const IntegratorSettingsXC& ks_settings, const bool dks_flag ) {
+                 value_type* VXCs_SS, int64_t ldvxcs_ss,
+                 value_type* VXCz_SS, int64_t ldvxcz_ss,
+                 value_type* VXCy_SS, int64_t ldvxcy_ss,
+                 value_type* VXCx_SS, int64_t ldvxcx_ss,
+                 value_type* EXC, const IntegratorSettingsXC& ks_settings ) {
+
 
   const auto& basis = this->load_balancer_->basis();
 
-
-
+  
   // Check that P / VXC are sane
   const int64_t nbf = basis.nbf();
 
-    std::cout<<"GauXc num basis func "<<nbf<<std::endl;
+  std::cout<<"GauXc num basis func "<<nbf<<std::endl;
   std::cout<<"GauXc size of P "<<m<<std::endl;
 
   if( m != n )
@@ -77,9 +85,12 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
   // Compute Local contributions to EXC / VXC
   this->timer_.time_op("XCIntegrator.LocalWork", [&](){
     exc_vxc_local_work_( basis, Ps, ldps, Pz, ldpz, Py, ldpy, Px, ldpx, 
+                         Ps_SS, ldps_ss, Pz_SS, ldpz_ss, Py_SS, ldpy_ss, Px_SS, ldpx_ss, 
                          VXCs, ldvxcs, VXCz, ldvxcz,
-                         VXCy, ldvxcy, VXCx, ldvxcx, EXC, &N_EL, ks_settings,
-                         tasks.begin(), tasks.end(), dks_flag );
+                         VXCy, ldvxcy, VXCx, ldvxcx,
+                         VXCs_SS, ldvxcs_ss, VXCz_SS, ldvxcz_ss,
+                         VXCy_SS, ldvxcy_ss, VXCx_SS, ldvxcx_ss, EXC, &N_EL, ks_settings,
+                         tasks.begin(), tasks.end() );
   });
 
 
@@ -103,7 +114,7 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
 }
 
 
-/// Generic implementation details of EXC/VXC local work - deduces RKS/UKS/GKS
+/// Generic implementation details of EXC/VXC local work - deduces RKS/UKS/GKS/DKS
 /// based on null-y / zero parameters
 template <typename ValueType>
 void ReferenceReplicatedXCHostIntegrator<ValueType>::
@@ -111,19 +122,28 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
                        const value_type* Pz, int64_t ldpz,
                        const value_type* Py, int64_t ldpy,
                        const value_type* Px, int64_t ldpx,
+                       const value_type* Ps_SS, int64_t ldps_ss,
+                       const value_type* Pz_SS, int64_t ldpz_ss,
+                       const value_type* Py_SS, int64_t ldpy_ss,
+                       const value_type* Px_SS, int64_t ldpx_ss,
                        value_type* VXCs, int64_t ldvxcs,
                        value_type* VXCz, int64_t ldvxcz,
                        value_type* VXCy, int64_t ldvxcy,
                        value_type* VXCx, int64_t ldvxcx,
+                       value_type* VXCs_SS, int64_t ldvxcs_ss,
+                       value_type* VXCz_SS, int64_t ldvxcz_ss,
+                       value_type* VXCy_SS, int64_t ldvxcy_ss,
+                       value_type* VXCx_SS, int64_t ldvxcx_ss,
                        value_type* EXC, value_type *N_EL, 
                        const IntegratorSettingsXC& settings,
-                       task_iterator task_begin, task_iterator task_end, const bool dks_flag ) {
+                       task_iterator task_begin, task_iterator task_end ) {
+    
+  const bool is_dks = (Pz != nullptr) and (Py != nullptr) and (Px != nullptr) and (Ps_SS != nullptr);
+  const bool is_gks = (Pz != nullptr) and (Py != nullptr) and (Px != nullptr) and (Ps_SS == nullptr);
+  const bool is_uks = (Pz != nullptr) and (Py == nullptr) and (Px == nullptr) and (Ps_SS == nullptr);
+  const bool is_rks = not is_uks and not is_gks and not is_dks;
 
-  const bool is_gks = (Pz != nullptr) and (Py != nullptr) and (Px != nullptr);
-  const bool is_uks = (Pz != nullptr) and (Py == nullptr) and (Px == nullptr);
-  const bool is_rks = not is_uks and not is_gks;
-  const bool is_dks = dks_flag;
-  if (not is_rks and not is_uks and not is_gks) {
+  if (not is_rks and not is_uks and not is_gks and not is_dks) {
     GAUXC_GENERIC_EXCEPTION("Must Be Either RKS, UKS, or GKS!");
   }
 
@@ -627,7 +647,7 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
 
 
 
-/// RKS EXC/VXC driver - delegates to generic GKS impl
+/// RKS EXC/VXC driver - delegates to generic DKS impl
 template <typename ValueType>
 void ReferenceReplicatedXCHostIntegrator<ValueType>::
   eval_exc_vxc_( int64_t m, int64_t n, 
@@ -636,12 +656,15 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
                  value_type* EXC, const IntegratorSettingsXC& ks_settings) {
 
   eval_exc_vxc_(m, n, P, ldp, nullptr, 0, nullptr, 0, nullptr, 0,
-    VXC, ldvxc, nullptr, 0, nullptr, 0, nullptr, 0, EXC, ks_settings, false );
+    nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0,
+    VXC, ldvxc, nullptr, 0, nullptr, 0, nullptr, 0,
+    nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0,
+    EXC, ks_settings );
 
 }
 
 
-/// UKS EXC/VXC driver - delegates to generic GKS impl
+/// UKS EXC/VXC driver - delegates to generic DKS impl
 template <typename ValueType>
 void ReferenceReplicatedXCHostIntegrator<ValueType>::
   eval_exc_vxc_( int64_t m, int64_t n, 
@@ -652,12 +675,14 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
                  value_type* EXC, const IntegratorSettingsXC& ks_settings) {
 
   eval_exc_vxc_(m, n, Ps, ldps, Pz, ldpz, nullptr, 0, nullptr, 0,
+    nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0,
     VXCs, ldvxcs, VXCz, ldvxcz, nullptr, 0, nullptr, 0,
-    EXC, ks_settings, false );
+    nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0,
+    EXC, ks_settings );
 
 }
 
-/// GKS EXC/VXC Driver = delegates, possibly temporary
+/// GKS EXC/VXC Driver = delegates to generic DKS impl
 template <typename ValueType>
 void ReferenceReplicatedXCHostIntegrator<ValueType>::
   eval_exc_vxc_( int64_t m, int64_t n, 
@@ -672,8 +697,10 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
                  value_type* EXC, const IntegratorSettingsXC& ks_settings ) {
 
   eval_exc_vxc_(m, n, Ps, ldps, Pz, ldpz, Py, ldpy, Px, ldpx,
+    nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0,
     VXCs, ldvxcs, VXCz, ldvxcz, VXCy, ldvxcy, VXCx, ldvxcx,
-    EXC, ks_settings, false );
+    nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0,
+    EXC, ks_settings );
 }
 
 } // namespace GauXC::detail
