@@ -626,7 +626,7 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
       const auto*   Xy_i = Xy + ioffy;
 
       // std::cout<< "Xs_i"<< *Xs_i <<std::endl;
-
+      std::cout<<"break 4.1"<<std::endl;
       const double rhos = blas::dot( nbe, basis_eval + ioffs, 1, Xs_i, 1 );
       const double rhoz = blas::dot( nbe, basis_eval + ioffz, 1, Xz_i, 1 );
       const double rhox = blas::dot( nbe, basis_eval + ioffx, 1, Xx_i, 1 );
@@ -660,7 +660,7 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
       const auto dMydz =
         2. * blas::dot( nbe, dbasis_z_eval + ioffy, 1, Xy_i, 1 );
 
-
+      std::cout<<"break 4.2"<<std::endl;
       dden_x_eval[4 * i] = dndx;
       dden_y_eval[4 * i] = dndy;
       dden_z_eval[4 * i] = dndz;
@@ -676,7 +676,7 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
       dden_x_eval[4 * i + 3] = dMxdx;
       dden_y_eval[4 * i + 3] = dMxdy;
       dden_z_eval[4 * i + 3] = dMxdz;
-
+            std::cout<<"break 4.3"<<std::endl;
       double mtemp = rhoz * rhoz + rhox * rhox + rhoy * rhoy;
       double mnorm = 0;
 
@@ -684,7 +684,7 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
       auto delz_dot_delz = dMzdx * dMzdx + dMzdy * dMzdy + dMzdz * dMzdz;
       auto delx_dot_delx = dMxdx * dMxdx + dMxdy * dMxdy + dMxdz * dMxdz;
       auto dely_dot_dely = dMydx * dMydx + dMydy * dMydy + dMydz * dMydz;
-
+            std::cout<<"break 4.4"<<std::endl;
       auto dels_dot_delz = dndx * dMzdx + dndy * dMzdy + dndz * dMzdz;
       auto dels_dot_delx = dndx * dMxdx + dndy * dMxdy + dndz * dMxdz;
       auto dels_dot_dely = dndx * dMydx + dndy * dMydy + dndz * dMydz;
@@ -692,15 +692,15 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
       auto sum = delz_dot_delz + delx_dot_delx + dely_dot_dely;
       auto s_sum =
           dels_dot_delz * rhoz + dels_dot_delx * rhox + dels_dot_dely * rhoy;
-
+            std::cout<<"break 4.5"<<std::endl;
       auto sqsum2 =
           sqrt(dels_dot_delz * dels_dot_delz + dels_dot_delx * dels_dot_delx +
                dels_dot_dely * dels_dot_dely);
-
+       std::cout<<"break 4.6"<<std::endl;
       double sign = 1.;
       if (std::signbit(s_sum))
         sign = -1.;
-
+             std::cout<<"break 4.7"<<std::endl;
       if (mtemp > dtolsq) {
         mnorm = sqrt(mtemp);
         KZ[i] = rhoz / mnorm;
@@ -719,7 +719,7 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
         HY[i] = sign / 3.;
         HX[i] = sign / 3.;
       }
-      
+             std::cout<<"break 4.8"<<std::endl;
       den_eval[2 * i] = 0.5 * (rhos + mnorm);
       den_eval[2 * i + 1] = 0.5 * (rhos - mnorm);
       

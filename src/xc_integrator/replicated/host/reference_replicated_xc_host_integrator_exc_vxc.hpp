@@ -217,6 +217,16 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
       }
     }
   }
+
+  if(VXCs_SS)
+  for( auto j = 0; j < nbf; ++j ) {
+    for( auto i = 0; i < nbf; ++i ) {
+      VXCs_SS[i + j*ldvxcs] = 0.;
+      VXCz_SS[i + j*ldvxcs] = 0.;
+      VXCy_SS[i + j*ldvxcs] = 0.;
+      VXCx_SS[i + j*ldvxcs] = 0.;
+    }
+  }
  
   double EXC_WORK = 0.0;
   double NEL_WORK = 0.0;
@@ -275,7 +285,7 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
     }
 
     if( func.is_mgga() or is_dks ){
-      if ( needs_laplacian ) {
+      if ( needs_laplacian or is_dks ) {
         host_data.basis_eval .resize( 11 * npts * nbe ); // basis + grad (3) + hess (6) + lapl 
         host_data.lapl       .resize( spin_dim_scal * npts );
         host_data.vlapl      .resize( spin_dim_scal * npts );
@@ -299,12 +309,24 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
     decltype(zmat) zmat_z = nullptr;
     decltype(zmat) zmat_x = nullptr;
     decltype(zmat) zmat_y = nullptr;
+
+    decltype(zmat) zmat_s_ss = nullptr;
+    decltype(zmat) zmat_z_ss = nullptr;
+    decltype(zmat) zmat_x_ss = nullptr;
+    decltype(zmat) zmat_y_ss = nullptr;
+
     if(!is_rks) {
       zmat_z = zmat + mgga_dim_scal * nbe * npts;
     }
-    if(is_gks) {
+    if(is_gks or is_dks) {
       zmat_x = zmat_z + nbe * npts;
       zmat_y = zmat_x + nbe * npts;
+    }
+    if(is_dks) {
+      zmat_s_ss = zmat_y + nbe * npts;
+      zmat_z_ss = zmat_s_ss + nbe * npts;
+      zmat_x_ss = zmat_z_ss + nbe * npts;
+      zmat_y_ss = zmat_x_ss + nbe * npts;
     }
      
     auto* eps        = host_data.eps.data();
@@ -451,7 +473,7 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
         lwd->eval_uvvar_gga_uks( npts, nbe, basis_eval, dbasis_x_eval, dbasis_y_eval,
           dbasis_z_eval, zmat, nbe, zmat_z, nbe, den_eval, dden_x_eval, 
           dden_y_eval, dden_z_eval, gamma );
-      } else if(is_gks and not is_dks) {
+      } else if(is_gks) {
         std::cout<<"reference_replicated_xc_host_integrator_exc_vxc.hpp Here ReferenceReplicatedXCHostIntegrator"<<std::endl;
         lwd->eval_uvvar_gga_gks( npts, nbe, basis_eval, dbasis_x_eval, dbasis_y_eval,
           dbasis_z_eval, zmat, nbe, zmat_z, nbe, zmat_x, nbe, zmat_y, nbe, den_eval, dden_x_eval,
@@ -565,7 +587,7 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
         lwd->eval_zmat_gga_vxc_uks( npts, nbe, vrho, vgamma, basis_eval, dbasis_x_eval,
                                 dbasis_y_eval, dbasis_z_eval, dden_x_eval, dden_y_eval,
                                 dden_z_eval, zmat, nbe, zmat_z, nbe);
-      } else if(is_gks and not is_dks) {
+      } else if(is_gks) {
         lwd->eval_zmat_gga_vxc_gks( npts, nbe, vrho, vgamma, basis_eval, dbasis_x_eval,
                                 dbasis_y_eval, dbasis_z_eval, dden_x_eval, dden_y_eval,
                                 dden_z_eval, zmat, nbe, zmat_z, nbe, zmat_x, nbe, zmat_y, nbe,
@@ -582,7 +604,7 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
         lwd->eval_zmat_lda_vxc_rks( npts, nbe, vrho, basis_eval, zmat, nbe );
       } else if(is_uks) {
         lwd->eval_zmat_lda_vxc_uks( npts, nbe, vrho, basis_eval, zmat, nbe, zmat_z, nbe );
-      } else if(is_gks and not is_dks) {
+      } else if(is_gks) {
         lwd->eval_zmat_lda_vxc_gks( npts, nbe, vrho, basis_eval, zmat, nbe, zmat_z, nbe, 
                                     zmat_x, nbe, zmat_y, nbe, K);
       // } else if(is_dks) {
@@ -601,10 +623,20 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
       if(not is_rks) {
         lwd->inc_vxc( mgga_dim_scal * npts, nbf, nbe, basis_eval, submat_map, zmat_z, nbe,VXCz, ldvxcz, nbe_scr);
       }
-      if(is_gks or is_dks) {
+      if(not is_uks) {
         lwd->inc_vxc( npts, nbf, nbe, basis_eval, submat_map, zmat_x, nbe, VXCy, ldvxcy,
           nbe_scr);
         lwd->inc_vxc( npts, nbf, nbe, basis_eval, submat_map, zmat_y, nbe, VXCx, ldvxcx,
+          nbe_scr);
+      }
+      if(is_dks) {
+        lwd->inc_vxc( npts, nbf, nbe, basis_eval, submat_map, zmat_s_ss, nbe, VXCs_SS, ldvxcs_ss,
+          nbe_scr);
+        lwd->inc_vxc( npts, nbf, nbe, basis_eval, submat_map, zmat_z_ss, nbe, VXCz_SS, ldvxcz_ss,
+          nbe_scr);
+        lwd->inc_vxc( npts, nbf, nbe, basis_eval, submat_map, zmat_x_ss, nbe, VXCy_SS, ldvxcy_ss,
+          nbe_scr);
+        lwd->inc_vxc( npts, nbf, nbe, basis_eval, submat_map, zmat_y_ss, nbe, VXCx_SS, ldvxcx_ss,
           nbe_scr);
       }
        
@@ -633,11 +665,21 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
         }
       }
     }
-    if( is_gks) {
+    if(not is_uks) {
       for( int32_t j = 0;   j < nbf; ++j ) {
         for( int32_t i = j+1; i < nbf; ++i ) {
           VXCy[ j + i*ldvxcy ] = VXCy[ i + j*ldvxcy ];
           VXCx[ j + i*ldvxcx ] = VXCx[ i + j*ldvxcx ];
+        }
+      }
+    }
+    if(is_dks) {
+      for( int32_t j = 0;   j < nbf; ++j ) {
+        for( int32_t i = j+1; i < nbf; ++i ) {
+          VXCs_SS[ j + i*ldvxcs_ss ] = VXCs_SS[ i + j*ldvxcs_ss ];
+          VXCz_SS[ j + i*ldvxcz_ss ] = VXCz_SS[ i + j*ldvxcz_ss ];
+          VXCy_SS[ j + i*ldvxcy_ss ] = VXCy_SS[ i + j*ldvxcy_ss ];
+          VXCx_SS[ j + i*ldvxcx_ss ] = VXCx_SS[ i + j*ldvxcx_ss ];
         }
       }
     }
