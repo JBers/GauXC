@@ -106,7 +106,7 @@ namespace GauXC {
 						const double* basis_eval, size_t ldb, double* X, size_t ldx, double* scr ) {
     const auto* P_use = P;
     size_t ldp_use = ldp;
-     
+     std::cout<<"eval_xmat"<<std::endl;
     if( submat_map.size() > 1 ) {
       detail::submat_set( nbf, nbf, nbe, nbe, P, ldp, scr, nbe, submat_map );
       P_use = scr;
@@ -114,9 +114,10 @@ namespace GauXC {
     } else if( nbe != nbf ) {
       P_use = P + submat_map[0][0]*(ldp+1);
     }
-
+    std::cout<<"break submat eval_xmat"<<std::endl;
     blas::gemm( 'N', 'N', nbe, npts, nbe, fac, P_use, ldp_use, basis_eval, ldb, 
 		0., X, ldx );
+    std::cout<<"break post gemm eval_xmat"<<std::endl;
 
   }
 
@@ -600,7 +601,9 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
     const double* dbasis_x_eval, const double *dbasis_y_eval,
     const double* dbasis_z_eval, const double* Xs, size_t ldxs,
     const double* Xz, size_t ldxz, const double* Xx, size_t ldxx,
-    const double* Xy, size_t ldxy, double* den_eval,
+    const double* Xy, size_t ldxy,  const double* Xs_SS, size_t ldxs_ss,
+    const double* Xz_SS, size_t ldxz_ss, const double* Xx_SS, size_t ldxx_ss,
+    const double* Xy_SS, size_t ldxy_ss, double* den_eval,
     double* dden_x_eval, double* dden_y_eval, double* dden_z_eval, double* gamma, double* K, double* H, const double dtol) {
       std::cout<<"hello ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks"<<std::endl;
    auto *KZ = K; // KZ // store K in the Z matrix
@@ -624,6 +627,11 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
       const auto*   Xz_i = Xz + ioffz;
       const auto*   Xx_i = Xx + ioffx;
       const auto*   Xy_i = Xy + ioffy;
+
+      const auto*   Xs_i_ss = Xs_ss+ ioffs;
+      const auto*   Xz_i_ss = Xz_ss+ ioffz;
+      const auto*   Xx_i_ss = Xx_ss+ ioffx;
+      const auto*   Xy_i_ss = Xy_ss+ ioffy;
 
       // std::cout<< "Xs_i"<< *Xs_i <<std::endl;
       std::cout<<"break 4.1"<<std::endl;
@@ -700,8 +708,9 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
       double sign = 1.;
       if (std::signbit(s_sum))
         sign = -1.;
-             std::cout<<"break 4.7"<<std::endl;
+        std::cout<<"break 4.7"<<std::endl;
       if (mtemp > dtolsq) {
+        std::cout<<"break 4.8.1"<<std::endl;
         mnorm = sqrt(mtemp);
         KZ[i] = rhoz / mnorm;
         KY[i] = rhoy / mnorm;
@@ -709,7 +718,9 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
         HZ[i] = sign * dels_dot_delz / sqsum2;
         HY[i] = sign * dels_dot_dely / sqsum2;
         HX[i] = sign * dels_dot_delx / sqsum2;
+        std::cout<<"break 4.8.2"<<std::endl;
       } else {
+        std::cout<<"break 4.9.1"<<std::endl;
         mnorm = (1. / 3.) * (rhox + rhoy + rhoz);
         KZ[i] = 1. / 3.;
         KY[i] = 1. / 3.;
@@ -718,8 +729,9 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
         HZ[i] = sign / 3.;
         HY[i] = sign / 3.;
         HX[i] = sign / 3.;
+        std::cout<<"break 4.9.2"<<std::endl;
       }
-             std::cout<<"break 4.8"<<std::endl;
+      std::cout<<"break 4.10"<<std::endl;
       den_eval[2 * i] = 0.5 * (rhos + mnorm);
       den_eval[2 * i + 1] = 0.5 * (rhos - mnorm);
       

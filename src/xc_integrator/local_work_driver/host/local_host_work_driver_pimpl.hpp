@@ -110,7 +110,9 @@ struct LocalHostWorkDriverPIMPL {
     const double* dbasis_x_eavl, const double *dbasis_y_eval,
     const double* dbasis_z_eval, const double* Xs, size_t ldxs,
     const double* Xz, size_t ldxz, const double* Xx, size_t ldxx,
-    const double* Xy, size_t ldxy, double* den_eval,
+    const double* Xy, size_t ldxy, const double* Xs_SS, size_t ldxs,
+    const double* Xz_SS, size_t ldxz, const double* Xx_SS, size_t ldxx,
+    const double* Xy_SS, size_t ldxy, double* den_eval,
     double* dden_x_eval, double* dden_y_eval, double* dden_z_eval, double* gamma, double* K, double* H, const double dtol) = 0; 
 
   virtual void eval_uvvar_mgga_rks( size_t npts, size_t nbe, const double* basis_eval,

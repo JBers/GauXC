@@ -144,7 +144,7 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
   const bool is_rks = not is_uks and not is_gks and not is_dks;
 
   if (not is_rks and not is_uks and not is_gks and not is_dks) {
-    GAUXC_GENERIC_EXCEPTION("Must Be Either RKS, UKS, or GKS!");
+    GAUXC_GENERIC_EXCEPTION("Must Be Either RKS, UKS, GKS, or DKS!");
   }
 
   const bool is_exc_only = (!VXCs) and (!VXCz) and (!VXCy) and (!VXCx);
@@ -379,9 +379,11 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
       dden_x_eval   = den_eval    + spin_dim_scal * npts;
       dden_y_eval   = dden_x_eval + spin_dim_scal * npts;
       dden_z_eval   = dden_y_eval + spin_dim_scal * npts;
+      if ( not is_dks ) {
       mmat_x        = zmat + npts * nbe;
       mmat_y        = mmat_x + npts * nbe;
       mmat_z        = mmat_y + npts * nbe;
+      }
       if ( needs_laplacian or is_dks ) {
         d2basis_xx_eval = dbasis_z_eval + npts * nbe;
         d2basis_xy_eval = d2basis_xx_eval + npts * nbe;
@@ -432,26 +434,40 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
       lwd->eval_collocation( npts, nshells, nbe, points, basis, shell_list,
         basis_eval );
 
-     
+             std::cout<<"break 13"<<std::endl;
     // Evaluate X matrix (fac * P * B) -> store in Z
     const auto xmat_fac = is_rks ? 2.0 : 1.0; // TODO Fix for spinor RKS input
     lwd->eval_xmat( mgga_dim_scal * npts, nbf, nbe, submat_map, xmat_fac, Ps, ldps, basis_eval, nbe,
       zmat, nbe, nbe_scr );
-		
+		        std::cout<<"break 13.1"<<std::endl;
 
     // X matrix for Pz
     if(not is_rks) {
+      		        std::cout<<"break 13.2"<<std::endl;
       lwd->eval_xmat( mgga_dim_scal * npts, nbf, nbe, submat_map, 1.0, Pz, ldpz, basis_eval, nbe,
         zmat_z, nbe, nbe_scr);
     }
      
-    if(is_gks) {
+    if(not is_uks) {
+      		        std::cout<<"break 13.3"<<std::endl;
       lwd->eval_xmat( npts, nbf, nbe, submat_map, 1.0, Py, ldpy, basis_eval, nbe,
         zmat_x, nbe, nbe_scr);
       lwd->eval_xmat( npts, nbf, nbe, submat_map, 1.0, Px, ldpx, basis_eval, nbe,
         zmat_y, nbe, nbe_scr);
     }
-     
+    if(is_dks) {
+      		        std::cout<<"break 13.4"<<std::endl;
+      lwd->eval_xmat( mgga_dim_scal * npts, nbf, nbe, submat_map, xmat_fac, Ps_SS, ldps_ss, basis_eval, nbe,
+        zmat_s_ss, nbe, nbe_scr );
+      lwd->eval_xmat( mgga_dim_scal * npts, nbf, nbe, submat_map, 1.0, Pz_SS, ldpz_ss, basis_eval, nbe,
+        zmat_z_ss, nbe, nbe_scr);
+      lwd->eval_xmat( npts, nbf, nbe, submat_map, 1.0, Py_SS, ldpy_ss, basis_eval, nbe,
+        zmat_x_ss, nbe, nbe_scr);
+      lwd->eval_xmat( npts, nbf, nbe, submat_map, 1.0, Px_SS, ldpx_ss, basis_eval, nbe,
+        zmat_y_ss, nbe, nbe_scr);
+    }
+
+     		        std::cout<<"break 13.5"<<std::endl;
     // Evaluate U and V variables
     if( func.is_mgga() ) {
       if (is_rks) {
@@ -481,7 +497,8 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
       } else if(is_dks) {
         std::cout<<"dks reference_replicated_xc_host_integrator_exc_vxc.hpp Here ReferenceReplicatedXCHostIntegrator"<<std::endl;
         lwd->eval_uvvar_gga_dks( npts, nbe, basis_eval, dbasis_x_eval, dbasis_y_eval,
-          dbasis_z_eval, zmat, nbe, zmat_z, nbe, zmat_x, nbe, zmat_y, nbe, den_eval, dden_x_eval,
+          dbasis_z_eval, zmat, nbe, zmat_z, nbe, zmat_x, nbe, zmat_y, nbe,
+          zmat_s_ss, nbe, zmat_z_ss, nbe, zmat_x_ss, nbe, zmat_y_ss, nbe, den_eval, dden_x_eval,
         dden_y_eval, dden_z_eval, gamma, K, H, gks_dtol );
       }
              std::cout<<"break 6"<<std::endl;
