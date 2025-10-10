@@ -262,10 +262,11 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
     const size_t sds          = is_rks ? 1 : 2;
     const size_t gks_mod_KH = is_gks ? 6*npts : 0; // used to store H and H
     const size_t mgga_dim_scal = func.is_mgga() ? 4 : 1; // basis + d1basis
+    const size_t dks_scal = is_dks ? 2 : 1;
 
     // Things that every calc needs
     host_data.nbe_scr .resize(nbe  * nbe);
-    host_data.zmat    .resize(npts * nbe * spin_dim_scal * mgga_dim_scal + gks_mod_KH); 
+    host_data.zmat    .resize(npts * nbe * spin_dim_scal * mgga_dim_scal * dks_scal + gks_mod_KH); 
     host_data.eps     .resize(npts);
     host_data.vrho    .resize(npts * spin_dim_scal);
 
@@ -380,6 +381,7 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
       dden_y_eval   = dden_x_eval + spin_dim_scal * npts;
       dden_z_eval   = dden_y_eval + spin_dim_scal * npts;
       if ( not is_dks ) {
+        std::cout<<"mmat bad"<<std::endl;
       mmat_x        = zmat + npts * nbe;
       mmat_y        = mmat_x + npts * nbe;
       mmat_z        = mmat_y + npts * nbe;
@@ -395,6 +397,7 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
         if (is_dks) { H = K + 3*npts;}
       }
       if(is_uks) {
+        std::cout<<"mmat bad 2"<<std::endl;
         mmat_x_z = zmat_z + npts * nbe;
         mmat_y_z = mmat_x_z + npts * nbe;
         mmat_z_z = mmat_y_z + npts * nbe;
@@ -457,9 +460,9 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
     }
     if(is_dks) {
       		        std::cout<<"break 13.4"<<std::endl;
-      lwd->eval_xmat( mgga_dim_scal * npts, nbf, nbe, submat_map, xmat_fac, Ps_SS, ldps_ss, basis_eval, nbe,
+      lwd->eval_xmat( npts, nbf, nbe, submat_map, 1.0, Ps_SS, ldps_ss, basis_eval, nbe,
         zmat_s_ss, nbe, nbe_scr );
-      lwd->eval_xmat( mgga_dim_scal * npts, nbf, nbe, submat_map, 1.0, Pz_SS, ldpz_ss, basis_eval, nbe,
+      lwd->eval_xmat( npts, nbf, nbe, submat_map, 1.0, Pz_SS, ldpz_ss, basis_eval, nbe,
         zmat_z_ss, nbe, nbe_scr);
       lwd->eval_xmat( npts, nbf, nbe, submat_map, 1.0, Py_SS, ldpy_ss, basis_eval, nbe,
         zmat_x_ss, nbe, nbe_scr);

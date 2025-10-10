@@ -628,18 +628,26 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
       const auto*   Xx_i = Xx + ioffx;
       const auto*   Xy_i = Xy + ioffy;
 
-      const auto*   Xs_i_ss = Xs_ss+ ioffs;
-      const auto*   Xz_i_ss = Xz_ss+ ioffz;
-      const auto*   Xx_i_ss = Xx_ss+ ioffx;
-      const auto*   Xy_i_ss = Xy_ss+ ioffy;
+      const auto*   Xs_i_ss = Xs_SS + ioffs;
+      const auto*   Xz_i_ss = Xz_SS + ioffz;
+      const auto*   Xx_i_ss = Xx_SS + ioffx;
+      const auto*   Xy_i_ss = Xy_SS + ioffy;
 
       // std::cout<< "Xs_i"<< *Xs_i <<std::endl;
       std::cout<<"break 4.1"<<std::endl;
+      // rho LL
       const double rhos = blas::dot( nbe, basis_eval + ioffs, 1, Xs_i, 1 );
       const double rhoz = blas::dot( nbe, basis_eval + ioffz, 1, Xz_i, 1 );
       const double rhox = blas::dot( nbe, basis_eval + ioffx, 1, Xx_i, 1 );
       const double rhoy = blas::dot( nbe, basis_eval + ioffy, 1, Xy_i, 1 );
 
+      // rho SS
+      const double rhos_ss = blas::dot( nbe, basis_eval + ioffs, 1, Xs_i, 1 );
+      const double rhoz_ss = blas::dot( nbe, basis_eval + ioffz, 1, Xz_i, 1 );
+      const double rhox_ss = blas::dot( nbe, basis_eval + ioffx, 1, Xx_i, 1 );
+      const double rhoy_ss = blas::dot( nbe, basis_eval + ioffy, 1, Xy_i, 1 );
+
+      // dV/dk LL
       const auto dndx =
         2. * blas::dot( nbe, dbasis_x_eval + ioffs, 1, Xs_i, 1 );
       const auto dndy =
@@ -667,6 +675,8 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
         2. * blas::dot( nbe, dbasis_y_eval + ioffy, 1, Xy_i, 1 );
       const auto dMydz =
         2. * blas::dot( nbe, dbasis_z_eval + ioffy, 1, Xy_i, 1 );
+
+      // dV/dk SS
 
       std::cout<<"break 4.2"<<std::endl;
       dden_x_eval[4 * i] = dndx;
