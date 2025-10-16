@@ -181,14 +181,14 @@ void ReplicatedXCIntegratorImpl<ValueType>::
                       Pz_SS,ldpz_ss,
                       Py_SS,ldpy_ss,
                       Px_SS,ldpx_ss,
-                      VXCs_SS,ldvxcs_ss,
-                      VXCz_SS,ldvxcz_ss,
-                      VXCy_SS,ldvxcy_ss,
-                      VXCx_SS,ldvxcx_ss,
                       VXCs,ldvxcs,
                       VXCz,ldvxcz,
                       VXCy,ldvxcy,
-                      VXCx,ldvxcx,EXC, ks_settings);
+                      VXCx,ldvxcx,
+                      VXCs_SS,ldvxcs_ss,
+                      VXCz_SS,ldvxcz_ss,
+                      VXCy_SS,ldvxcy_ss,
+                      VXCx_SS,ldvxcx_ss,EXC, ks_settings);
 
 }
 

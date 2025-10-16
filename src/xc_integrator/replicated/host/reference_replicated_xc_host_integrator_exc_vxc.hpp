@@ -93,13 +93,13 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
                          tasks.begin(), tasks.end() );
   });
 
-
+  // std::cout<<"VXCs[0] eval_exc_vxc_ "<<VXCs[0]<<std::endl;
   // Reduce Results
   this->timer_.time_op("XCIntegrator.Allreduce", [&](){
 
     if( not this->reduction_driver_->takes_host_memory() )
       GAUXC_GENERIC_EXCEPTION("This Module Only Works With Host Reductions");
-
+    
     this->reduction_driver_->allreduce_inplace( VXCs, nbf*nbf, ReductionOp::Sum );
     if(VXCz) this->reduction_driver_->allreduce_inplace( VXCz, nbf*nbf, ReductionOp::Sum );
     if(VXCy) this->reduction_driver_->allreduce_inplace( VXCy, nbf*nbf, ReductionOp::Sum ); 
@@ -355,7 +355,7 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
     value_type* dden_z_eval = nullptr;
     value_type* K = nullptr;
     value_type* H = nullptr;
-    if (is_gks) { K = zmat + npts * nbe * 4; }
+    if (is_gks or is_dks) { K = zmat + npts * nbe * 4; }
     value_type* mmat_x      = nullptr;
     value_type* mmat_y      = nullptr;
     value_type* mmat_z      = nullptr;
@@ -460,13 +460,13 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
     }
     if(is_dks) {
       		        std::cout<<"break 13.4"<<std::endl;
-      lwd->eval_xmat( npts, nbf, nbe, submat_map, 1.0, Ps_SS, ldps_ss, basis_eval, nbe,
+      lwd->eval_xmat( npts, nbf, nbe, submat_map, 1.0, Ps_SS, ldps_ss, dbasis_y_eval, nbe,
         zmat_s_ss, nbe, nbe_scr );
-      lwd->eval_xmat( npts, nbf, nbe, submat_map, 1.0, Pz_SS, ldpz_ss, basis_eval, nbe,
+      lwd->eval_xmat( npts, nbf, nbe, submat_map, 1.0, Pz_SS, ldpz_ss, dbasis_y_eval, nbe,
         zmat_z_ss, nbe, nbe_scr);
-      lwd->eval_xmat( npts, nbf, nbe, submat_map, 1.0, Py_SS, ldpy_ss, basis_eval, nbe,
+      lwd->eval_xmat( npts, nbf, nbe, submat_map, 1.0, Py_SS, ldpy_ss, dbasis_y_eval, nbe,
         zmat_x_ss, nbe, nbe_scr);
-      lwd->eval_xmat( npts, nbf, nbe, submat_map, 1.0, Px_SS, ldpx_ss, basis_eval, nbe,
+      lwd->eval_xmat( npts, nbf, nbe, submat_map, 1.0, Px_SS, ldpx_ss, dbasis_y_eval, nbe,
         zmat_y_ss, nbe, nbe_scr);
     }
 
@@ -627,9 +627,9 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
       } else if(is_gks) {
         lwd->eval_zmat_lda_vxc_gks( npts, nbe, vrho, basis_eval, zmat, nbe, zmat_z, nbe, 
                                     zmat_x, nbe, zmat_y, nbe, K);
-      // } else if(is_dks) {
-      //   lwd->eval_zmat_lda_vxc_dks( npts, nbe, vrho, basis_eval, zmat, nbe, zmat_z, nbe, 
-      //                               zmat_x, nbe, zmat_y, nbe, K);
+      } else if(is_dks) {
+        lwd->eval_zmat_lda_vxc_dks( npts, nbe, vrho, basis_eval, zmat, nbe, zmat_z, nbe, 
+                                    zmat_x, nbe, zmat_y, nbe, K);
       }
     }
     
@@ -650,13 +650,13 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
           nbe_scr);
       }
       if(is_dks) {
-        lwd->inc_vxc( npts, nbf, nbe, basis_eval, submat_map, zmat_s_ss, nbe, VXCs_SS, ldvxcs_ss,
+        lwd->inc_vxc( npts, nbf, nbe, dbasis_y_eval, submat_map, zmat_s_ss, nbe, VXCs_SS, ldvxcs_ss,
           nbe_scr);
-        lwd->inc_vxc( npts, nbf, nbe, basis_eval, submat_map, zmat_z_ss, nbe, VXCz_SS, ldvxcz_ss,
+        lwd->inc_vxc( npts, nbf, nbe, dbasis_y_eval, submat_map, zmat_z_ss, nbe, VXCz_SS, ldvxcz_ss,
           nbe_scr);
-        lwd->inc_vxc( npts, nbf, nbe, basis_eval, submat_map, zmat_x_ss, nbe, VXCy_SS, ldvxcy_ss,
+        lwd->inc_vxc( npts, nbf, nbe, dbasis_y_eval, submat_map, zmat_x_ss, nbe, VXCy_SS, ldvxcy_ss,
           nbe_scr);
-        lwd->inc_vxc( npts, nbf, nbe, basis_eval, submat_map, zmat_y_ss, nbe, VXCx_SS, ldvxcx_ss,
+        lwd->inc_vxc( npts, nbf, nbe, dbasis_y_eval, submat_map, zmat_y_ss, nbe, VXCx_SS, ldvxcx_ss,
           nbe_scr);
       }
        
@@ -676,6 +676,7 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
     for( int32_t j = 0;   j < nbf; ++j ) {
       for( int32_t i = j+1; i < nbf; ++i ) {
         VXCs[ j + i*ldvxcs ] = VXCs[ i + j*ldvxcs ];
+        std::cout<<"VXCs[ j + i*ldvxcs ] "<<VXCs[ j + i*ldvxcs ]<<std::endl;
       }
     }
     if(not is_rks) {

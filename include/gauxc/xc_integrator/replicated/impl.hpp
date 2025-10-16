@@ -167,7 +167,7 @@ typename ReplicatedXCIntegrator<MatrixType>::exc_vxc_type_gks
                         VXCz.data(), VXCz.rows(),
                         VXCy.data(), VXCy.rows(),
                         VXCx.data(), VXCx.rows(), &EXC, ks_settings );
-
+std::cout<< "eval_exc_vxc_  exc_vxc_type_gks make_tuple"<<std::endl;
   return std::make_tuple( EXC, VXCs, VXCz, VXCy, VXCx);
 
 }
@@ -207,6 +207,10 @@ typename ReplicatedXCIntegrator<MatrixType>::exc_vxc_type_dks
                         VXCy_SS.data(), VXCy_SS.rows(),
                         VXCx_SS.data(), VXCx_SS.rows(), &EXC, ks_settings );
 
+  // std::cout<<"VXCs[0] impl.hpp make_tuple "<<VXCs<<std::endl;
+  // std::cout<<"VXCs_SS[0] impl.hpp make_tuple "<<VXCs_SS<<std::endl;
+  //   std::cout<<"VXCz[0] impl.hpp make_tuple "<<VXCz<<std::endl;
+  // std::cout<<"VXCz_SS[0] impl.hpp make_tuple "<<VXCz_SS<<std::endl;
   return std::make_tuple( EXC, VXCs, VXCz, VXCy, VXCx, VXCs_SS, VXCz_SS, VXCy_SS, VXCx_SS);
 
 }
