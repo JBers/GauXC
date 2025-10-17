@@ -107,13 +107,19 @@ struct LocalHostWorkDriverPIMPL {
     double* dden_x_eval, double* dden_y_eval, double* dden_z_eval, double* gamma, double* K, double* H, const double dtol) = 0; 
 
   virtual void eval_uvvar_gga_dks( size_t npts, size_t nbe, const double* basis_eval,
-    const double* dbasis_x_eavl, const double *dbasis_y_eval,
-    const double* dbasis_z_eval, const double* Xs, size_t ldxs,
-    const double* Xz, size_t ldxz, const double* Xx, size_t ldxx,
-    const double* Xy, size_t ldxy, const double* Xs_SS, size_t ldxs_ss,
-    const double* Xz_SS, size_t ldxz_ss, const double* Xx_SS, size_t ldxx_ss,
-    const double* Xy_SS, size_t ldxy_ss, double* den_eval,
-    double* dden_x_eval, double* dden_y_eval, double* dden_z_eval, double* gamma, double* K, double* H, const double dtol) = 0; 
+    const double* dbasis_x_eval, const double *dbasis_y_eval, const double* dbasis_z_eval, 
+    const double* d2basis_xx_eval, const double* d2basis_xy_eval, const double* d2basis_xz_eval, 
+    const double* d2basis_yy_eval, const double* d2basis_yz_eval, const double* d2basis_zz_eval,
+    const double* Xs, size_t ldxs, const double* Xz, size_t ldxz, 
+    const double* Xx, size_t ldxx, const double* Xy, size_t ldxy,  
+    const double* Xs_x_SS, size_t ldxs_ss, const double* Xz_x_SS, size_t ldxz_ss, 
+    const double* Xx_x_SS, size_t ldxx_ss, const double* Xy_x_SS, size_t ldxy_ss, 
+    const double* Xs_y_SS, const double* Xz_y_SS, 
+    const double* Xx_y_SS, const double* Xy_y_SS, 
+    const double* Xs_z_SS, const double* Xz_z_SS, 
+    const double* Xx_z_SS, const double* Xy_z_SS, 
+    double* den_eval, double* dden_x_eval, double* dden_y_eval, double* dden_z_eval, 
+    double* gamma, double* K, double* H, const double dtol) = 0; 
 
   virtual void eval_uvvar_mgga_rks( size_t npts, size_t nbe, const double* basis_eval,
       const double* dbasis_x_eval, const double* dbasis_y_eval,
@@ -167,7 +173,8 @@ struct LocalHostWorkDriverPIMPL {
     const double* dbasis_y_eval, const double* dbasis_z_eval,
     const double* dden_x_eval, const double* dden_y_eval, const double* dden_z_eval,
     double* Zs, size_t ldzs, double* Zz, size_t ldzz, double* Zx, size_t ldzx,
-    double* Zy, size_t ldzy, double* K, double* H ) = 0;
+    double* Zy, size_t ldzy, double* Zs_SS, size_t ldzs_ss, double* Zz_SS, size_t ldzz_ss, double* Zx_SS, size_t ldzx_ss,
+    double* Zy_SS, size_t ldzy_ss, double* K, double* H ) = 0;
 
   virtual void eval_zmat_mgga_vxc_rks( size_t npts, size_t nbe, const double* vrho,
       const double* vgamma, const double* vlapl, const double* basis_eval,
