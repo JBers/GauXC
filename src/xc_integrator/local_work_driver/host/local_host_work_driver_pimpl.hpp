@@ -168,13 +168,20 @@ struct LocalHostWorkDriverPIMPL {
     double* Zs, size_t ldzs, double* Zz, size_t ldzz, double* Zx, size_t ldzx,
     double* Zy, size_t ldzy, double* K, double* H ) = 0;
 
-  virtual void eval_zmat_gga_vxc_dks( size_t npts, size_t nbe, const double* vrho,
+  virtual void eval_zmat_gga_vxc_dks( size_t npts, size_t nbf, const double* vrho,
     const double* vgamma, const double* basis_eval, const double* dbasis_x_eval,
     const double* dbasis_y_eval, const double* dbasis_z_eval,
+    const double* d2basis_xx_eval, const double* d2basis_xy_eval, const double* d2basis_xz_eval, 
+    const double* d2basis_yy_eval, const double* d2basis_yz_eval, const double* d2basis_zz_eval,
     const double* dden_x_eval, const double* dden_y_eval, const double* dden_z_eval,
-    double* Zs, size_t ldzs, double* Zz, size_t ldzz, double* Zx, size_t ldzx,
-    double* Zy, size_t ldzy, double* Zs_SS, size_t ldzs_ss, double* Zz_SS, size_t ldzz_ss, double* Zx_SS, size_t ldzx_ss,
-    double* Zy_SS, size_t ldzy_ss, double* K, double* H ) = 0;
+    double* Zs, size_t ldzs, double* Zz, size_t ldzz, double* Zx, size_t ldzx, double* Zy, size_t ldzy,
+    double* Zs_x_SS, size_t ldzs_ss, double* Zz_x_SS, size_t ldzz_ss, 
+    double* Zx_x_SS, size_t ldzx_ss, double* Zy_x_SS, size_t ldzy_ss, 
+    double* Zs_y_SS, double* Zz_y_SS, 
+    double* Zx_y_SS, double* Zy_y_SS, 
+    double* Zs_z_SS, double* Zz_z_SS, 
+    double* Zx_z_SS, double* Zy_z_SS,
+    double* K, double* H  ) = 0;
 
   virtual void eval_zmat_mgga_vxc_rks( size_t npts, size_t nbe, const double* vrho,
       const double* vgamma, const double* vlapl, const double* basis_eval,
@@ -199,7 +206,7 @@ struct LocalHostWorkDriverPIMPL {
 
   virtual void inc_vxc( size_t npts, size_t nbf, size_t nbe, 
     const double* basis_eval, const submat_map_t& submat_map, const double* Z, 
-    size_t ldz, double* VXC, size_t ldvxc, double* scr ) = 0;
+    size_t ldz, double* VXC, size_t ldvxc, double* scr, const double factor ) = 0;
 
 };
 

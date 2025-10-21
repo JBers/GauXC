@@ -558,17 +558,17 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
     {
 
       // Increment Electronic XC (VXC+EPC)
-      lwd->inc_vxc( npts, nbf, nbe, basis_eval, submat_map, zmat, nbe, elec_VXCs, elec_ldvxcs, nbe_scr );
+      lwd->inc_vxc( npts, nbf, nbe, basis_eval, submat_map, zmat, nbe, elec_VXCs, elec_ldvxcs, nbe_scr, 1. );
       if(not is_rks) 
-        lwd->inc_vxc( npts, nbf, nbe, basis_eval, submat_map, zmat_z, nbe, elec_VXCz, elec_ldvxcz, nbe_scr );
+        lwd->inc_vxc( npts, nbf, nbe, basis_eval, submat_map, zmat_z, nbe, elec_VXCz, elec_ldvxcz, nbe_scr, 1. );
 
       // Increment Protonic XC (EPC)
       // Scalar integrations
       if(evalProtonic){
         lwd->inc_vxc( npts, protonic_nbf, protonic_nbe, protonic_basis_eval, protonic_submat_map, 
-          protonic_zmat,   protonic_nbe, prot_VXCs, prot_ldvxcs, nbe_scr );
+          protonic_zmat,   protonic_nbe, prot_VXCs, prot_ldvxcs, nbe_scr, 1. );
         lwd->inc_vxc( npts, protonic_nbf, protonic_nbe, protonic_basis_eval, protonic_submat_map, 
-          protonic_zmat_z, protonic_nbe, prot_VXCz, prot_ldvxcz, nbe_scr );
+          protonic_zmat_z, protonic_nbe, prot_VXCz, prot_ldvxcz, nbe_scr, 1. );
       }
 
     }

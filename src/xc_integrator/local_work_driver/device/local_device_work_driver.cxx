@@ -58,7 +58,7 @@ void LocalDeviceWorkDriver::NAME( XCDeviceData* device_data, integrator_ks_schem
   throw_if_invalid_pimpl(pimpl_);                               \
   pimpl_->NAME(device_data, track, den);                               \
 }
-std::cout<<"hello local_Device_worker_driver"<<std::endl;
+
 FWD_TO_PIMPL(partition_weights)         // Partition weights
 
 FWD_TO_PIMPL(eval_collocation)          // Collocation

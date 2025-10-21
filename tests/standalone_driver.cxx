@@ -48,7 +48,7 @@ int main(int argc, char** argv) {
 
     // Require Ref file
     auto ref_file = input.getData<std::string>("GAUXC.REF_FILE");
-    std::cout<< "hello standalone" <<std::endl;
+
     // Optional Args
     std::string grid_spec          = "ULTRAFINE";
     std::string prune_spec         = "UNPRUNED";

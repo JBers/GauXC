@@ -371,19 +371,35 @@ void LocalHostWorkDriver::eval_zmat_gga_vxc_gks( size_t npts, size_t nbe,
 
 }
 
-void LocalHostWorkDriver::eval_zmat_gga_vxc_dks( size_t npts, size_t nbe,
-  const double* vrho, const double* vgamma, const double* basis_eval,
-  const double* dbasis_x_eval, const double* dbasis_y_eval,
-  const double* dbasis_z_eval, const double* dden_x_eval,
-  const double* dden_y_eval, const double* dden_z_eval, double* Zs, size_t ldzs,
-  double* Zz, size_t ldzz, double* Zx, size_t ldzx,double* Zy, size_t ldzy, double* Zs_SS, size_t ldzs_ss, double* Zz_SS, size_t ldzz_ss, double* Zx_SS, size_t ldzx_ss,
-    double* Zy_SS, size_t ldzy_ss, double* K, double* H ) {
+void LocalHostWorkDriver::eval_zmat_gga_vxc_dks( size_t npts, size_t nbf, const double* vrho,
+    const double* vgamma, const double* basis_eval, const double* dbasis_x_eval,
+    const double* dbasis_y_eval, const double* dbasis_z_eval,
+    const double* d2basis_xx_eval, const double* d2basis_xy_eval, const double* d2basis_xz_eval, 
+    const double* d2basis_yy_eval, const double* d2basis_yz_eval, const double* d2basis_zz_eval,
+    const double* dden_x_eval, const double* dden_y_eval, const double* dden_z_eval,
+    double* Zs, size_t ldzs, double* Zz, size_t ldzz, double* Zx, size_t ldzx, double* Zy, size_t ldzy,
+    double* Zs_x_SS, size_t ldzs_ss, double* Zz_x_SS, size_t ldzz_ss, 
+    double* Zx_x_SS, size_t ldzx_ss, double* Zy_x_SS, size_t ldzy_ss, 
+    double* Zs_y_SS, double* Zz_y_SS, 
+    double* Zx_y_SS, double* Zy_y_SS, 
+    double* Zs_z_SS, double* Zz_z_SS, 
+    double* Zx_z_SS, double* Zy_z_SS,
+    double* K, double* H ) {
   std::cout<<"pimpl_->eval_zmat_gga_vxc_dks"<<std::endl;
   throw_if_invalid_pimpl(pimpl_);
-  pimpl_->eval_zmat_gga_vxc_dks(npts, nbe, vrho, vgamma, basis_eval, dbasis_x_eval,
-    dbasis_y_eval, dbasis_z_eval, dden_x_eval, dden_y_eval, dden_z_eval,
-    Zs, ldzs, Zz, ldzz, Zx, ldzx, Zy, ldzy, Zs_SS, ldzs_ss, Zz_SS, ldzz_ss, Zx_SS, ldzx_ss,
-    Zy_SS, ldzy_ss, K, H);
+  pimpl_->eval_zmat_gga_vxc_dks(npts, nbf, vrho, vgamma, basis_eval, dbasis_x_eval,
+    dbasis_y_eval, dbasis_z_eval,
+    d2basis_xx_eval, d2basis_xy_eval, d2basis_xz_eval, 
+    d2basis_yy_eval, d2basis_yz_eval, d2basis_zz_eval,
+    dden_x_eval, dden_y_eval, dden_z_eval,
+    Zs, ldzs, Zz, ldzz, Zx, ldzx, Zy, ldzy, 
+    Zs_x_SS, ldzs_ss, Zz_x_SS, ldzz_ss, 
+    Zx_x_SS, ldzx_ss, Zy_x_SS, ldzy_ss, 
+    Zs_y_SS, Zz_y_SS, 
+    Zx_y_SS, Zy_y_SS, 
+    Zs_z_SS, Zz_z_SS, 
+    Zx_z_SS, Zy_z_SS,
+    K, H);
 
 }
 
@@ -450,10 +466,10 @@ void LocalHostWorkDriver::eval_mmat_mgga_vxc_uks( size_t npts, size_t nbe,
 // Increment VXC by Z
 void LocalHostWorkDriver::inc_vxc( size_t npts, size_t nbf, size_t nbe, 
   const double* basis_eval, const submat_map_t& submat_map, const double* Z, 
-  size_t ldz, double* VXC, size_t ldvxc, double* scr ) {
+  size_t ldz, double* VXC, size_t ldvxc, double* scr, const double factor ) {
 
   throw_if_invalid_pimpl(pimpl_);
-  pimpl_->inc_vxc(npts, nbf, nbe, basis_eval, submat_map, Z, ldz, VXC, ldvxc, scr);
+  pimpl_->inc_vxc(npts, nbf, nbe, basis_eval, submat_map, Z, ldz, VXC, ldvxc, scr, factor );
 
 }
 
