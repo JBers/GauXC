@@ -549,7 +549,7 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
     
 
      
-    // Incremeta LT of VXC
+    // Increment LT of VXC
     {
 
       // Increment VXC
@@ -558,9 +558,9 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
         lwd->inc_vxc( mgga_dim_scal * npts, nbf, nbe, basis_eval, submat_map, zmat_z, nbe,VXCz, ldvxcz, nbe_scr);
       }
       if(is_gks) {
-        lwd->inc_vxc( npts, nbf, nbe, basis_eval, submat_map, zmat_x, nbe, VXCy, ldvxcy,
+        lwd->inc_vxc( npts, nbf, nbe, basis_eval, submat_map, zmat_y, nbe, VXCy, ldvxcy,
           nbe_scr);
-        lwd->inc_vxc( npts, nbf, nbe, basis_eval, submat_map, zmat_y, nbe, VXCx, ldvxcx,
+        lwd->inc_vxc( npts, nbf, nbe, basis_eval, submat_map, zmat_x, nbe, VXCx, ldvxcx,
           nbe_scr);
       }
        
