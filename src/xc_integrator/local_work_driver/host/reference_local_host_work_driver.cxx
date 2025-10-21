@@ -949,8 +949,9 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
       if (std::signbit(s_sum))
         sign = -1.;
         // std::cout<<"break 4.7"<<std::endl;
-      if (mtemp > dtolsq) {
-        // std::cout<<"break 4.8.1"<<std::endl;
+      if (mtemp > 1e-12) {
+      // if (mtemp > dtolsq) {
+        std::cout<<"mtemp > dtolsq "<<mtemp<<" > "<<dtolsq<<std::endl;
         mnorm = sqrt(mtemp);
         KZ[i] = rhoz / mnorm;
         KY[i] = rhoy / mnorm;
@@ -958,6 +959,13 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
         HZ[i] = sign * dels_dot_delz / sqsum2;
         HY[i] = sign * dels_dot_dely / sqsum2;
         HX[i] = sign * dels_dot_delx / sqsum2;
+
+        std::cout<<"KZ[i] "<<  rhoz / mnorm <<std::endl;
+        std::cout<<"KY[i] "<<  rhoy / mnorm <<std::endl;
+        std::cout<<"KX[i] "<<  rhox / mnorm <<std::endl;
+        std::cout<<"HZ[i] "<<  sign * dels_dot_delz / sqsum2 <<std::endl;
+        std::cout<<"HY[i] "<<  sign * dels_dot_dely / sqsum2 <<std::endl;
+        std::cout<<"HX[i] "<<  sign * dels_dot_delx / sqsum2 <<std::endl;
         // std::cout<<"break 4.8.2"<<std::endl;
       } else {
         // std::cout<<"break 4.9.1"<<std::endl;
@@ -1519,7 +1527,7 @@ void ReferenceLocalHostWorkDriver::eval_zmat_gga_vxc_dks( size_t npts, size_t nb
     double* Zs_z_SS, double* Zz_z_SS, 
     double* Zx_z_SS, double* Zy_z_SS,
     double* K, double* H ) {
-
+    // for(int k=0; k<3*npts; k++){ std::cout<<"H["<<k<<"] "<<H[k]<<std::endl;}
     auto *KZ = K; // KZ // store K in the Z matrix
     auto *KY = KZ + npts;
     auto *KX = KY + npts;
@@ -1749,9 +1757,10 @@ void ReferenceLocalHostWorkDriver::eval_zmat_gga_vxc_dks( size_t npts, size_t nb
   void ReferenceLocalHostWorkDriver::inc_vxc( size_t npts, size_t nbf, size_t nbe, 
 					      const double* basis_eval, const submat_map_t& submat_map, const double* Z,
 					      size_t ldz, double* VXC, size_t ldvxc, double* scr, const double factor ) {
-
+      
       blas::syr2k('L', 'N', nbe, npts, factor, basis_eval, nbe, Z, ldz, 0., scr, nbe );
-                  
+      // for(int i=0; i < nbe*npts; i++) std::cout<<Z[i]<<" ";
+      // std::cout<<std::endl;
       detail::inc_by_submat_atomic( nbf, nbf, nbe, nbe, VXC, ldvxc, scr, nbe, submat_map );
       std::cout<<"Z[0] "<<Z[0]<<" basis eval[0] "<<basis_eval[0]<<" scr[0] "<<scr[0]<<" VXC[0] "<<VXC[0]<<std::endl;
 
