@@ -239,9 +239,9 @@ void LocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, const dou
 
   throw_if_invalid_pimpl(pimpl_);
   
-  std::cout<<"pimpl_->eval_uvvar_gga_dks local_host_work_driver"<<std::endl;
-      std::cout<<"zmat_s_ss in pimpl Xs_x_SS"<<std::endl;
-    for(auto k=0;k<nbe*npts;k++){if(Xs_x_SS[k] != 0.) std::cout<<"LOOOOK "<<Xs_x_SS[k]<<std::endl;}
+  // std::cout<<"pimpl_->eval_uvvar_gga_dks local_host_work_driver"<<std::endl;
+  //     std::cout<<"zmat_s_ss in pimpl Xs_x_SS"<<std::endl;
+  //   for(auto k=0;k<nbe*npts;k++){if(Xs_x_SS[k] != 0.) std::cout<<"LOOOOK "<<Xs_x_SS[k]<<std::endl;}
   pimpl_->eval_uvvar_gga_dks(npts, nbe, basis_eval, dbasis_x_eval, dbasis_y_eval,
     dbasis_z_eval, d2basis_xx_eval, d2basis_xy_eval, d2basis_xz_eval, 
     d2basis_yy_eval, d2basis_yz_eval, d2basis_zz_eval,

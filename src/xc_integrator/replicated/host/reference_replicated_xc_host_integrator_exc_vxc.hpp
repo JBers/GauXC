@@ -510,8 +510,6 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
       lwd->eval_xmat( npts, nbf, nbe, submat_map, 1.0, Px_SS, ldpx_ss, dbasis_z_eval, nbe,
         xmat_z_x_ss, nbe, nbe_scr);
     }
-    std::cout<<"zmat_s_ss after eval_xmat"<<std::endl;
-    for(auto k=0;k<nbe*npts;k++){std::cout<<zmat_s_ss[k]<<std::endl;}
     
 
      		        // std::cout<<"break 13.5"<<std::endl;

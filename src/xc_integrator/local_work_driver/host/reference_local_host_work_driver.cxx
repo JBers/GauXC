@@ -120,12 +120,12 @@ namespace GauXC {
 
     blas::gemm( 'N', 'N', nbe, npts, nbe, fac, P_use, ldp_use, basis_eval, ldb, 
 		0., X, ldx );
-    double X_sum = 0.;
-    for(auto i=0; i<nbe*npts;i++){X_sum+=X[i];}
-    if(X_sum != 0.){
-    std::cout<<"X_sum "<<X_sum<<std::endl;
-    }
-    for(auto i=0; i<nbe*npts;i++){if(X[i] != 0.) std::cout<<X[i]<<std::endl;}
+    // double X_sum = 0.;
+    // for(auto i=0; i<nbe*npts;i++){X_sum+=X[i];}
+    // if(X_sum != 0.){
+    // std::cout<<"X_sum "<<X_sum<<std::endl;
+    // }
+    // for(auto i=0; i<nbe*npts;i++){if(X[i] != 0.) std::cout<<X[i]<<std::endl;}
     // std::cout<<"X[0] "<<X[0]<<std::endl;
     // std::cout<<"break post gemm eval_xmat"<<std::endl;
 
@@ -637,12 +637,12 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
 
    double dtolsq = dtol*dtol;
 
-    std::cout<<"zmat_s_ss inside eval_uvvar_gga Xs_x_SS"<<std::endl;
-    for(size_t k=0.;k<nbe*npts;k++){if(Xs_x_SS[k] != 0.) std::cout<<Xs_x_SS[k]<<std::endl;}
+    // std::cout<<"zmat_s_ss inside eval_uvvar_gga Xs_x_SS"<<std::endl;
+    // for(size_t k=0.;k<nbe*npts;k++){if(Xs_x_SS[k] != 0.) std::cout<<Xs_x_SS[k]<<std::endl;}
       // std::cout<<"break 4"<<std::endl;
    for( int32_t i = 0; i < (int32_t)npts; ++i ) {
 
-    std::cout<<"i = "<<i<<std::endl;
+    // std::cout<<"i = "<<i<<std::endl;
 
       const size_t ioffs = size_t(i) * ldxs;
       const size_t ioffz = size_t(i) * ldxz;
@@ -1017,7 +1017,7 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
         // std::cout<<"break 4.7"<<std::endl;
       // if (mtemp > 1e-12) {
       if (mtemp > dtolsq and sqsum2 != 0.) {
-        std::cout<<"mtemp > dtolsq "<<mtemp<<" > "<<dtolsq<<std::endl;
+        // std::cout<<"mtemp > dtolsq "<<mtemp<<" > "<<dtolsq<<std::endl;
         mnorm = sqrt(mtemp);
         KZ[i] = rhoz / mnorm;
         KY[i] = rhoy / mnorm;
@@ -1027,14 +1027,14 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
         HX[i] = sign * dels_dot_delx / sqsum2;
       //         std::cout<<"Xs_x_i_ss after K is assigned "<<nbe<<std::endl;
       // for(auto j=0;j<nbe;j++){std::cout<<Xs_x_i_ss[j]<<std::endl;}
-        std::cout<<"mtemp = "<<mtemp<<std::endl;
-        std::cout<<"sqsum2 = "<<sqsum2<<std::endl;
-        std::cout<<"KZ[i] "<<  rhoz / mnorm <<std::endl;
-        std::cout<<"KY[i] "<<  rhoy / mnorm <<std::endl;
-        std::cout<<"KX[i] "<<  rhox / mnorm <<std::endl;
-        std::cout<<"HZ[i] "<<  sign * dels_dot_delz / sqsum2 <<std::endl;
-        std::cout<<"HY[i] "<<  sign * dels_dot_dely / sqsum2 <<std::endl;
-        std::cout<<"HX[i] "<<  sign * dels_dot_delx / sqsum2 <<std::endl;
+        // std::cout<<"mtemp = "<<mtemp<<std::endl;
+        // std::cout<<"sqsum2 = "<<sqsum2<<std::endl;
+        // std::cout<<"KZ[i] "<<  rhoz / mnorm <<std::endl;
+        // std::cout<<"KY[i] "<<  rhoy / mnorm <<std::endl;
+        // std::cout<<"KX[i] "<<  rhox / mnorm <<std::endl;
+        // std::cout<<"HZ[i] "<<  sign * dels_dot_delz / sqsum2 <<std::endl;
+        // std::cout<<"HY[i] "<<  sign * dels_dot_dely / sqsum2 <<std::endl;
+        // std::cout<<"HX[i] "<<  sign * dels_dot_delx / sqsum2 <<std::endl;
         // std::cout<<"break 4.8.2"<<std::endl;
       } else {
         // std::cout<<"H, K approx"<<std::endl;
@@ -1046,8 +1046,8 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
         HZ[i] = sign / 3.;
         HY[i] = sign / 3.;
         HX[i] = sign / 3.;
-                      std::cout<<"Xs_x_i_ss after K is assigned "<<nbe<<std::endl;
-      for(auto j=0;j<nbe;j++){std::cout<<Xs_x_i_ss[j]<<std::endl;}
+      //                 std::cout<<"Xs_x_i_ss after K is assigned "<<nbe<<std::endl;
+      // for(auto j=0;j<nbe;j++){std::cout<<Xs_x_i_ss[j]<<std::endl;}
         // std::cout<<"break 4.9.2"<<std::endl;
       }
       // std::cout<<"break 4.10"<<std::endl;
@@ -1837,9 +1837,9 @@ void ReferenceLocalHostWorkDriver::eval_zmat_gga_vxc_dks( size_t npts, size_t nb
       for(int i=0; i < nbe*npts; i++) Z_sum+=Z[i];
       for(int i=0; i < nbe*npts; i++) basis_eval_sum+=basis_eval[i];
       for(int i=0; i < nbe*nbe; i++) scr_sum+=scr[i];
-      std::cout<<"basis_eval_sum = "<<basis_eval_sum<<" Z_sum = "<<Z_sum<<" scr_sum = "<<scr_sum<<std::endl;
+      // std::cout<<"basis_eval_sum = "<<basis_eval_sum<<" Z_sum = "<<Z_sum<<" scr_sum = "<<scr_sum<<std::endl;
       detail::inc_by_submat_atomic( nbf, nbf, nbe, nbe, VXC, ldvxc, scr, nbe, submat_map );
-      std::cout<<"Z[0] "<<Z[0]<<" basis eval[0] "<<basis_eval[0]<<" scr[0] "<<scr[0]<<" VXC[0] "<<VXC[0]<<std::endl;
+      // std::cout<<"Z[0] "<<Z[0]<<" basis eval[0] "<<basis_eval[0]<<" scr[0] "<<scr[0]<<" VXC[0] "<<VXC[0]<<std::endl;
 
   }
 
