@@ -108,7 +108,7 @@ namespace GauXC {
 						const double* basis_eval, size_t ldb, double* X, size_t ldx, double* scr ) {
     const auto* P_use = P;
     size_t ldp_use = ldp;
-     std::cout<<"eval_xmat"<<std::endl;
+    //  std::cout<<"eval_xmat"<<std::endl;
     if( submat_map.size() > 1 ) {
       detail::submat_set( nbf, nbf, nbe, nbe, P, ldp, scr, nbe, submat_map );
       P_use = scr;

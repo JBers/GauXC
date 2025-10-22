@@ -262,7 +262,7 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
    
     const size_t spin_dim_scal = is_rks ? 1 : is_uks ? 2 : 4; // last case is_gks
     const size_t sds          = is_rks ? 1 : 2;
-    const size_t gks_mod_KH = is_gks ? 6*npts : 0; // used to store H and H
+    const size_t gks_mod_KH = is_gks ? 6*npts : is_dks ? 6*npts : 0; // used to store K and H
     const size_t mgga_dim_scal = func.is_mgga() ? 4 : 1; // basis + d1basis
     const size_t dks_scal = is_dks ? 4 : 1;
 
@@ -689,7 +689,7 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
     
 
     //  std::cout<<"break 3"<<std::endl;
-    // Incremeta LT of VXC
+    // Increment LT of VXC
     {
 
       // Increment VXC
