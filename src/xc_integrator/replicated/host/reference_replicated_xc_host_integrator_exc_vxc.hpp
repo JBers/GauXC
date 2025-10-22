@@ -224,9 +224,9 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
   for( auto j = 0; j < nbf; ++j ) {
     for( auto i = 0; i < nbf; ++i ) {
       VXCs_SS[i + j*ldvxcs] = 0.;
-      VXCz_SS[i + j*ldvxcs] = 0.;
-      VXCy_SS[i + j*ldvxcs] = 0.;
-      VXCx_SS[i + j*ldvxcs] = 0.;
+      VXCz_SS[i + j*ldvxcz] = 0.;
+      VXCy_SS[i + j*ldvxcy] = 0.;
+      VXCx_SS[i + j*ldvxcx] = 0.;
     }
   }
  
@@ -378,7 +378,7 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
     value_type* dden_z_eval = nullptr;
     value_type* K = nullptr;
     value_type* H = nullptr;
-    if (is_gks or is_dks) { K = zmat + npts * nbe * 4; }
+    if (is_gks or is_dks) { K = zmat + npts * nbe * 4 * dks_scal; }
     value_type* mmat_x      = nullptr;
     value_type* mmat_y      = nullptr;
     value_type* mmat_z      = nullptr;
@@ -510,6 +510,9 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
       lwd->eval_xmat( npts, nbf, nbe, submat_map, 1.0, Px_SS, ldpx_ss, dbasis_z_eval, nbe,
         xmat_z_x_ss, nbe, nbe_scr);
     }
+    std::cout<<"zmat_s_ss after eval_xmat"<<std::endl;
+    for(auto k=0;k<nbe*npts;k++){std::cout<<zmat_s_ss[k]<<std::endl;}
+    
 
      		        // std::cout<<"break 13.5"<<std::endl;
     // Evaluate U and V variables

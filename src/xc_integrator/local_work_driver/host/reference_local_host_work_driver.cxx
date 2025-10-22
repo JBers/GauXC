@@ -108,7 +108,7 @@ namespace GauXC {
 						const double* basis_eval, size_t ldb, double* X, size_t ldx, double* scr ) {
     const auto* P_use = P;
     size_t ldp_use = ldp;
-    //  std::cout<<"eval_xmat"<<std::endl;
+     std::cout<<"eval_xmat"<<std::endl;
     if( submat_map.size() > 1 ) {
       detail::submat_set( nbf, nbf, nbe, nbe, P, ldp, scr, nbe, submat_map );
       P_use = scr;
@@ -120,6 +120,12 @@ namespace GauXC {
 
     blas::gemm( 'N', 'N', nbe, npts, nbe, fac, P_use, ldp_use, basis_eval, ldb, 
 		0., X, ldx );
+    double X_sum = 0.;
+    for(auto i=0; i<nbe*npts;i++){X_sum+=X[i];}
+    if(X_sum != 0.){
+    std::cout<<"X_sum "<<X_sum<<std::endl;
+    }
+    for(auto i=0; i<nbe*npts;i++){if(X[i] != 0.) std::cout<<X[i]<<std::endl;}
     // std::cout<<"X[0] "<<X[0]<<std::endl;
     // std::cout<<"break post gemm eval_xmat"<<std::endl;
 
@@ -630,8 +636,13 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
    auto *HX = HY + npts;
 
    double dtolsq = dtol*dtol;
+
+    std::cout<<"zmat_s_ss inside eval_uvvar_gga Xs_x_SS"<<std::endl;
+    for(size_t k=0.;k<nbe*npts;k++){if(Xs_x_SS[k] != 0.) std::cout<<Xs_x_SS[k]<<std::endl;}
       // std::cout<<"break 4"<<std::endl;
    for( int32_t i = 0; i < (int32_t)npts; ++i ) {
+
+    std::cout<<"i = "<<i<<std::endl;
 
       const size_t ioffs = size_t(i) * ldxs;
       const size_t ioffz = size_t(i) * ldxz;
@@ -657,6 +668,12 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
       const auto*   Xz_z_i_ss = Xz_z_SS + ioffz;
       const auto*   Xx_z_i_ss = Xx_z_SS + ioffx;
       const auto*   Xy_z_i_ss = Xy_z_SS + ioffy;
+
+      // std::cout<<"Xs_x_ss[j+ioffs] nbe= "<<nbe<<std::endl;
+      // for(auto j=0;j<nbe;j++){std::cout<<Xs_x_SS[size_t(j)+ioffs]<<std::endl;}
+
+      // std::cout<<"Xs_x_i_ss nbe= "<<nbe<<std::endl;
+      // for(auto j=0;j<nbe;j++){std::cout<<Xs_x_i_ss[j]<<std::endl;}
 
       // std::cout<< "Xs_i"<< *Xs_i <<std::endl;
       // std::cout<<"break 4.1"<<std::endl;
@@ -687,15 +704,39 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
       // const double rhox_xz_ss = 2 * RKB_factor * blas::dot( nbe, dbasis_x_eval + ioffx, 1, Xx_z_i_ss, 1 );
       // const double rhoy_xz_ss = 2 * RKB_factor * blas::dot( nbe, dbasis_x_eval + ioffy, 1, Xy_z_i_ss, 1 );
 
-      // std::cout<<"rhos LL "<<rhos<<std::endl;
-      // std::cout<<"rhoz LL "<<rhoz<<std::endl;
-      // std::cout<<"rhox LL "<<rhox<<std::endl;
-      // std::cout<<"rhoy LL "<<rhoy<<std::endl;
+
       // // total rho
       rhos += rhos_yy_ss + rhos_xx_ss + rhos_zz_ss;
       rhoz += rhoz_yy_ss + rhoz_xx_ss + rhoz_zz_ss;
       rhox += rhox_yy_ss + rhox_xx_ss + rhox_zz_ss;
       rhoy += rhoy_yy_ss + rhoy_xx_ss + rhoy_zz_ss;
+
+      // if((rhos + rhoz + rhoy + rhox)!=0.){
+      // std::cout<<"rhos_yy_ss = "<<rhos_yy_ss<<std::endl;
+      // std::cout<<"rhoz_yy_ss = "<<rhoz_yy_ss<<std::endl;
+      // std::cout<<"rhox_yy_ss = "<<rhox_yy_ss<<std::endl;
+      // std::cout<<"rhoy_yy_ss = "<<rhoy_yy_ss<<std::endl;
+      // std::cout<<"rhos_xx_ss = "<<rhos_xx_ss<<std::endl;
+      // std::cout<<"rhoz_xx_ss = "<<rhoz_xx_ss<<std::endl;
+      // std::cout<<"rhox_xx_ss = "<<rhox_xx_ss<<std::endl;
+      // std::cout<<"rhoy_xx_ss = "<<rhoy_xx_ss<<std::endl;
+      // std::cout<<"rhos_zz_ss = "<<rhos_zz_ss<<std::endl;
+      // std::cout<<"rhoz_zz_ss = "<<rhoz_zz_ss<<std::endl;
+      // std::cout<<"rhox_zz_ss = "<<rhox_zz_ss<<std::endl;
+      // std::cout<<"rhoy_zz_ss = "<<rhoy_zz_ss<<std::endl;
+      //   std::cout<<"rhos = "<<rhos<<std::endl;
+      //   std::cout<<"rhoz = "<<rhoz<<std::endl;
+      //   std::cout<<"rhox = "<<rhox<<std::endl;
+      //   std::cout<<"rhoy = "<<rhoy<<std::endl;
+      //   std::cout<<"ldxs = "<<ldxs<<std::endl;
+      //   std::cout<<"ldxz = "<<ldxz<<std::endl;
+      //   std::cout<<"ldxx = "<<ldxx<<std::endl;
+      //   std::cout<<"ldxy = "<<ldxy<<std::endl;
+      //   std::cout<<"ldxs_ss = "<<ldxs_ss<<std::endl;
+      //   std::cout<<"ldxz_ss = "<<ldxz_ss<<std::endl;
+      //   std::cout<<"ldxx_ss = "<<ldxx_ss<<std::endl;
+      //   std::cout<<"ldxy_ss = "<<ldxy_ss<<std::endl;
+      // }
 
       // std::cout<<"rhos LL +SS "<<rhos<<std::endl;
       // std::cout<<"rhoz LL +SS "<<rhoz<<std::endl;
@@ -877,13 +918,28 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
       dMzdy += dMzdy_ss;
       dMzdz += dMzdz_ss;
 
-      dMydx += dMydx_ss;
+      dMzdx += dMydx_ss;
       dMydy += dMydy_ss;
       dMydz += dMydz_ss;
 
       dMxdx += dMxdx_ss;
       dMxdy += dMxdy_ss;
       dMxdz += dMxdz_ss;
+
+      // if((dndx+dndy+dndz+dMzdx+dMzdy+dMzdz+dMzdx+dMzdy+dMzdz+dMxdx+dMxdy+dMxdz)!=0.){
+      // std::cout<<" dndx = "<< dndx<<std::endl;
+      // std::cout<<" dndy = "<< dndy<<std::endl;
+      // std::cout<<" dndz = "<< dndz<<std::endl;
+      // std::cout<<"dMzdx = "<<dMzdx<<std::endl;
+      // std::cout<<"dMzdy = "<<dMzdy<<std::endl;
+      // std::cout<<"dMzdz = "<<dMzdz<<std::endl;
+      // std::cout<<"dMydx = "<<dMydx<<std::endl;
+      // std::cout<<"dMydy = "<<dMydy<<std::endl;
+      // std::cout<<"dMydz = "<<dMydz<<std::endl;
+      // std::cout<<"dMxdx = "<<dMxdx<<std::endl;
+      // std::cout<<"dMxdy = "<<dMxdy<<std::endl;
+      // std::cout<<"dMxdz = "<<dMxdz<<std::endl;
+      // }
 
       //Temporary screen dens derivs
       // dndx = std::abs(dndx)>1e-20 ? dndx : 0.;
@@ -937,6 +993,16 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
       auto dels_dot_delx = dndx * dMxdx + dndy * dMxdy + dndz * dMxdz;
       auto dels_dot_dely = dndx * dMydx + dndy * dMydy + dndz * dMydz;
 
+      // std::cout<<"mtemp ="<<mtemp<<std::endl;
+      
+      // std::cout<<"dels_dot_dels = "<<dels_dot_dels<<std::endl;
+      // std::cout<<"delz_dot_delz = "<<delz_dot_delz<<std::endl;
+      // std::cout<<"delx_dot_delx = "<<delx_dot_delx<<std::endl;
+      // std::cout<<"dely_dot_dely = "<<dely_dot_dely<<std::endl;
+      // std::cout<<"dels_dot_delz = "<<dels_dot_delz<<std::endl;
+      // std::cout<<"dels_dot_delx = "<<dels_dot_delx<<std::endl;
+      // std::cout<<"dels_dot_dely = "<<dels_dot_dely<<std::endl;
+
       auto sum = delz_dot_delz + delx_dot_delx + dely_dot_dely;
       auto s_sum =
           dels_dot_delz * rhoz + dels_dot_delx * rhox + dels_dot_dely * rhoy;
@@ -949,8 +1015,8 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
       if (std::signbit(s_sum))
         sign = -1.;
         // std::cout<<"break 4.7"<<std::endl;
-      if (mtemp > 1e-12) {
-      // if (mtemp > dtolsq) {
+      // if (mtemp > 1e-12) {
+      if (mtemp > dtolsq and sqsum2 != 0.) {
         std::cout<<"mtemp > dtolsq "<<mtemp<<" > "<<dtolsq<<std::endl;
         mnorm = sqrt(mtemp);
         KZ[i] = rhoz / mnorm;
@@ -959,7 +1025,10 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
         HZ[i] = sign * dels_dot_delz / sqsum2;
         HY[i] = sign * dels_dot_dely / sqsum2;
         HX[i] = sign * dels_dot_delx / sqsum2;
-
+      //         std::cout<<"Xs_x_i_ss after K is assigned "<<nbe<<std::endl;
+      // for(auto j=0;j<nbe;j++){std::cout<<Xs_x_i_ss[j]<<std::endl;}
+        std::cout<<"mtemp = "<<mtemp<<std::endl;
+        std::cout<<"sqsum2 = "<<sqsum2<<std::endl;
         std::cout<<"KZ[i] "<<  rhoz / mnorm <<std::endl;
         std::cout<<"KY[i] "<<  rhoy / mnorm <<std::endl;
         std::cout<<"KX[i] "<<  rhox / mnorm <<std::endl;
@@ -968,7 +1037,7 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
         std::cout<<"HX[i] "<<  sign * dels_dot_delx / sqsum2 <<std::endl;
         // std::cout<<"break 4.8.2"<<std::endl;
       } else {
-        // std::cout<<"break 4.9.1"<<std::endl;
+        // std::cout<<"H, K approx"<<std::endl;
         mnorm = (1. / 3.) * (rhox + rhoy + rhoz);
         KZ[i] = 1. / 3.;
         KY[i] = 1. / 3.;
@@ -977,6 +1046,8 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
         HZ[i] = sign / 3.;
         HY[i] = sign / 3.;
         HX[i] = sign / 3.;
+                      std::cout<<"Xs_x_i_ss after K is assigned "<<nbe<<std::endl;
+      for(auto j=0;j<nbe;j++){std::cout<<Xs_x_i_ss[j]<<std::endl;}
         // std::cout<<"break 4.9.2"<<std::endl;
       }
       // std::cout<<"break 4.10"<<std::endl;
@@ -1760,7 +1831,13 @@ void ReferenceLocalHostWorkDriver::eval_zmat_gga_vxc_dks( size_t npts, size_t nb
       
       blas::syr2k('L', 'N', nbe, npts, factor, basis_eval, nbe, Z, ldz, 0., scr, nbe );
       // for(int i=0; i < nbe*npts; i++) std::cout<<Z[i]<<" ";
-      // std::cout<<std::endl;
+      double Z_sum =0.;
+      double basis_eval_sum =0.;
+      double scr_sum = 0.;
+      for(int i=0; i < nbe*npts; i++) Z_sum+=Z[i];
+      for(int i=0; i < nbe*npts; i++) basis_eval_sum+=basis_eval[i];
+      for(int i=0; i < nbe*nbe; i++) scr_sum+=scr[i];
+      std::cout<<"basis_eval_sum = "<<basis_eval_sum<<" Z_sum = "<<Z_sum<<" scr_sum = "<<scr_sum<<std::endl;
       detail::inc_by_submat_atomic( nbf, nbf, nbe, nbe, VXC, ldvxc, scr, nbe, submat_map );
       std::cout<<"Z[0] "<<Z[0]<<" basis eval[0] "<<basis_eval[0]<<" scr[0] "<<scr[0]<<" VXC[0] "<<VXC[0]<<std::endl;
 
