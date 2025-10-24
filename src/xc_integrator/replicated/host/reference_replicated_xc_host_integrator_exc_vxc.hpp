@@ -332,7 +332,7 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
     if(!is_rks) {
       zmat_z = zmat + mgga_dim_scal * nbe * npts;
     }
-    if(is_gks or is_dks) {
+    if(!is_uks) {
       zmat_x = zmat_z + nbe * npts;
       zmat_y = zmat_x + nbe * npts;
     }
@@ -511,7 +511,8 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
         xmat_z_x_ss, nbe, nbe_scr);
     }
     
-
+    // std::cout<<"Grid points to follow:"<<std::endl;
+    // for(auto i=0;i<npts;++i){std::cout<<points[i]<<std::endl;}
      		        // std::cout<<"break 13.5"<<std::endl;
     // Evaluate U and V variables
     if( func.is_mgga() ) {
@@ -628,6 +629,8 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
     #pragma omp atomic
     NEL_WORK += NEL_local;
 
+    
+
     if(is_exc_only) continue;
 
     // Evaluate Z matrix for VXC
@@ -718,15 +721,28 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
         lwd->inc_vxc( npts, nbf, nbe, dbasis_z_eval, submat_map, xmat_z_s_ss, nbe, VXCs_SS, ldvxcs_ss,
           nbe_scr, RKB_factor );
 
-          std::cout<<"inc_vxc z x SS"<<std::endl;
-        lwd->inc_vxc( npts, nbf, nbe, dbasis_x_eval, submat_map, zmat_z_ss, nbe, VXCz_SS, ldvxcz_ss,
+          // Old thought
+        //   std::cout<<"inc_vxc z x SS"<<std::endl;
+        // lwd->inc_vxc( npts, nbf, nbe, dbasis_x_eval, submat_map, zmat_z_ss, nbe, VXCz_SS, ldvxcz_ss,
+        //   nbe_scr, RKB_factor );
+        //          std::cout<<"inc_vxc z y SS"<<std::endl;
+        // lwd->inc_vxc( npts, nbf, nbe, dbasis_y_eval, submat_map, xmat_y_z_ss, nbe, VXCz_SS, ldvxcz_ss,
+        //   nbe_scr, RKB_factor );
+        //          std::cout<<"inc_vxc z z SS"<<std::endl;
+        // lwd->inc_vxc( npts, nbf, nbe, dbasis_z_eval, submat_map, xmat_z_z_ss, nbe, VXCz_SS, ldvxcz_ss,
+        //   nbe_scr, RKB_factor );
+
+        // New thought 2x(d)z
+        //           std::cout<<"inc_vxc z x SS"<<std::endl;
+        // lwd->inc_vxc( npts, nbf, nbe, dbasis_x_eval, submat_map, zmat_z_ss, nbe, VXCz_SS, ldvxcz_ss,
+        //   nbe_scr, RKB_factor );
+        //          std::cout<<"inc_vxc z y SS"<<std::endl;
+        // lwd->inc_vxc( npts, nbf, nbe, dbasis_y_eval, submat_map, xmat_y_z_ss, nbe, VXCz_SS, ldvxcz_ss,
+        //   nbe_scr, RKB_factor );
+                 std::cout<<"inc_vxc x (d) z SS"<<std::endl;
+        lwd->inc_vxc( npts, nbf, nbe, dbasis_x_eval, submat_map, xmat_z_z_ss, nbe, VXCz_SS, ldvxcz_ss,
           nbe_scr, RKB_factor );
-                 std::cout<<"inc_vxc z y SS"<<std::endl;
-        lwd->inc_vxc( npts, nbf, nbe, dbasis_y_eval, submat_map, xmat_y_z_ss, nbe, VXCz_SS, ldvxcz_ss,
-          nbe_scr, RKB_factor );
-                 std::cout<<"inc_vxc z z SS"<<std::endl;
-        lwd->inc_vxc( npts, nbf, nbe, dbasis_z_eval, submat_map, xmat_z_z_ss, nbe, VXCz_SS, ldvxcz_ss,
-          nbe_scr, RKB_factor );
+
        std::cout<<"inc_vxc y x SS"<<std::endl;
         lwd->inc_vxc( npts, nbf, nbe, dbasis_x_eval, submat_map, zmat_y_ss, nbe, VXCy_SS, ldvxcy_ss,
           nbe_scr, RKB_factor );
@@ -757,6 +773,8 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
   // Set scalar return values
   *EXC  = EXC_WORK;
   *N_EL = NEL_WORK;
+
+  std::cout<<"N_EL =  "<<*N_EL<<std::endl;
 
   if(not is_exc_only) {
     // Symmetrize VXC
