@@ -684,20 +684,42 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
       double rhoy = blas::dot( nbe, basis_eval + ioffy, 1, Xy_i, 1 );
           // std::cout<<"rhos[0] "<<rhos<<std::endl;
       // rho SS
+      // s
       const double rhos_yy_ss = RKB_factor * blas::dot( nbe, dbasis_y_eval + ioffs, 1, Xs_y_i_ss, 1 );
-      const double rhoz_yy_ss = RKB_factor * blas::dot( nbe, dbasis_y_eval + ioffz, 1, Xz_y_i_ss, 1 );
-      const double rhox_yy_ss = RKB_factor * blas::dot( nbe, dbasis_y_eval + ioffx, 1, Xx_y_i_ss, 1 );
-      const double rhoy_yy_ss = RKB_factor * blas::dot( nbe, dbasis_y_eval + ioffy, 1, Xy_y_i_ss, 1 );
-
       const double rhos_xx_ss = RKB_factor * blas::dot( nbe, dbasis_x_eval + ioffs, 1, Xs_x_i_ss, 1 );
-      const double rhoz_xx_ss = RKB_factor * blas::dot( nbe, dbasis_x_eval + ioffz, 1, Xz_x_i_ss, 1 );
-      const double rhox_xx_ss = RKB_factor * blas::dot( nbe, dbasis_x_eval + ioffx, 1, Xx_x_i_ss, 1 );
-      const double rhoy_xx_ss = RKB_factor * blas::dot( nbe, dbasis_x_eval + ioffy, 1, Xy_x_i_ss, 1 );
-
       const double rhos_zz_ss = RKB_factor * blas::dot( nbe, dbasis_z_eval + ioffs, 1, Xs_z_i_ss, 1 );
+
+      // z
+      const double rhoz_xx_ss = RKB_factor * blas::dot( nbe, dbasis_x_eval + ioffz, 1, Xz_x_i_ss, 1 );
+      const double rhoz_yy_ss = RKB_factor * blas::dot( nbe, dbasis_y_eval + ioffz, 1, Xz_y_i_ss, 1 );       
       const double rhoz_zz_ss = RKB_factor * blas::dot( nbe, dbasis_z_eval + ioffz, 1, Xz_z_i_ss, 1 );
-      const double rhox_zz_ss = RKB_factor * blas::dot( nbe, dbasis_z_eval + ioffx, 1, Xx_z_i_ss, 1 );
-      const double rhoy_zz_ss = RKB_factor * blas::dot( nbe, dbasis_z_eval + ioffy, 1, Xy_z_i_ss, 1 );
+
+      // x
+      const double rhox_xx_ss = RKB_factor * blas::dot( nbe, dbasis_x_eval + ioffz, 1, Xx_x_i_ss, 1 );
+      const double rhox_yy_ss = RKB_factor * blas::dot( nbe, dbasis_y_eval + ioffz, 1, Xx_y_i_ss, 1 );       
+      const double rhox_zz_ss = RKB_factor * blas::dot( nbe, dbasis_z_eval + ioffz, 1, Xx_z_i_ss, 1 );
+      // y
+      const double rhoy_xx_ss = RKB_factor * blas::dot( nbe, dbasis_x_eval + ioffz, 1, Xy_x_i_ss, 1 );
+      const double rhoy_yy_ss = RKB_factor * blas::dot( nbe, dbasis_y_eval + ioffz, 1, Xy_y_i_ss, 1 );       
+      const double rhoy_zz_ss = RKB_factor * blas::dot( nbe, dbasis_z_eval + ioffz, 1, Xy_z_i_ss, 1 );
+
+      // // z xy - yx
+      // const double rhoz_xy_ss = RKB_factor * blas::dot( nbe, dbasis_x_eval + ioffz, 1, Xz_y_i_ss, 1 );
+      // const double rhoz_yx_ss = RKB_factor * blas::dot( nbe, dbasis_y_eval + ioffz, 1, Xz_x_i_ss, 1 );
+      // std::cout<<"rho z xy-yx "<<rhoz_xy_ss-rhoz_yx_ss<<std::endl;
+
+      // // x yz-zy
+      // const double rhox_yz_ss = RKB_factor * blas::dot( nbe, dbasis_y_eval + ioffx, 1, Xx_z_i_ss, 1 );
+      // const double rhoy_zy_ss = RKB_factor * blas::dot( nbe, dbasis_z_eval + ioffy, 1, Xx_y_i_ss, 1 );
+
+      // // y zx - xz
+      // const double rhox_xz_ss = RKB_factor * blas::dot( nbe, dbasis_x_eval + ioffx, 1, Xy_z_i_ss, 1 );
+      // const double rhoy_zx_ss = RKB_factor * blas::dot( nbe, dbasis_z_eval + ioffy, 1, Xy_x_i_ss, 1 );
+
+      
+      // const double rhoz_zz_ss = RKB_factor * blas::dot( nbe, dbasis_z_eval + ioffz, 1, Xz_z_i_ss, 1 );
+      // const double rhox_zz_ss = RKB_factor * blas::dot( nbe, dbasis_z_eval + ioffx, 1, Xx_z_i_ss, 1 );
+      // const double rhoy_zz_ss = RKB_factor * blas::dot( nbe, dbasis_z_eval + ioffy, 1, Xy_z_i_ss, 1 );
 
       // const double rhos_xz_ss = 2 * RKB_factor * blas::dot( nbe, dbasis_x_eval + ioffs, 1, Xs_z_i_ss, 1 );
       // const double rhoz_xz_ss = 2 * RKB_factor * blas::dot( nbe, dbasis_x_eval + ioffz, 1, Xz_z_i_ss, 1 );
@@ -708,8 +730,8 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
       // // total rho
       rhos += rhos_yy_ss + rhos_xx_ss + rhos_zz_ss;
       rhoz += rhoz_yy_ss + rhoz_xx_ss + rhoz_zz_ss;
-      rhox += rhox_yy_ss + rhox_xx_ss + rhox_zz_ss;
-      rhoy += rhoy_yy_ss + rhoy_xx_ss + rhoy_zz_ss;
+      rhox +=  rhox_xx_ss - rhox_zz_ss - rhox_yy_ss;
+      rhoy +=  rhoy_xx_ss - rhoy_zz_ss - rhoy_yy_ss;
 
       // if((rhos + rhoz + rhoy + rhox)!=0.){
       // std::cout<<"rhos_yy_ss = "<<rhos_yy_ss<<std::endl;
@@ -851,7 +873,7 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
       // const auto dMxdx_zxx_ss =
       //   2. * RKB_factor * blas::dot( nbe, d2basis_xx_eval + ioffs, 1, Xx_z_i_ss, 1 );
 
-      const auto dMxdx_ss = dMxdx_xxx_ss + dMxdx_yxy_ss + dMxdx_zxz_ss;
+      const auto dMxdx_ss = dMxdx_xxx_ss - dMxdx_yxy_ss - dMxdx_zxz_ss;
 
       const auto dMxdy_xyx_ss =
         2. * RKB_factor * blas::dot( nbe, d2basis_xy_eval + ioffs, 1, Xx_x_i_ss, 1 );
@@ -862,7 +884,7 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
       // const auto dMxdy_zyx_ss =
       //   2. * RKB_factor * blas::dot( nbe, d2basis_xy_eval + ioffs, 1, Xx_z_i_ss, 1 );
 
-      const auto dMxdy_ss = dMxdy_xyx_ss + dMxdy_yyy_ss + dMxdy_zyz_ss;
+      const auto dMxdy_ss = dMxdy_xyx_ss - dMxdy_yyy_ss - dMxdy_zyz_ss;
 
       const auto dMxdz_xzx_ss =
         2. * RKB_factor * blas::dot( nbe, d2basis_xz_eval + ioffs, 1, Xx_x_i_ss, 1 );
@@ -873,7 +895,7 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
       // const auto dMxdz_zzx_ss =
       //   2. * RKB_factor * blas::dot( nbe, d2basis_xz_eval + ioffs, 1, Xx_z_i_ss, 1 );
 
-      const auto dMxdz_ss = dMxdz_xzx_ss + dMxdz_yzy_ss + dMxdz_zzz_ss;
+      const auto dMxdz_ss = dMxdz_xzx_ss - dMxdz_yzy_ss - dMxdz_zzz_ss;
 
            //////
       const auto dMydx_xxx_ss =
@@ -885,7 +907,7 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
       // const auto dMydx_zxx_ss =
       //   2. * RKB_factor * blas::dot( nbe, d2basis_xx_eval + ioffs, 1, Xy_z_i_ss, 1 );
 
-      const auto dMydx_ss = dMydx_xxx_ss + dMydx_yxy_ss + dMydx_zxz_ss;
+      const auto dMydx_ss = dMydx_xxx_ss - dMydx_yxy_ss - dMydx_zxz_ss;
 
       const auto dMydy_xyx_ss =
         2. * RKB_factor * blas::dot( nbe, d2basis_xy_eval + ioffs, 1, Xy_x_i_ss, 1 );
@@ -896,7 +918,7 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
       // const auto dMydy_zyx_ss =
       //   2. * RKB_factor * blas::dot( nbe, d2basis_xy_eval + ioffs, 1, Xy_z_i_ss, 1 );
 
-      const auto dMydy_ss = dMydy_xyx_ss + dMydy_yyy_ss + dMydy_zyz_ss;
+      const auto dMydy_ss = dMydy_xyx_ss - dMydy_yyy_ss - dMydy_zyz_ss;
 
       const auto dMydz_xzx_ss =
         2. * RKB_factor * blas::dot( nbe, d2basis_xz_eval + ioffs, 1, Xy_x_i_ss, 1 );
@@ -907,7 +929,7 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
       // const auto dMydz_zzx_ss =
       //   2. * RKB_factor * blas::dot( nbe, d2basis_xz_eval + ioffs, 1, Xy_z_i_ss, 1 );
 
-      const auto dMydz_ss = dMydz_xzx_ss + dMydz_yzy_ss + dMydz_zzz_ss;
+      const auto dMydz_ss = dMydz_xzx_ss - dMydz_yzy_ss - dMydz_zzz_ss;
 
       // Form total density derivs
       dndx += dndx_ss;
@@ -1779,12 +1801,12 @@ void ReferenceLocalHostWorkDriver::eval_zmat_gga_vxc_dks( size_t npts, size_t nb
       blas::axpy(nbf, z_fact_z, bf_zx_col, 1, zz_x_ss_col, 1);
 
       blas::axpy(nbf, x_fact_x, bf_xx_col, 1, zx_x_ss_col, 1);
-      blas::axpy(nbf, y_fact_x, bf_yx_col, 1, zx_x_ss_col, 1);
-      blas::axpy(nbf, z_fact_x, bf_zx_col, 1, zx_x_ss_col, 1);
+      blas::axpy(nbf, -1.*y_fact_x, bf_yx_col, 1, zx_x_ss_col, 1);
+      blas::axpy(nbf, -1.*z_fact_x, bf_zx_col, 1, zx_x_ss_col, 1);
 
       blas::axpy(nbf, x_fact_y, bf_xx_col, 1, zy_x_ss_col, 1);
-      blas::axpy(nbf, y_fact_y, bf_yx_col, 1, zy_x_ss_col, 1);
-      blas::axpy(nbf, z_fact_y, bf_zx_col, 1, zy_x_ss_col, 1);
+      blas::axpy(nbf, -1.*y_fact_y, bf_yx_col, 1, zy_x_ss_col, 1);
+      blas::axpy(nbf, -1.*z_fact_y, bf_zx_col, 1, zy_x_ss_col, 1);
 
       // SS dY
       blas::axpy(nbf, x_fact_s, bf_xy_col, 1, zs_y_ss_col, 1);
@@ -1796,12 +1818,12 @@ void ReferenceLocalHostWorkDriver::eval_zmat_gga_vxc_dks( size_t npts, size_t nb
       blas::axpy(nbf, z_fact_z, bf_zy_col, 1, zz_y_ss_col, 1);
 
       blas::axpy(nbf, x_fact_x, bf_xy_col, 1, zx_y_ss_col, 1);
-      blas::axpy(nbf, y_fact_x, bf_yy_col, 1, zx_y_ss_col, 1);
-      blas::axpy(nbf, z_fact_x, bf_zy_col, 1, zx_y_ss_col, 1);
+      blas::axpy(nbf, -1.*y_fact_x, bf_yy_col, 1, zx_y_ss_col, 1);
+      blas::axpy(nbf, -1.*z_fact_x, bf_zy_col, 1, zx_y_ss_col, 1);
 
       blas::axpy(nbf, x_fact_y, bf_xy_col, 1, zy_y_ss_col, 1);
-      blas::axpy(nbf, y_fact_y, bf_yy_col, 1, zy_y_ss_col, 1);
-      blas::axpy(nbf, z_fact_y, bf_zy_col, 1, zy_y_ss_col, 1);
+      blas::axpy(nbf, -1.*y_fact_y, bf_yy_col, 1, zy_y_ss_col, 1);
+      blas::axpy(nbf, -1.*z_fact_y, bf_zy_col, 1, zy_y_ss_col, 1);
 
       // SS dZ
       blas::axpy(nbf, x_fact_s, bf_xz_col, 1, zs_z_ss_col, 1);
@@ -1813,12 +1835,12 @@ void ReferenceLocalHostWorkDriver::eval_zmat_gga_vxc_dks( size_t npts, size_t nb
       blas::axpy(nbf, z_fact_z, bf_zz_col, 1, zz_z_ss_col, 1);
 
       blas::axpy(nbf, x_fact_x, bf_xz_col, 1, zx_z_ss_col, 1);
-      blas::axpy(nbf, y_fact_x, bf_yz_col, 1, zx_z_ss_col, 1);
-      blas::axpy(nbf, z_fact_x, bf_zz_col, 1, zx_z_ss_col, 1);
+      blas::axpy(nbf, -1.*y_fact_x, bf_yz_col, 1, zx_z_ss_col, 1);
+      blas::axpy(nbf, -1.*z_fact_x, bf_zz_col, 1, zx_z_ss_col, 1);
 
       blas::axpy(nbf, x_fact_y, bf_xz_col, 1, zy_z_ss_col, 1);
-      blas::axpy(nbf, y_fact_y, bf_yz_col, 1, zy_z_ss_col, 1);
-      blas::axpy(nbf, z_fact_y, bf_zz_col, 1, zy_z_ss_col, 1);
+      blas::axpy(nbf, -1.*y_fact_y, bf_yz_col, 1, zy_z_ss_col, 1);
+      blas::axpy(nbf, -1.*z_fact_y, bf_zz_col, 1, zy_z_ss_col, 1);
 
     }
       // std::cout<<"break 2"<<std::endl;
