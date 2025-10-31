@@ -81,7 +81,6 @@ typename XCIntegrator<MatrixType>::exc_vxc_type_gks
   XCIntegrator<MatrixType>::eval_exc_vxc( const MatrixType& Ps, const MatrixType& Pz, const MatrixType& Py, const MatrixType& Px, 
                                           const IntegratorSettingsXC& ks_settings ) {
   if( not pimpl_ ) GAUXC_PIMPL_NOT_INITIALIZED();
-  std::cout<< " xc_integrator/impl.hpp type_gks" <<std::endl;
   return pimpl_->eval_exc_vxc(Ps, Pz, Py, Px, ks_settings);
 };
 
@@ -90,8 +89,6 @@ typename XCIntegrator<MatrixType>::exc_vxc_type_dks
   XCIntegrator<MatrixType>::eval_exc_vxc( const MatrixType& Ps, const MatrixType& Pz, const MatrixType& Py, const MatrixType& Px, 
                                           const MatrixType& Ps_SS, const MatrixType& Pz_SS, const MatrixType& Py_SS, const MatrixType& Px_SS, const IntegratorSettingsXC& ks_settings ) {
   if( not pimpl_ ) GAUXC_PIMPL_NOT_INITIALIZED();
-  std::cout<< " xc_integrator/impl.hpp type_dks" <<std::endl;
-
   return pimpl_->eval_exc_vxc(Ps, Pz, Py, Px, Ps_SS, Pz_SS, Py_SS, Px_SS, ks_settings);
 };
 

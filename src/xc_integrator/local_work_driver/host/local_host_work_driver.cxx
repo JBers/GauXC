@@ -69,7 +69,7 @@ void LocalHostWorkDriver::eval_collocation_hessian( size_t npts, size_t nshells,
     double* dbasis_y_eval, double* dbasis_z_eval, double* d2basis_xx_eval, 
     double* d2basis_xy_eval, double* d2basis_xz_eval, double* d2basis_yy_eval, 
     double* d2basis_yz_eval, double* d2basis_zz_eval ) {
-      std::cout<<"eval_collocation_hessian"<<std::endl;
+
   throw_if_invalid_pimpl(pimpl_);
   pimpl_->eval_collocation_hessian(npts, nshells, nbe, pts, basis, shell_list, basis_eval,
     dbasis_x_eval, dbasis_y_eval, dbasis_z_eval, d2basis_xx_eval, d2basis_xy_eval,
@@ -214,7 +214,6 @@ void LocalHostWorkDriver::eval_uvvar_gga_gks( size_t npts, size_t nbe,
   double* dden_z_eval, double* gamma, double* K, double* H, const double dtol ) {
 
   throw_if_invalid_pimpl(pimpl_);
-  std::cout<<"pimpl_->eval_uvvar_gga_gks local_host_work_driver"<<std::endl;
   pimpl_->eval_uvvar_gga_gks(npts, nbe, basis_eval, dbasis_x_eval, dbasis_y_eval,
     dbasis_z_eval, Xs, ldxs, Xz, ldxz, Xx, ldxx, Xy, ldxy, den_eval, dden_x_eval, dden_y_eval, dden_z_eval,
     gamma, K, H, dtol);
@@ -239,9 +238,6 @@ void LocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, const dou
 
   throw_if_invalid_pimpl(pimpl_);
   
-  // std::cout<<"pimpl_->eval_uvvar_gga_dks local_host_work_driver"<<std::endl;
-  //     std::cout<<"zmat_s_ss in pimpl Xs_x_SS"<<std::endl;
-  //   for(auto k=0;k<nbe*npts;k++){if(Xs_x_SS[k] != 0.) std::cout<<"LOOOOK "<<Xs_x_SS[k]<<std::endl;}
   pimpl_->eval_uvvar_gga_dks(npts, nbe, basis_eval, dbasis_x_eval, dbasis_y_eval,
     dbasis_z_eval, d2basis_xx_eval, d2basis_xy_eval, d2basis_xz_eval, 
     d2basis_yy_eval, d2basis_yz_eval, d2basis_zz_eval,
@@ -388,7 +384,7 @@ void LocalHostWorkDriver::eval_zmat_gga_vxc_dks( size_t npts, size_t nbf, const 
     double* Zs_z_SS, double* Zz_z_SS, 
     double* Zx_z_SS, double* Zy_z_SS,
     double* K, double* H ) {
-  std::cout<<"pimpl_->eval_zmat_gga_vxc_dks"<<std::endl;
+      
   throw_if_invalid_pimpl(pimpl_);
   pimpl_->eval_zmat_gga_vxc_dks(npts, nbf, vrho, vgamma, basis_eval, dbasis_x_eval,
     dbasis_y_eval, dbasis_z_eval,

@@ -126,24 +126,20 @@ public:
    *  @returns EXC / VXC in a combined structure
    */
   exc_vxc_type_rks eval_exc_vxc( const MatrixType& P, const IntegratorSettingsXC& ks_settings ) {
-    std::cout<< " xc_integrator_impl.hpp" <<std::endl;
     return eval_exc_vxc_(P, ks_settings);
   }
 
   exc_vxc_type_uks eval_exc_vxc( const MatrixType& Ps, const MatrixType& Pz, const IntegratorSettingsXC& ks_settings ) {
-    std::cout<< " xc_integrator_impl.hpp" <<std::endl;
     return eval_exc_vxc_(Ps, Pz, ks_settings);
   }
 
   exc_vxc_type_gks eval_exc_vxc( const MatrixType& Ps, const MatrixType& Pz, const MatrixType& Py, const MatrixType& Px, const IntegratorSettingsXC& ks_settings ) {
-    std::cout<< " xc_integrator_impl.hpp gks" <<std::endl;
     return eval_exc_vxc_(Ps, Pz, Py, Px, ks_settings);
   }
 
   exc_vxc_type_dks eval_exc_vxc( const MatrixType& Ps, const MatrixType& Pz, const MatrixType& Py, const MatrixType& Px, 
                                  const MatrixType& Ps_SS, const MatrixType& Pz_SS, const MatrixType& Py_SS, const MatrixType& Px_SS, 
                                  const IntegratorSettingsXC& ks_settings ) {
-    std::cout<< " xc_integrator_impl.hpp dks" <<std::endl;
     return eval_exc_vxc_(Ps, Pz, Py, Px, Ps_SS, Pz_SS, Py_SS, Px_SS, ks_settings );
   }
   

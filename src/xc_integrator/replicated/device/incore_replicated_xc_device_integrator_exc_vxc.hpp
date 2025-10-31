@@ -62,9 +62,6 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
   // Check that P / VXC are sane
   const int64_t nbf = basis.nbf();
 
-  std::cout<<"GauXc num basis func incore"<<nbf<<std::endl;
-  std::cout<<"GauXc size of P incore"<<m<<std::endl;
-  
   if( m != n ) 
     GAUXC_GENERIC_EXCEPTION("P/VXC Must Be Square");
   if( m != nbf ) 
