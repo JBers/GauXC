@@ -141,10 +141,12 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
   const bool is_uks = (Pz != nullptr) and (Py == nullptr) and (Px == nullptr) and (Ps_SS == nullptr);
   const bool is_rks = not is_uks and not is_gks and not is_dks;
 
+  std::cout<<"is rks uks gks dks "<<is_rks<<is_uks<<is_gks<<is_dks<<std::endl;
+
   if (not is_rks and not is_uks and not is_gks and not is_dks) {
     GAUXC_GENERIC_EXCEPTION("Must Be Either RKS, UKS, GKS, or DKS!");
   }
-
+std::cout<<"gauxc here 2"<<std::endl;
   const bool is_exc_only = (!VXCs) and (!VXCz) and (!VXCy) and (!VXCx);
   //if(is_exc_only) std::cout << "EXC ONLY" << std::endl;
   // Misc KS settings
@@ -448,19 +450,20 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
     else
       lwd->eval_collocation( npts, nshells, nbe, points, basis, shell_list,
         basis_eval );
-
+std::cout<<"gauxc here 3"<<std::endl;
     // Evaluate X matrix (fac * P * B) -> store in Z
     const auto xmat_fac = is_rks ? 2.0 : 1.0; // TODO Fix for spinor RKS input
     lwd->eval_xmat( mgga_dim_scal * npts, nbf, nbe, submat_map, xmat_fac, Ps, ldps, basis_eval, nbe,
       zmat, nbe, nbe_scr );
+      std::cout<<"gauxc here 4"<<std::endl;
 
     // X matrix for Pz
     if(not is_rks) {
       lwd->eval_xmat( mgga_dim_scal * npts, nbf, nbe, submat_map, 1.0, Pz, ldpz, basis_eval, nbe,
         zmat_z, nbe, nbe_scr);
     }
-     
-    if(not is_uks) {
+    
+    if(not is_uks and not is_rks) {
       lwd->eval_xmat( npts, nbf, nbe, submat_map, 1.0, Py, ldpy, basis_eval, nbe,
         zmat_x, nbe, nbe_scr);
       lwd->eval_xmat( npts, nbf, nbe, submat_map, 1.0, Px, ldpx, basis_eval, nbe,
@@ -510,9 +513,11 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
       }
     } else if ( func.is_gga() ) {
       if(is_rks) {
+        std::cout<<"gauxc here 5"<<std::endl;
         lwd->eval_uvvar_gga_rks( npts, nbe, basis_eval, dbasis_x_eval, dbasis_y_eval,
           dbasis_z_eval, zmat, nbe, den_eval, dden_x_eval, dden_y_eval, dden_z_eval,
           gamma );
+          std::cout<<"gauxc here 6"<<std::endl;
       } else if(is_uks) {
         lwd->eval_uvvar_gga_uks( npts, nbe, basis_eval, dbasis_x_eval, dbasis_y_eval,
           dbasis_z_eval, zmat, nbe, zmat_z, nbe, den_eval, dden_x_eval, 
@@ -677,7 +682,7 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
       if(not is_rks) {
         lwd->inc_vxc( mgga_dim_scal * npts, nbf, nbe, basis_eval, submat_map, zmat_z, nbe,VXCz, ldvxcz, nbe_scr, 1.);
       }
-      if(not is_uks) {
+      if(not is_uks and not is_rks) {
         lwd->inc_vxc( npts, nbf, nbe, basis_eval, submat_map, zmat_y, nbe, VXCy, ldvxcy,
           nbe_scr, 1.);
         lwd->inc_vxc( npts, nbf, nbe, basis_eval, submat_map, zmat_x, nbe, VXCx, ldvxcx,
@@ -691,12 +696,20 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
         lwd->inc_vxc( npts, nbf, nbe, dbasis_z_eval, submat_map, xmat_z_s_ss, nbe, VXCs_SS, ldvxcs_ss,
           nbe_scr, RKB_factor );
 
+        // lwd->inc_vxc( npts, nbf, nbe, dbasis_x_eval, submat_map, xmat_z_s_ss, nbe, VXCs_SS, ldvxcs_ss,
+        //   nbe_scr, 2*RKB_factor );
+
+
         lwd->inc_vxc( npts, nbf, nbe, dbasis_x_eval, submat_map, zmat_z_ss, nbe, VXCz_SS, ldvxcz_ss,
-          nbe_scr, RKB_factor );
+          nbe_scr, -1*RKB_factor );
         lwd->inc_vxc( npts, nbf, nbe, dbasis_y_eval, submat_map, xmat_y_z_ss, nbe, VXCz_SS, ldvxcz_ss,
-          nbe_scr, RKB_factor );
+          nbe_scr, -1*RKB_factor );
         lwd->inc_vxc( npts, nbf, nbe, dbasis_z_eval, submat_map, xmat_z_z_ss, nbe, VXCz_SS, ldvxcz_ss,
           nbe_scr, RKB_factor );
+
+        // lwd->inc_vxc( npts, nbf, nbe, dbasis_x_eval, submat_map, xmat_z_z_ss, nbe, VXCz_SS, ldvxcs_ss,
+        //   nbe_scr, 2*RKB_factor );
+
 
         lwd->inc_vxc( npts, nbf, nbe, dbasis_x_eval, submat_map, zmat_x_ss, nbe, VXCx_SS, ldvxcz_ss,
           nbe_scr, RKB_factor );
@@ -705,12 +718,19 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
         lwd->inc_vxc( npts, nbf, nbe, dbasis_z_eval, submat_map, xmat_z_x_ss, nbe, VXCx_SS, ldvxcz_ss,
           nbe_scr, -1*RKB_factor );
 
+        // lwd->inc_vxc( npts, nbf, nbe, dbasis_y_eval, submat_map, zmat_x_ss, nbe, VXCx_SS, ldvxcz_ss,
+        //   nbe_scr, 2*RKB_factor );
+
+
         lwd->inc_vxc( npts, nbf, nbe, dbasis_x_eval, submat_map, zmat_y_ss, nbe, VXCy_SS, ldvxcy_ss,
-          nbe_scr, RKB_factor );
-        lwd->inc_vxc( npts, nbf, nbe, dbasis_y_eval, submat_map, xmat_y_y_ss, nbe, VXCy_SS, ldvxcy_ss,
           nbe_scr, -1*RKB_factor );
+        lwd->inc_vxc( npts, nbf, nbe, dbasis_y_eval, submat_map, xmat_y_y_ss, nbe, VXCy_SS, ldvxcy_ss,
+          nbe_scr, RKB_factor );
         lwd->inc_vxc( npts, nbf, nbe, dbasis_z_eval, submat_map, xmat_z_y_ss, nbe, VXCy_SS, ldvxcy_ss,
           nbe_scr, -1*RKB_factor );
+
+        // // lwd->inc_vxc( npts, nbf, nbe, dbasis_y_eval, submat_map, zmat_y_ss, nbe, VXCy_SS, ldvxcz_ss,
+        //   nbe_scr, -2*RKB_factor );
       }
        
     }
@@ -740,7 +760,7 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
         }
       }
     }
-    if(not is_uks) {
+    if(not is_uks and not is_rks) {
       for( int32_t j = 0;   j < nbf; ++j ) {
         for( int32_t i = j+1; i < nbf; ++i ) {
           VXCy[ j + i*ldvxcy ] = VXCy[ i + j*ldvxcy ];
