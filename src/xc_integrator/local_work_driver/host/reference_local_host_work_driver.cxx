@@ -267,7 +267,6 @@ namespace GauXC {
 						     size_t ldx, double* den_eval, double* dden_x_eval, double* dden_y_eval, 
 						     double* dden_z_eval, double* gamma ) {
 
-                  std::cout<<"gauxc made it to here"<<std::endl;
     for( int32_t i = 0; i < (int32_t)npts; ++i ) {
 
       const size_t ioff = size_t(i) * ldx;
