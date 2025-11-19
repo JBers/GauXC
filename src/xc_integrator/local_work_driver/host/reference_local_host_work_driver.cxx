@@ -803,7 +803,7 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
       const auto dMxdx_zxx_ss =
         4. * RKB_factor * blas::dot( nbe, d2basis_xz_eval + ioffs, 1, Xz_x_i_ss, 1 );
       const auto dMxdx_yxx_ss =
-        4. * RKB_factor * blas::dot( nbe, d2basis_xy_eval + ioffs, 1, Xy_x_i_ss, 1 );
+        -4. * RKB_factor * blas::dot( nbe, d2basis_xy_eval + ioffs, 1, Xy_x_i_ss, 1 );
 
       const auto dMxdx_ss = dMxdx_xxx_ss - dMxdx_yxy_ss - dMxdx_zxz_ss + dMxdx_zxx_ss + dMxdx_yxx_ss;
 
@@ -817,7 +817,7 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
       const auto dMxdy_zyx_ss =
         4. * RKB_factor * blas::dot( nbe, d2basis_yz_eval + ioffs, 1, Xz_x_i_ss, 1 );
       const auto dMxdy_yyx_ss =
-        4. * RKB_factor * blas::dot( nbe, d2basis_yy_eval + ioffs, 1, Xy_x_i_ss, 1 );
+        -4. * RKB_factor * blas::dot( nbe, d2basis_yy_eval + ioffs, 1, Xy_x_i_ss, 1 );
 
       const auto dMxdy_ss = dMxdy_xyx_ss - dMxdy_yyy_ss - dMxdy_zyz_ss + dMxdy_zyx_ss + dMxdy_yyx_ss;
 
@@ -831,7 +831,7 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
       const auto dMxdz_zzx_ss =
         4. * RKB_factor * blas::dot( nbe, d2basis_zz_eval + ioffs, 1, Xz_x_i_ss, 1 );
       const auto dMxdz_yzx_ss =
-        4. * RKB_factor * blas::dot( nbe, d2basis_yz_eval + ioffs, 1, Xy_x_i_ss, 1 );
+        -4. * RKB_factor * blas::dot( nbe, d2basis_yz_eval + ioffs, 1, Xy_x_i_ss, 1 );
 
       const auto dMxdz_ss = dMxdz_xzx_ss - dMxdz_yzy_ss - dMxdz_zzz_ss + dMxdz_zzx_ss + dMxdz_yzx_ss;
 
