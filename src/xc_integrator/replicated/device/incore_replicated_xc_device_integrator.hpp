@@ -117,7 +117,7 @@ protected:
                             value_type* VXC, int64_t ldvxc,
                             value_type* VXCz, int64_t ldvxcz,
                             value_type* VXCy, int64_t ldvxcy,
-                            value_type* VXCx, int64_t ldvxcx, value_type* EXC, value_type *N_EL,
+                            value_type* VXCx, int64_t ldvxcx, value_type* EXC, value_type *N_EL, 
                             host_task_iterator task_begin, host_task_iterator task_end,
                             XCDeviceData& device_data );
 

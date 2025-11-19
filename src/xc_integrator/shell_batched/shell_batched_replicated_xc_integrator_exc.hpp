@@ -75,6 +75,7 @@ void ShellBatchedReplicatedXCIntegrator<BaseIntegratorType, IncoreIntegratorType
 
   // Temporary electron count to judge integrator accuracy
   value_type N_EL;
+  value_type spin_N_EL;
 
   // Compute local contributions to EXC/VXC
   this->timer_.time_op("XCIntegrator.LocalWork", [&](){
@@ -82,7 +83,7 @@ void ShellBatchedReplicatedXCIntegrator<BaseIntegratorType, IncoreIntegratorType
       nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0,
       nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0,
       nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, EXC, 
-      &N_EL, tasks.begin(), tasks.end(), incore_integrator );
+      &N_EL, &spin_N_EL, tasks.begin(), tasks.end(), incore_integrator );
   });
 
   // Release ownership of LWD back to this integrator instance

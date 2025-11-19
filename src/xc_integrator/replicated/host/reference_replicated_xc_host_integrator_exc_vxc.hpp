@@ -80,7 +80,8 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
 
   // Temporary electron count to judge integrator accuracy
   value_type N_EL;
-   
+  value_type spin_N_EL;
+  
   // Compute Local contributions to EXC / VXC
   this->timer_.time_op("XCIntegrator.LocalWork", [&](){
     exc_vxc_local_work_( basis, Ps, ldps, Pz, ldpz, Py, ldpy, Px, ldpx, 
@@ -88,7 +89,7 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
                          VXCs, ldvxcs, VXCz, ldvxcz,
                          VXCy, ldvxcy, VXCx, ldvxcx,
                          VXCs_SS, ldvxcs_ss, VXCz_SS, ldvxcz_ss,
-                         VXCy_SS, ldvxcy_ss, VXCx_SS, ldvxcx_ss, EXC, &N_EL, ks_settings,
+                         VXCy_SS, ldvxcy_ss, VXCx_SS, ldvxcx_ss, EXC, &N_EL, &spin_N_EL, ks_settings,
                          tasks.begin(), tasks.end() );
   });
 
@@ -105,6 +106,7 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
 
     this->reduction_driver_->allreduce_inplace( EXC,   1    , ReductionOp::Sum );
     this->reduction_driver_->allreduce_inplace( &N_EL, 1    , ReductionOp::Sum );
+    this->reduction_driver_->allreduce_inplace( &spin_N_EL, 1    , ReductionOp::Sum );
 
   });
 
@@ -132,7 +134,7 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
                        value_type* VXCz_SS, int64_t ldvxcz_ss,
                        value_type* VXCy_SS, int64_t ldvxcy_ss,
                        value_type* VXCx_SS, int64_t ldvxcx_ss,
-                       value_type* EXC, value_type *N_EL, 
+                       value_type* EXC, value_type *N_EL, value_type *spin_N_EL,
                        const IntegratorSettingsXC& settings,
                        task_iterator task_begin, task_iterator task_end ) {
     
@@ -228,6 +230,7 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
  
   double EXC_WORK = 0.0;
   double NEL_WORK = 0.0;
+  double spin_NEL_WORK = 0.0;
     
   // Loop over tasks
   const size_t ntasks = std::distance(task_begin, task_end);
@@ -593,10 +596,13 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
 
     // Scalar integrations
     double NEL_local = 0.0;
+    double spin_NEL_local = 0.0;
     double EXC_local  = 0.0;
     for( int32_t i = 0; i < npts; ++i ) {
       const auto den = is_rks ? den_eval[i] : (den_eval[2*i] + den_eval[2*i+1]);
+      const auto spin_den = is_rks ? den_eval[i] : (den_eval[2*i] - den_eval[2*i+1]);
       NEL_local += weights[i] * den;
+      spin_NEL_local += weights[i] * spin_den;
       EXC_local += eps[i]     * den;
     }
 
@@ -606,6 +612,8 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
     EXC_WORK += EXC_local;
     #pragma omp atomic
     NEL_WORK += NEL_local;
+    #pragma omp atomic
+    spin_NEL_WORK += spin_NEL_local;
 
     
 
@@ -743,8 +751,10 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
   // Set scalar return values
   *EXC  = EXC_WORK;
   *N_EL = NEL_WORK;
+  *spin_N_EL = spin_NEL_WORK;
 
   std::cout<<"N_EL =  "<<*N_EL<<std::endl;
+  std::cout<<"spin N_EL =  "<<*spin_N_EL<<std::endl;
 
   if(not is_exc_only) {
     // Symmetrize VXC

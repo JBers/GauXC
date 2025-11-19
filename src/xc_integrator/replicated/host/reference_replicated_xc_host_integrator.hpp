@@ -155,7 +155,7 @@ protected:
                             value_type* VXCz_SS, int64_t ldvxcz_ss,
                             value_type* VXCy_SS, int64_t ldvxcy_ss,
                             value_type* VXCx_SS, int64_t ldvxcx_ss,
-                            value_type* EXC, value_type *N_EL, const IntegratorSettingsXC& ks_settings,
+                            value_type* EXC, value_type *N_EL, value_type *spin_N_EL, const IntegratorSettingsXC& ks_settings,
                             task_iterator task_begin, task_iterator task_end );
 
   void neo_exc_vxc_local_work_( const value_type* Ps, int64_t ldps,
