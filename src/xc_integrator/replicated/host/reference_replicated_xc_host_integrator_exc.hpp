@@ -30,7 +30,7 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
 
   const auto& basis = this->load_balancer_->basis();
 
-  bool dks_flag = false;
+std::cout<<"Hello from eval_exc_"<<std::endl;
 
 
   // Check that P / VXC are sane

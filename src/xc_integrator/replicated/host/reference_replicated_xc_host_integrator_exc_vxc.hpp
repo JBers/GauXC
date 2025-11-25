@@ -86,6 +86,7 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
   this->timer_.time_op("XCIntegrator.LocalWork", [&](){
     exc_vxc_local_work_( basis, Ps, ldps, Pz, ldpz, Py, ldpy, Px, ldpx, 
                          Ps_SS, ldps_ss, Pz_SS, ldpz_ss, Py_SS, ldpy_ss, Px_SS, ldpx_ss, 
+                         Ps_SS_imag, Pz_SS_imag, Py_SS_imag, Px_SS_imag, 
                          VXCs, ldvxcs, VXCz, ldvxcz,
                          VXCy, ldvxcy, VXCx, ldvxcx,
                          VXCs_SS, ldvxcs_ss, VXCz_SS, ldvxcz_ss,
@@ -126,6 +127,10 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
                        const value_type* Pz_SS, int64_t ldpz_ss,
                        const value_type* Py_SS, int64_t ldpy_ss,
                        const value_type* Px_SS, int64_t ldpx_ss,
+                       const value_type* Ps_SS_imag, int64_t ldps_ss,
+                       const value_type* Pz_SS_imag, int64_t ldpz_ss,
+                       const value_type* Py_SS_imag, int64_t ldpy_ss,
+                       const value_type* Px_SS_imag, int64_t ldpx_ss,
                        value_type* VXCs, int64_t ldvxcs,
                        value_type* VXCz, int64_t ldvxcz,
                        value_type* VXCy, int64_t ldvxcy,
@@ -465,9 +470,9 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
     }
     if(not is_uks and not is_rks) {
       lwd->eval_xmat( npts, nbf, nbe, submat_map, 1.0, Py, ldpy, basis_eval, nbe,
-        zmat_x, nbe, nbe_scr);
-      lwd->eval_xmat( npts, nbf, nbe, submat_map, 1.0, Px, ldpx, basis_eval, nbe,
         zmat_y, nbe, nbe_scr);
+      lwd->eval_xmat( npts, nbf, nbe, submat_map, 1.0, Px, ldpx, basis_eval, nbe,
+        zmat_x, nbe, nbe_scr);
     }
     if(is_dks) {
       lwd->eval_xmat( npts, nbf, nbe, submat_map, 1.0, Ps_SS, ldps_ss, dbasis_x_eval, nbe,
@@ -475,9 +480,9 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
       lwd->eval_xmat( npts, nbf, nbe, submat_map, 1.0, Pz_SS, ldpz_ss, dbasis_x_eval, nbe,
         zmat_z_ss, nbe, nbe_scr);
       lwd->eval_xmat( npts, nbf, nbe, submat_map, 1.0, Py_SS, ldpy_ss, dbasis_x_eval, nbe,
-        zmat_x_ss, nbe, nbe_scr);
-      lwd->eval_xmat( npts, nbf, nbe, submat_map, 1.0, Px_SS, ldpx_ss, dbasis_x_eval, nbe,
         zmat_y_ss, nbe, nbe_scr);
+      lwd->eval_xmat( npts, nbf, nbe, submat_map, 1.0, Px_SS, ldpx_ss, dbasis_x_eval, nbe,
+        zmat_x_ss, nbe, nbe_scr);
 
       lwd->eval_xmat( npts, nbf, nbe, submat_map, 1.0, Ps_SS, ldps_ss, dbasis_y_eval, nbe,
         xmat_y_s_ss, nbe, nbe_scr );

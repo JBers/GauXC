@@ -41,6 +41,7 @@ protected:
   virtual value_type        eval_exc_     ( const MatrixType& Ps, const MatrixType& Pz, const MatrixType& Py, const MatrixType& Px, const IntegratorSettingsXC& ks_settings ) = 0;
   virtual value_type        eval_exc_     ( const MatrixType& Ps, const MatrixType& Pz, const MatrixType& Py, const MatrixType& Px, 
                                             const MatrixType& Ps_SS, const MatrixType& Pz_SS, const MatrixType& Py_SS, const MatrixType& Px_SS, 
+                                            const MatrixType& Ps_SS_imag, const MatrixType& Pz_SS_imag, const MatrixType& Py_SS_imag, const MatrixType& Px_SS_imag,
                                             const IntegratorSettingsXC& ks_settings ) = 0;
 
 
@@ -50,7 +51,8 @@ protected:
                                             const IntegratorSettingsXC& ks_settings ) = 0;
 
   virtual exc_vxc_type_dks  eval_exc_vxc_ ( const MatrixType& Ps, const MatrixType& Pz, const MatrixType& Py, const MatrixType& Px, 
-                                            const MatrixType& Ps_SS, const MatrixType& Pz_SS, const MatrixType& Py_SS, const MatrixType& Px_SS, 
+                                            const MatrixType& Ps_SS, const MatrixType& Pz_SS, const MatrixType& Py_SS, const MatrixType& Px_SS,
+                                            const MatrixType& Ps_SS_imag, const MatrixType& Pz_SS_imag, const MatrixType& Py_SS_imag, const MatrixType& Px_SS_imag, 
                                             const IntegratorSettingsXC& ks_settings) = 0;
 
   virtual exc_vxc_type_neo_rks  neo_eval_exc_vxc_ ( const MatrixType& elec_Ps, const MatrixType& prot_Ps, const MatrixType& prot_Pz,
@@ -115,9 +117,10 @@ public:
    *  @returns Integrated EXC 
    */
   value_type eval_exc( const MatrixType& Ps, const MatrixType& Pz, const MatrixType& Py, const MatrixType& Px, 
-                       const MatrixType& Ps_SS, const MatrixType& Pz_SS, const MatrixType& Py_SS, const MatrixType& Px_SS, 
+                       const MatrixType& Ps_SS, const MatrixType& Pz_SS, const MatrixType& Py_SS, const MatrixType& Px_SS,
+                       const MatrixType& Ps_SS_imag, const MatrixType& Pz_SS_imag, const MatrixType& Py_SS_imag, const MatrixType& Px_SS_imag, 
                        const IntegratorSettingsXC& ks_settings ) {
-    return eval_exc_(Ps, Pz, Py, Px, Ps_SS, Pz_SS, Py_SS, Px_SS, ks_settings );
+    return eval_exc_(Ps, Pz, Py, Px, Ps_SS, Pz_SS, Py_SS, Px_SS, Ps_SS_imag, Pz_SS_imag, Py_SS_imag, Px_SS_imag, ks_settings );
   }
 
   /** Integrate EXC / VXC (Mean field terms) for RKS
@@ -139,8 +142,9 @@ public:
 
   exc_vxc_type_dks eval_exc_vxc( const MatrixType& Ps, const MatrixType& Pz, const MatrixType& Py, const MatrixType& Px, 
                                  const MatrixType& Ps_SS, const MatrixType& Pz_SS, const MatrixType& Py_SS, const MatrixType& Px_SS, 
+                                 const MatrixType& Ps_SS_imag, const MatrixType& Pz_SS_imag, const MatrixType& Py_SS_imag, const MatrixType& Px_SS_imag,
                                  const IntegratorSettingsXC& ks_settings ) {
-    return eval_exc_vxc_(Ps, Pz, Py, Px, Ps_SS, Pz_SS, Py_SS, Px_SS, ks_settings );
+    return eval_exc_vxc_(Ps, Pz, Py, Px, Ps_SS, Pz_SS, Py_SS, Px_SS, Ps_SS_imag, Pz_SS_imag, Py_SS_imag, Px_SS_imag, ks_settings );
   }
   
   exc_vxc_type_neo_rks neo_eval_exc_vxc( const MatrixType& elec_Ps, const MatrixType& prot_Ps, const MatrixType& prot_Pz, 

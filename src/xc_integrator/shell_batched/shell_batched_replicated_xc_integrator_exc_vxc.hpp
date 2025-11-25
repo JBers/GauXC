@@ -94,6 +94,7 @@ void ShellBatchedReplicatedXCIntegrator<BaseIntegratorType, IncoreIntegratorType
   this->timer_.time_op("XCIntegrator.LocalWork", [&](){
     exc_vxc_local_work_( basis, Ps, ldps, Pz, ldpz, Py, ldpy, Px, ldpx,
       nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0,
+      nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0,
       VXCs, ldvxcs, VXCz, ldvxcz, VXCy, ldvxcy, VXCx, ldvxcx,
       nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, EXC, 
       &N_EL, &spin_N_EL, tasks.begin(), tasks.end(), incore_integrator );
@@ -227,6 +228,10 @@ void ShellBatchedReplicatedXCIntegrator<BaseIntegratorType, IncoreIntegratorType
                        const value_type* Pz_SS, int64_t ldpz_ss,
                        const value_type* Py_SS, int64_t ldpy_ss,
                        const value_type* Px_SS, int64_t ldpx_ss,
+                       const value_type* Ps_SS_imag, 
+                       const value_type* Pz_SS_imag, 
+                       const value_type* Py_SS_imag,
+                       const value_type* Px_SS_imag,
                        value_type* VXCs, int64_t ldvxcs,
                        value_type* VXCz, int64_t ldvxcz,
                        value_type* VXCy, int64_t ldvxcy,

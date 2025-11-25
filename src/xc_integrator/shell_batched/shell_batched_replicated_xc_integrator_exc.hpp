@@ -81,6 +81,7 @@ void ShellBatchedReplicatedXCIntegrator<BaseIntegratorType, IncoreIntegratorType
   this->timer_.time_op("XCIntegrator.LocalWork", [&](){
     exc_vxc_local_work_( basis, Ps, ldps, Pz, ldpz, Py, ldpy, Px, ldpx,
       nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0,
+      nullptr, nullptr, nullptr, nullptr,
       nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0,
       nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, EXC, 
       &N_EL, &spin_N_EL, tasks.begin(), tasks.end(), incore_integrator );
