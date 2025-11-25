@@ -26,6 +26,10 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
              const value_type* Pz_SS, int64_t ldpz_ss,
              const value_type* Py_SS, int64_t ldpy_ss,
              const value_type* Px_SS, int64_t ldpx_ss,
+             const value_type* Ps_SS_imag,
+             const value_type* Pz_SS_imag,
+             const value_type* Py_SS_imag,
+             const value_type* Px_SS_imag,
              value_type* EXC, const IntegratorSettingsXC& ks_settings ) {
 
   const auto& basis = this->load_balancer_->basis();
@@ -61,6 +65,8 @@ std::cout<<"Hello from eval_exc_"<<std::endl;
     //exc_vxc_local_work_( P, ldp, VXC, ldvxc, EXC, &N_EL );
     exc_vxc_local_work_( basis, Ps, ldps, Pz, ldpz, Py, ldpy, Px, ldpx,
                          Ps_SS, ldps_ss, Pz_SS, ldpz_ss, Py_SS, ldpy_ss, Px_SS, ldpx_ss,
+                         Ps_SS_imag, Pz_SS_imag, Py_SS_imag, Px_SS_imag, 
+                         nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0,
                          nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0,
                          nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0,
                          EXC, &N_EL, &spin_N_EL, ks_settings, tasks.begin(), tasks.end());
@@ -87,7 +93,8 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
              value_type* EXC, const IntegratorSettingsXC& ks_settings ) {
 
   eval_exc_(m, n, P, ldp, nullptr, 0, nullptr, 0, nullptr, 0,
-    nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, EXC, ks_settings);
+    nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0,
+    nullptr, nullptr, nullptr, nullptr, EXC, ks_settings);
 
 }
 // UKS
@@ -98,7 +105,8 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
              value_type* EXC, const IntegratorSettingsXC& ks_settings ) {
 
   eval_exc_(m, n, Ps, ldps, Pz, ldpz, nullptr, 0, nullptr, 0, 
-    nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, EXC, ks_settings);
+    nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0,
+    nullptr, nullptr, nullptr, nullptr, EXC, ks_settings);
 
 }
 // GKS
@@ -111,7 +119,8 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
              value_type* EXC, const IntegratorSettingsXC& ks_settings ) {
 
   eval_exc_(m, n, Ps, ldps, Pz, ldpz, Py, ldpy, Px, ldpx, 
-    nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, EXC, ks_settings);
+    nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0,
+    nullptr, nullptr, nullptr, nullptr, EXC, ks_settings);
 
 }
 }

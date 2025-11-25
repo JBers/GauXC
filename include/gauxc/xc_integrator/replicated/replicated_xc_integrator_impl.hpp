@@ -59,6 +59,10 @@ protected:
                           const value_type* Pz_SS, int64_t ldpz_ss, 
                           const value_type* Py_SS, int64_t ldpy_ss, 
                           const value_type* Px_SS, int64_t ldpx_ss, 
+                          const value_type* Ps_SS_imag,
+                          const value_type* Pz_SS_imag,
+                          const value_type* Py_SS_imag,
+                          const value_type* Px_SS_imag,
                           value_type* EXC, const IntegratorSettingsXC& ks_settings ) = 0;
 
   virtual void eval_exc_vxc_( int64_t m, int64_t n, const value_type* P,
@@ -101,6 +105,10 @@ protected:
                               int64_t ldpy_ss,
                               const value_type* Px_SS,
                               int64_t ldpx_ss,
+                              const value_type* Ps_SS_imag,
+                              const value_type* Pz_SS_imag,
+                              const value_type* Py_SS_imag,
+                              const value_type* Px_SS_imag,
                               value_type* VXCs, int64_t ldvxcs,
                               value_type* VXCz, int64_t ldvxcz,
                               value_type* VXCy, int64_t ldvxcy,
@@ -109,6 +117,10 @@ protected:
                               value_type* VXCz_SS, int64_t ldvxcz_ss,
                               value_type* VXCy_SS, int64_t ldvxcy_ss,
                               value_type* VXCx_SS, int64_t ldvxcx_ss,
+                              value_type* VXCs_SS_im, int64_t ldvxcs_ss_im,
+                              value_type* VXCz_SS_im, int64_t ldvxcz_ss_im,
+                              value_type* VXCy_SS_im, int64_t ldvxcy_ss_im,
+                              value_type* VXCx_SS_im, int64_t ldvxcx_ss_im,
                               value_type* EXC, const IntegratorSettingsXC& ks_settings ) = 0;
 
   virtual void neo_eval_exc_vxc_( int64_t elec_m, int64_t elec_mn, int64_t prot_m, int64_t prot_n,
@@ -174,6 +186,10 @@ public:
                  const value_type* Pz_SS, int64_t ldpz_ss, 
                  const value_type* Py_SS, int64_t ldpy_ss, 
                  const value_type* Px_SS, int64_t ldpx_ss, 
+                 const value_type* Ps_SS_imag,
+                 const value_type* Pz_SS_imag,
+                 const value_type* Py_SS_imag,
+                 const value_type* Px_SS_imag,
                  value_type* EXC, const IntegratorSettingsXC& ks_settings );
 
   void eval_exc_vxc( int64_t m, int64_t n, const value_type* P,
@@ -217,6 +233,10 @@ public:
                      int64_t ldpy_ss,
                      const value_type* Px_SS,
                      int64_t ldpx_ss,
+                     const value_type* Ps_SS_imag,
+                     const value_type* Pz_SS_imag,
+                     const value_type* Py_SS_imag,
+                     const value_type* Px_SS_imag,
                      value_type* VXCs, int64_t ldvxcs,
                      value_type* VXCz, int64_t ldvxcz,
                      value_type* VXCy, int64_t ldvxcy,
@@ -225,6 +245,10 @@ public:
                      value_type* VXCz_SS, int64_t ldvxcz_ss,
                      value_type* VXCy_SS, int64_t ldvxcy_ss,
                      value_type* VXCx_SS, int64_t ldvxcx_ss,
+                     value_type* VXCs_SS_im, int64_t ldvxcs_ss_im,
+                     value_type* VXCz_SS_im, int64_t ldvxcz_ss_im,
+                     value_type* VXCy_SS_im, int64_t ldvxcy_ss_im,
+                     value_type* VXCx_SS_im, int64_t ldvxcx_ss_im,
                      value_type* EXC, const IntegratorSettingsXC& ks_settings );
   
   void neo_eval_exc_vxc( int64_t elec_m, int64_t elec_n, int64_t prot_m, int64_t prot_n,  

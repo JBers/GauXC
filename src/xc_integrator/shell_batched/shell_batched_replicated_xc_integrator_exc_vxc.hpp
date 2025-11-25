@@ -94,8 +94,9 @@ void ShellBatchedReplicatedXCIntegrator<BaseIntegratorType, IncoreIntegratorType
   this->timer_.time_op("XCIntegrator.LocalWork", [&](){
     exc_vxc_local_work_( basis, Ps, ldps, Pz, ldpz, Py, ldpy, Px, ldpx,
       nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0,
-      nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0,
+      nullptr, nullptr, nullptr, nullptr,
       VXCs, ldvxcs, VXCz, ldvxcz, VXCy, ldvxcy, VXCx, ldvxcx,
+      nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, 
       nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, EXC, 
       &N_EL, &spin_N_EL, tasks.begin(), tasks.end(), incore_integrator );
   });
@@ -164,6 +165,10 @@ void ShellBatchedReplicatedXCIntegrator<BaseIntegratorType, IncoreIntegratorType
                  const value_type* Pz_SS, int64_t ldpz_ss,
                  const value_type* Py_SS, int64_t ldpy_ss,
                  const value_type* Px_SS, int64_t ldpx_ss,
+                 const value_type* Ps_SS_imag,
+                 const value_type* Pz_SS_imag,
+                 const value_type* Py_SS_imag,
+                 const value_type* Px_SS_imag,
                  value_type* VXCs, int64_t ldvxcs,
                  value_type* VXCz, int64_t ldvxcz,
                  value_type* VXCy, int64_t ldvxcy,
@@ -172,6 +177,10 @@ void ShellBatchedReplicatedXCIntegrator<BaseIntegratorType, IncoreIntegratorType
                  value_type* VXCz_SS, int64_t ldvxcz_ss,
                  value_type* VXCy_SS, int64_t ldvxcy_ss,
                  value_type* VXCx_SS, int64_t ldvxcx_ss,
+                 value_type* VXCs_SS_im, int64_t ldvxcs_ss_im,
+                 value_type* VXCz_SS_im, int64_t ldvxcz_ss_im,
+                 value_type* VXCy_SS_im, int64_t ldvxcy_ss_im,
+                 value_type* VXCx_SS_im, int64_t ldvxcx_ss_im,
                  value_type* EXC, const IntegratorSettingsXC& ks_settings ) {
 
     GAUXC_GENERIC_EXCEPTION("DKS ShellBatched Not Yet Implemented");
@@ -240,6 +249,10 @@ void ShellBatchedReplicatedXCIntegrator<BaseIntegratorType, IncoreIntegratorType
                        value_type* VXCz_SS, int64_t ldvxcz_ss,
                        value_type* VXCy_SS, int64_t ldvxcy_ss,
                        value_type* VXCx_SS, int64_t ldvxcx_ss,
+                       value_type* VXCs_SS_im, int64_t ldvxcs_ss_im,
+                       value_type* VXCz_SS_im, int64_t ldvxcz_ss_im,
+                       value_type* VXCy_SS_im, int64_t ldvxcy_ss_im,
+                       value_type* VXCx_SS_im, int64_t ldvxcx_ss_im,
                        value_type* EXC, value_type *N_EL, value_type *spin_N_EL,
                        host_task_iterator task_begin, host_task_iterator task_end,
                        incore_integrator_type& incore_integrator ) {
@@ -498,7 +511,9 @@ void ShellBatchedReplicatedXCIntegrator<BaseIntegratorType, IncoreIntegratorType
     incore_integrator.exc_vxc_local_work( basis_subset, 
       Ps_submat, nbe, Pz_submat, nbe, Py_submat, nbe, Px_submat, nbe,
       nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, 
+      nullptr, nullptr, nullptr, nullptr, 
       VXCs_submat, nbe, VXCz_submat, nbe, VXCy_submat, nbe, VXCx_submat, nbe,
+      nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0,
       nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0,
       &EXC_tmp, &NEL_tmp, &spin_NEL_tmp, IntegratorSettingsKS{}, task_begin, task_end );
 #ifdef GAUXC_HAS_DEVICE

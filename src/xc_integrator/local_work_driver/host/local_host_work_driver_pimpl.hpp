@@ -118,6 +118,8 @@ struct LocalHostWorkDriverPIMPL {
     const double* Xx_y_SS, const double* Xy_y_SS, 
     const double* Xs_z_SS, const double* Xz_z_SS, 
     const double* Xx_z_SS, const double* Xy_z_SS, 
+    const double* immat_x_z, const double* immat_y_x, const double* immat_z_y,
+    const double* immat_y_z, const double* immat_x_x, const double* immat_x_y,
     double* den_eval, double* dden_x_eval, double* dden_y_eval, double* dden_z_eval, 
     double* gamma, double* K, double* H, const double dtol) = 0; 
 

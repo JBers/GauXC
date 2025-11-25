@@ -35,6 +35,10 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
                  const value_type* Pz_SS, int64_t ldpz_ss,
                  const value_type* Py_SS, int64_t ldpy_ss,
                  const value_type* Px_SS, int64_t ldpx_ss,
+                 const value_type* Ps_SS_imag,
+                 const value_type* Pz_SS_imag,
+                 const value_type* Py_SS_imag,
+                 const value_type* Px_SS_imag,
                  value_type* VXCs, int64_t ldvxcs,
                  value_type* VXCz, int64_t ldvxcz,
                  value_type* VXCy, int64_t ldvxcy,
@@ -43,6 +47,10 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
                  value_type* VXCz_SS, int64_t ldvxcz_ss,
                  value_type* VXCy_SS, int64_t ldvxcy_ss,
                  value_type* VXCx_SS, int64_t ldvxcx_ss,
+                 value_type* VXCs_SS_im, int64_t ldvxcs_ss_im,
+                 value_type* VXCz_SS_im, int64_t ldvxcz_ss_im,
+                 value_type* VXCy_SS_im, int64_t ldvxcy_ss_im,
+                 value_type* VXCx_SS_im, int64_t ldvxcx_ss_im,
                  value_type* EXC, const IntegratorSettingsXC& ks_settings ) {
 
 
@@ -90,7 +98,10 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
                          VXCs, ldvxcs, VXCz, ldvxcz,
                          VXCy, ldvxcy, VXCx, ldvxcx,
                          VXCs_SS, ldvxcs_ss, VXCz_SS, ldvxcz_ss,
-                         VXCy_SS, ldvxcy_ss, VXCx_SS, ldvxcx_ss, EXC, &N_EL, &spin_N_EL, ks_settings,
+                         VXCy_SS, ldvxcy_ss, VXCx_SS, ldvxcx_ss,
+                         VXCs_SS_im, ldvxcs_ss_im, VXCz_SS_im, ldvxcz_ss_im,
+                         VXCy_SS_im, ldvxcy_ss_im, VXCx_SS_im, ldvxcx_ss_im,
+                         EXC, &N_EL, &spin_N_EL, ks_settings,
                          tasks.begin(), tasks.end() );
   });
 
@@ -127,10 +138,10 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
                        const value_type* Pz_SS, int64_t ldpz_ss,
                        const value_type* Py_SS, int64_t ldpy_ss,
                        const value_type* Px_SS, int64_t ldpx_ss,
-                       const value_type* Ps_SS_imag, int64_t ldps_ss,
-                       const value_type* Pz_SS_imag, int64_t ldpz_ss,
-                       const value_type* Py_SS_imag, int64_t ldpy_ss,
-                       const value_type* Px_SS_imag, int64_t ldpx_ss,
+                       const value_type* Ps_SS_imag, 
+                       const value_type* Pz_SS_imag, 
+                       const value_type* Py_SS_imag,
+                       const value_type* Px_SS_imag, 
                        value_type* VXCs, int64_t ldvxcs,
                        value_type* VXCz, int64_t ldvxcz,
                        value_type* VXCy, int64_t ldvxcy,
@@ -139,6 +150,10 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
                        value_type* VXCz_SS, int64_t ldvxcz_ss,
                        value_type* VXCy_SS, int64_t ldvxcy_ss,
                        value_type* VXCx_SS, int64_t ldvxcx_ss,
+                       value_type* VXCs_SS_im, int64_t ldvxcs_ss_im,
+                       value_type* VXCz_SS_im, int64_t ldvxcz_ss_im,
+                       value_type* VXCy_SS_im, int64_t ldvxcy_ss_im,
+                       value_type* VXCx_SS_im, int64_t ldvxcx_ss_im,
                        value_type* EXC, value_type *N_EL, value_type *spin_N_EL,
                        const IntegratorSettingsXC& settings,
                        task_iterator task_begin, task_iterator task_end ) {
@@ -230,6 +245,10 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
       VXCz_SS[i + j*ldvxcz] = 0.;
       VXCy_SS[i + j*ldvxcy] = 0.;
       VXCx_SS[i + j*ldvxcx] = 0.;
+      VXCs_SS_im[i + j*ldvxcs] = 0.;
+      VXCz_SS_im[i + j*ldvxcz] = 0.;
+      VXCy_SS_im[i + j*ldvxcy] = 0.;
+      VXCx_SS_im[i + j*ldvxcx] = 0.;
     }
   }
  
@@ -269,10 +288,11 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
     const size_t gks_mod_KH = is_gks ? 6*npts : is_dks ? 6*npts : 0; // used to store K and H
     const size_t mgga_dim_scal = func.is_mgga() ? 4 : 1; // basis + d1basis
     const size_t dks_scal = is_dks ? 4 : 1;
+    const size_t dks_im_mats = is_dks ? 6*npts*nbe : 0;
 
     // Things that every calc needs
     host_data.nbe_scr .resize(nbe  * nbe);
-    host_data.zmat    .resize(npts * nbe * spin_dim_scal * mgga_dim_scal * dks_scal + gks_mod_KH); 
+    host_data.zmat    .resize(npts * nbe * spin_dim_scal * mgga_dim_scal * dks_scal + gks_mod_KH + dks_im_mats); 
     host_data.eps     .resize(npts);
     host_data.vrho    .resize(npts * spin_dim_scal);
 
@@ -333,6 +353,15 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
     decltype(zmat) xmat_z_x_ss = nullptr;
     decltype(zmat) xmat_z_y_ss = nullptr;
 
+    decltype(zmat) immat_x_z = nullptr;
+    decltype(zmat) immat_y_x = nullptr;
+    decltype(zmat) immat_z_y = nullptr;
+
+    decltype(zmat) immat_y_z = nullptr;
+    decltype(zmat) immat_z_x = nullptr;
+    decltype(zmat) immat_x_y = nullptr;
+
+
     if(!is_rks) {
       zmat_z = zmat + mgga_dim_scal * nbe * npts;
     }
@@ -355,6 +384,15 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
       xmat_z_z_ss = xmat_z_s_ss + nbe * npts;
       xmat_z_x_ss = xmat_z_z_ss + nbe * npts;
       xmat_z_y_ss = xmat_z_x_ss + nbe * npts;
+
+      immat_x_z = xmat_z_y_ss + nbe * npts;
+      immat_y_x = immat_x_z + nbe * npts;
+      immat_z_y = immat_y_x + nbe * npts;
+
+      immat_y_z = immat_z_y  + nbe * npts;
+      immat_z_x = immat_x_z + nbe * npts;
+      immat_x_y = immat_y_x + nbe * npts;
+
     }
      
     auto* eps        = host_data.eps.data();
@@ -382,7 +420,7 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
     value_type* dden_z_eval = nullptr;
     value_type* K = nullptr;
     value_type* H = nullptr;
-    if (is_gks or is_dks) { K = zmat + npts * nbe * 4 * dks_scal; }
+    if (is_gks or is_dks) { K = zmat + npts * nbe * 4 * dks_scal + dks_im_mats; }
     value_type* mmat_x      = nullptr;
     value_type* mmat_y      = nullptr;
     value_type* mmat_z      = nullptr;
@@ -501,6 +539,22 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
         xmat_z_y_ss, nbe, nbe_scr);
       lwd->eval_xmat( npts, nbf, nbe, submat_map, 1.0, Px_SS, ldpx_ss, dbasis_z_eval, nbe,
         xmat_z_x_ss, nbe, nbe_scr);
+
+       // imaginary contrib to rho s 
+      lwd->eval_xmat( npts, nbf, nbe, submat_map, 1.0, Pz_SS_imag, ldpz_ss, dbasis_x_eval, nbe,
+        immat_x_z, nbe, nbe_scr);
+      lwd->eval_xmat( npts, nbf, nbe, submat_map, 1.0, Pz_SS_imag, ldpz_ss, dbasis_y_eval, nbe,
+        immat_y_z, nbe, nbe_scr);
+
+      lwd->eval_xmat( npts, nbf, nbe, submat_map, 1.0, Py_SS_imag, ldpy_ss, dbasis_z_eval, nbe,
+        immat_z_y, nbe, nbe_scr);
+      lwd->eval_xmat( npts, nbf, nbe, submat_map, 1.0, Py_SS_imag, ldpy_ss, dbasis_x_eval, nbe,
+        immat_x_y, nbe, nbe_scr);
+
+      lwd->eval_xmat( npts, nbf, nbe, submat_map, 1.0, Px_SS_imag, ldpx_ss, dbasis_y_eval, nbe,
+        immat_y_x, nbe, nbe_scr);
+      lwd->eval_xmat( npts, nbf, nbe, submat_map, 1.0, Px_SS_imag, ldpx_ss, dbasis_z_eval, nbe,
+        immat_z_x, nbe, nbe_scr);
     }
     
 
@@ -538,6 +592,8 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
           zmat_s_ss, nbe, zmat_z_ss, nbe, zmat_x_ss, nbe, zmat_y_ss, nbe, 
           xmat_y_s_ss, xmat_y_z_ss, xmat_y_x_ss, xmat_y_y_ss,
           xmat_z_s_ss, xmat_z_z_ss, xmat_z_x_ss, xmat_z_y_ss,
+          immat_x_z, immat_y_x, immat_z_y,
+          immat_y_z, immat_z_x, immat_x_y,
           den_eval, dden_x_eval, dden_y_eval, dden_z_eval, 
           gamma, K, H, gks_dtol );
       }
@@ -719,6 +775,10 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
         lwd->inc_vxc( npts, nbf, nbe, dbasis_y_eval, submat_map, xmat_z_z_ss, nbe, VXCz_SS, ldvxcs_ss,
           nbe_scr, -2*RKB_factor );
 
+        // Vxc z im anti
+        lwd->inc_vxc( npts, nbf, nbe, dbasis_x_eval, submat_map, xmat_y_z_ss, nbe, VXCz_SS_im, ldvxcs_ss,
+          nbe_scr, -2*RKB_factor );
+
         // Vxc x
         lwd->inc_vxc( npts, nbf, nbe, dbasis_x_eval, submat_map, zmat_x_ss, nbe, VXCx_SS, ldvxcz_ss,
           nbe_scr, RKB_factor );
@@ -732,6 +792,10 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
         lwd->inc_vxc( npts, nbf, nbe, dbasis_y_eval, submat_map, zmat_x_ss, nbe, VXCx_SS, ldvxcz_ss,
           nbe_scr, -2*RKB_factor );
 
+                // Vxc x im anti
+        lwd->inc_vxc( npts, nbf, nbe, dbasis_y_eval, submat_map, xmat_z_x_ss, nbe, VXCx_SS_im, ldvxcs_ss,
+          nbe_scr, -2*RKB_factor );
+
         //Vxc y
         lwd->inc_vxc( npts, nbf, nbe, dbasis_x_eval, submat_map, zmat_y_ss, nbe, VXCy_SS, ldvxcy_ss,
           nbe_scr, -1*RKB_factor );
@@ -743,6 +807,10 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
         lwd->inc_vxc( npts, nbf, nbe, dbasis_y_eval, submat_map, zmat_y_ss, nbe, VXCy_SS, ldvxcz_ss,
           nbe_scr, -2*RKB_factor );
         lwd->inc_vxc( npts, nbf, nbe, dbasis_z_eval, submat_map, zmat_y_ss, nbe, VXCy_SS, ldvxcz_ss,
+          nbe_scr, -2*RKB_factor );
+
+                // Vxc y im anti
+        lwd->inc_vxc( npts, nbf, nbe, dbasis_z_eval, submat_map, zmat_y_ss, nbe, VXCy_SS_im, ldvxcs_ss,
           nbe_scr, -2*RKB_factor );
       }
        
@@ -790,10 +858,16 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
           VXCz_SS[ j + i*ldvxcz_ss ] = VXCz_SS[ i + j*ldvxcz_ss ];
           VXCy_SS[ j + i*ldvxcy_ss ] = VXCy_SS[ i + j*ldvxcy_ss ];
           VXCx_SS[ j + i*ldvxcx_ss ] = VXCx_SS[ i + j*ldvxcx_ss ];
+          VXCs_SS_im[ j + i*ldvxcs_ss ] = -1. * VXCs_SS_im[ i + j*ldvxcs_ss ];
+          VXCz_SS_im[ j + i*ldvxcz_ss ] = -1. * VXCz_SS_im[ i + j*ldvxcz_ss ];
+          VXCy_SS_im[ j + i*ldvxcy_ss ] = -1. * VXCy_SS_im[ i + j*ldvxcy_ss ];
+          VXCx_SS_im[ j + i*ldvxcx_ss ] = -1. * VXCx_SS_im[ i + j*ldvxcx_ss ];
+          std::cout<<VXCs_SS_im[ j + i*ldvxcs_ss ]<<std::endl;
         }
       }
     }
   }
+
 
 } 
 
@@ -809,7 +883,9 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
 
   eval_exc_vxc_(m, n, P, ldp, nullptr, 0, nullptr, 0, nullptr, 0,
     nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0,
+    nullptr, nullptr, nullptr, nullptr, 
     VXC, ldvxc, nullptr, 0, nullptr, 0, nullptr, 0,
+    nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0,
     nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0,
     EXC, ks_settings );
 
@@ -828,7 +904,9 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
 
   eval_exc_vxc_(m, n, Ps, ldps, Pz, ldpz, nullptr, 0, nullptr, 0,
     nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0,
+    nullptr, nullptr, nullptr, nullptr, 
     VXCs, ldvxcs, VXCz, ldvxcz, nullptr, 0, nullptr, 0,
+    nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0,
     nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0,
     EXC, ks_settings );
 
@@ -850,7 +928,9 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
 
   eval_exc_vxc_(m, n, Ps, ldps, Pz, ldpz, Py, ldpy, Px, ldpx,
     nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0,
+    nullptr, nullptr, nullptr, nullptr, 
     VXCs, ldvxcs, VXCz, ldvxcz, VXCy, ldvxcy, VXCx, ldvxcx,
+    nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0,
     nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0,
     EXC, ks_settings );
 }

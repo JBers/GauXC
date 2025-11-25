@@ -91,7 +91,7 @@ typename XCIntegrator<MatrixType>::exc_vxc_type_dks
                                           const MatrixType& Ps_SS, const MatrixType& Pz_SS, const MatrixType& Py_SS, const MatrixType& Px_SS, 
                                           const MatrixType& Ps_SS_imag, const MatrixType& Pz_SS_imag, const MatrixType& Py_SS_imag, const MatrixType& Px_SS_imag, const IntegratorSettingsXC& ks_settings ) {
   if( not pimpl_ ) GAUXC_PIMPL_NOT_INITIALIZED();
-  return pimpl_->eval_exc_vxc(Ps, Pz, Py, Px, Ps_SS, Pz_SS, Py_SS, Px_SS, Ps_SS_imag, Pz_SS_imag, Py_SS_imag, Px_SS_imag ks_settings);
+  return pimpl_->eval_exc_vxc(Ps, Pz, Py, Px, Ps_SS, Pz_SS, Py_SS, Px_SS, Ps_SS_imag, Pz_SS_imag, Py_SS_imag, Px_SS_imag, ks_settings);
 };
 
 template <typename MatrixType>

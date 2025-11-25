@@ -84,10 +84,15 @@ void ReplicatedXCIntegratorImpl<ValueType>::
             const value_type* Pz_SS, int64_t ldpz_ss,
             const value_type* Py_SS, int64_t ldpy_ss,
             const value_type* Px_SS, int64_t ldpx_ss,
+            const value_type* Ps_SS_imag,
+            const value_type* Pz_SS_imag,
+            const value_type* Py_SS_imag,
+            const value_type* Px_SS_imag,
             value_type* EXC, const IntegratorSettingsXC& ks_settings ) {
 
     eval_exc_(m,n,Ps,ldps,Pz,ldpz,Py,ldpy,Px,ldpx,
-      Ps_SS,ldps_ss,Pz_SS,ldpz_ss,Py_SS,ldpy_ss,Px_SS,ldpx_ss,EXC,ks_settings);
+      Ps_SS,ldps_ss,Pz_SS,ldpz_ss,Py_SS,ldpy_ss,Px_SS,ldpx_ss,
+      Ps_SS_imag, Pz_SS_imag, Py_SS_imag, Px_SS_imag,EXC,ks_settings);
 
 }
 
@@ -163,6 +168,10 @@ void ReplicatedXCIntegratorImpl<ValueType>::
                      int64_t ldpy_ss,
                      const value_type* Px_SS,
                      int64_t ldpx_ss,
+                     const value_type* Ps_SS_imag,
+                     const value_type* Pz_SS_imag,
+                     const value_type* Py_SS_imag,
+                     const value_type* Px_SS_imag,
                      value_type* VXCs, int64_t ldvxcs,
                      value_type* VXCz, int64_t ldvxcz,
                      value_type* VXCy, int64_t ldvxcy,
@@ -171,6 +180,10 @@ void ReplicatedXCIntegratorImpl<ValueType>::
                      value_type* VXCz_SS, int64_t ldvxcz_ss,
                      value_type* VXCy_SS, int64_t ldvxcy_ss,
                      value_type* VXCx_SS, int64_t ldvxcx_ss,
+                     value_type* VXCs_SS_im, int64_t ldvxcs_ss_im,
+                     value_type* VXCz_SS_im, int64_t ldvxcz_ss_im,
+                     value_type* VXCy_SS_im, int64_t ldvxcy_ss_im,
+                     value_type* VXCx_SS_im, int64_t ldvxcx_ss_im,
                      value_type* EXC, const IntegratorSettingsXC& ks_settings ) {
   
     eval_exc_vxc_(m,n,Ps,ldps,
@@ -181,6 +194,10 @@ void ReplicatedXCIntegratorImpl<ValueType>::
                       Pz_SS,ldpz_ss,
                       Py_SS,ldpy_ss,
                       Px_SS,ldpx_ss,
+                      Ps_SS_imag,
+                      Pz_SS_imag,
+                      Py_SS_imag,
+                      Px_SS_imag,
                       VXCs,ldvxcs,
                       VXCz,ldvxcz,
                       VXCy,ldvxcy,
@@ -188,7 +205,11 @@ void ReplicatedXCIntegratorImpl<ValueType>::
                       VXCs_SS,ldvxcs_ss,
                       VXCz_SS,ldvxcz_ss,
                       VXCy_SS,ldvxcy_ss,
-                      VXCx_SS,ldvxcx_ss,EXC, ks_settings);
+                      VXCx_SS,ldvxcx_ss,
+                      VXCs_SS_im,ldvxcs_ss_im, 
+                      VXCz_SS_im,ldvxcz_ss_im, 
+                      VXCy_SS_im,ldvxcy_ss_im, 
+                      VXCx_SS_im,ldvxcx_ss_im, EXC, ks_settings);
 
 }
 

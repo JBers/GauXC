@@ -56,6 +56,10 @@ protected:
                       const value_type* Pz_SS, int64_t ldpz_ss,
                       const value_type* Py_SS, int64_t ldpy_ss,
                       const value_type* Px_SS, int64_t ldpx_ss,
+                      const value_type* Ps_SS_imag,
+                      const value_type* Pz_SS_imag,
+                      const value_type* Py_SS_imag,
+                      const value_type* Px_SS_imag,
                       value_type* EXC, const IntegratorSettingsXC& ks_settings ) override;
 
   /// RKS EXC/VXC
@@ -92,6 +96,10 @@ protected:
                       const value_type* Pz_SS, int64_t ldpz_ss,
                       const value_type* Py_SS, int64_t ldpy_ss,
                       const value_type* Px_SS, int64_t ldpx_ss,
+                      const value_type* Ps_SS_imag,
+                      const value_type* Pz_SS_imag,
+                      const value_type* Py_SS_imag,
+                      const value_type* Px_SS_imag,
                       value_type* VXCs, int64_t ldvxcs,
                       value_type* VXCz, int64_t ldvxcz,
                       value_type* VXCy, int64_t ldvxcy,
@@ -100,6 +108,10 @@ protected:
                       value_type* VXCz_SS, int64_t ldvxcz_ss,
                       value_type* VXCy_SS, int64_t ldvxcy_ss,
                       value_type* VXCx_SS, int64_t ldvxcx_ss,
+                      value_type* VXCs_SS_im, int64_t ldvxcs_ss_im,
+                      value_type* VXCz_SS_im, int64_t ldvxcz_ss_im,
+                      value_type* VXCy_SS_im, int64_t ldvxcy_ss_im,
+                      value_type* VXCx_SS_im, int64_t ldvxcx_ss_im,
                       value_type* EXC, const IntegratorSettingsXC& ks_settings ) override;
 
 
@@ -159,6 +171,10 @@ protected:
                             value_type* VXCz_SS, int64_t ldvxcz_ss,
                             value_type* VXCy_SS, int64_t ldvxcy_ss,
                             value_type* VXCx_SS, int64_t ldvxcx_ss,
+                            value_type* VXCs_SS_im, int64_t ldvxcs_ss_im,
+                            value_type* VXCz_SS_im, int64_t ldvxcz_ss_im,
+                            value_type* VXCy_SS_im, int64_t ldvxcy_ss_im,
+                            value_type* VXCx_SS_im, int64_t ldvxcx_ss_im,
                             value_type* EXC, value_type *N_EL, value_type *spin_N_EL, const IntegratorSettingsXC& ks_settings,
                             task_iterator task_begin, task_iterator task_end );
 

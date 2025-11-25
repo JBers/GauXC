@@ -83,6 +83,7 @@ void ShellBatchedReplicatedXCIntegrator<BaseIntegratorType, IncoreIntegratorType
       nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0,
       nullptr, nullptr, nullptr, nullptr,
       nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0,
+      nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, 
       nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, EXC, 
       &N_EL, &spin_N_EL, tasks.begin(), tasks.end(), incore_integrator );
   });
@@ -141,6 +142,10 @@ void ShellBatchedReplicatedXCIntegrator<BaseIntegratorType, IncoreIntegratorType
              const value_type* Pz_SS, int64_t ldpz_ss,
              const value_type* Py_SS, int64_t ldpy_ss,
              const value_type* Px_SS, int64_t ldpx_ss,
+             const value_type* Ps_SS_imag,
+             const value_type* Pz_SS_imag,
+             const value_type* Py_SS_imag,
+             const value_type* Px_SS_imag,
              value_type* EXC, const IntegratorSettingsXC& ks_settings ) {
 
 
