@@ -609,6 +609,7 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
     const double* Xx_z_SS, const double* Xy_z_SS, 
     const double* immat_x_z, const double* immat_y_x, const double* immat_z_y,
     const double* immat_y_z, const double* immat_x_x, const double* immat_x_y,
+    const double* immat_x_s, const double* immat_y_s, const double* immat_z_s,
     double* den_eval, double* dden_x_eval, double* dden_y_eval, double* dden_z_eval, 
     double* gamma, double* K, double* H, const double dtol) {
 
@@ -621,6 +622,8 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
    auto *HX = HY + npts;
 
    double dtolsq = dtol*dtol;
+
+  //  std::cout<<"seg fault here?"<<std::endl;
 
    for( int32_t i = 0; i < (int32_t)npts; ++i ) {
 
@@ -644,12 +647,12 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
       const auto*   Xx_y_i_ss = Xx_y_SS + ioffx;
       const auto*   Xy_y_i_ss = Xy_y_SS + ioffy;
 
-      const auto*   Xs_z_i_ss = Xs_z_SS + ioffs;
+      const auto*   Xs_z_i_ss = Xs_z_SS + ioffs; // Re[Ps] * d/dz chi nu
       const auto*   Xz_z_i_ss = Xz_z_SS + ioffz;
       const auto*   Xx_z_i_ss = Xx_z_SS + ioffx;
       const auto*   Xy_z_i_ss = Xy_z_SS + ioffy;
 
-      const auto*   Xz_x_i_im = immat_x_z + ioffz;
+      const auto*   Xz_x_i_im = immat_x_z + ioffz; // im[Pz] * d/dx chi nu
       const auto*   Xz_y_i_im = immat_y_z + ioffz;
 
       const auto*   Xx_y_i_im = immat_y_x + ioffx;
@@ -657,6 +660,10 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
 
       const auto*   Xy_z_i_im = immat_z_y + ioffy;
       const auto*   Xy_x_i_im = immat_x_y + ioffy;
+
+      const auto*   Xs_x_i_im = immat_x_s + ioffs;
+      const auto*   Xs_y_i_im = immat_y_s + ioffs;
+      const auto*   Xs_z_i_im = immat_z_s + ioffs;
 
 
 
@@ -684,38 +691,68 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
 
 
       auto rhos_ss = rhos_yy_ss + rhos_xx_ss + rhos_zz_ss; 
-      rhos_ss += rhos_z_yx - rhos_z_xy + rhos_x_yz - rhos_x_zy + rhos_y_zx - rhos_y_xz;
+      rhos_ss -= rhos_z_yx - rhos_z_xy + rhos_x_yz - rhos_x_zy + rhos_y_zx - rhos_y_xz;
 
       // z
       const double rhoz_xx_ss = blas::dot( nbe, dbasis_x_eval + ioffz, 1, Xz_x_i_ss, 1 );
       const double rhoz_yy_ss = blas::dot( nbe, dbasis_y_eval + ioffz, 1, Xz_y_i_ss, 1 );       
       const double rhoz_zz_ss = blas::dot( nbe, dbasis_z_eval + ioffz, 1, Xz_z_i_ss, 1 );
 
-      const double rhoz_xz_ss = blas::dot( nbe, dbasis_x_eval + ioffs, 1, Xx_z_i_ss, 1 );
-      const double rhoz_zx_ss = blas::dot( nbe, dbasis_z_eval + ioffs, 1, Xx_x_i_ss, 1 );
-      const double rhoz_yz_ss = blas::dot( nbe, dbasis_y_eval + ioffs, 1, Xy_z_i_ss, 1 );
-      const double rhoz_zy_ss = blas::dot( nbe, dbasis_z_eval + ioffs, 1, Xy_y_i_ss, 1 );
+      const double rhoz_xz_ss = blas::dot( nbe, dbasis_x_eval + ioffx, 1, Xx_z_i_ss, 1 );
+      const double rhoz_zx_ss = blas::dot( nbe, dbasis_z_eval + ioffx, 1, Xx_x_i_ss, 1 );
+
+      const double rhoz_yz_ss = blas::dot( nbe, dbasis_y_eval + ioffy, 1, Xy_z_i_ss, 1 );
+      const double rhoz_zy_ss = blas::dot( nbe, dbasis_z_eval + ioffy, 1, Xy_y_i_ss, 1 );
 
       auto rhoz_ss = rhoz_zz_ss - rhoz_yy_ss - rhoz_xx_ss + rhoz_xz_ss +rhoz_zx_ss - rhoz_yz_ss - rhoz_zy_ss; 
+
+      // z anti
+
+      const double rhoz_yx_im = blas::dot( nbe, dbasis_y_eval + ioffs, 1, immat_x_s, 1 );
+      const double rhoz_xy_im = blas::dot( nbe, dbasis_x_eval + ioffs, 1, immat_y_s, 1 );
+
+      rhoz_ss += rhoz_yx_im - rhoz_xy_im;
 
       // x
       const double rhox_xx_ss = blas::dot( nbe, dbasis_x_eval + ioffz, 1, Xx_x_i_ss, 1 );
       const double rhox_yy_ss = blas::dot( nbe, dbasis_y_eval + ioffz, 1, Xx_y_i_ss, 1 );       
       const double rhox_zz_ss = blas::dot( nbe, dbasis_z_eval + ioffz, 1, Xx_z_i_ss, 1 );
 
-      const double rhox_xz_ss = blas::dot( nbe, dbasis_x_eval + ioffs, 1, Xz_z_i_ss, 1 );
-      const double rhox_yx_ss = blas::dot( nbe, dbasis_x_eval + ioffs, 1, Xy_y_i_ss, 1 );
+      const double rhox_xz_ss = blas::dot( nbe, dbasis_x_eval + ioffz, 1, Xz_z_i_ss, 1 );
+      const double rhox_zx_ss = blas::dot( nbe, dbasis_z_eval + ioffz, 1, Xz_x_i_ss, 1 );
 
-      auto rhox_ss = rhox_xx_ss - rhox_zz_ss - rhox_yy_ss + 2.*rhox_xz_ss + -2.*rhox_yx_ss;
+      const double rhox_yx_ss = blas::dot( nbe, dbasis_x_eval + ioffy, 1, Xy_y_i_ss, 1 );
+      const double rhox_xy_ss = blas::dot( nbe, dbasis_y_eval + ioffy, 1, Xy_x_i_ss, 1 );
+
+      auto rhox_ss = rhox_xx_ss - rhox_zz_ss - rhox_yy_ss + rhox_xz_ss +rhox_zx_ss -rhox_yx_ss - rhox_xy_ss;
+
+      // x anti
+
+      const double rhox_zy_im = blas::dot( nbe, dbasis_z_eval + ioffs, 1, immat_y_s, 1 );
+      const double rhox_yz_im = blas::dot( nbe, dbasis_y_eval + ioffs, 1, immat_z_s, 1 );   
+      
+      rhox_ss += rhox_zy_im - rhox_yz_im;
+
+
       // y
       const double rhoy_xx_ss = blas::dot( nbe, dbasis_x_eval + ioffz, 1, Xy_x_i_ss, 1 );
       const double rhoy_yy_ss = blas::dot( nbe, dbasis_y_eval + ioffz, 1, Xy_y_i_ss, 1 );       
       const double rhoy_zz_ss = blas::dot( nbe, dbasis_z_eval + ioffz, 1, Xy_z_i_ss, 1 );
 
       const double rhoy_xy_ss = blas::dot( nbe, dbasis_y_eval + ioffs, 1, Xz_z_i_ss, 1 );
-      const double rhoy_yz_ss = blas::dot( nbe, dbasis_x_eval + ioffs, 1, Xx_y_i_ss, 1 );
+      const double rhoy_yx_ss = blas::dot( nbe, dbasis_z_eval + ioffs, 1, Xz_y_i_ss, 1 );
 
-      auto rhoy_ss =  rhoy_yy_ss - rhoy_xx_ss - rhoy_zz_ss + -2.*rhoy_xy_ss + -2.*rhoy_yz_ss; 
+      const double rhoy_yz_ss = blas::dot( nbe, dbasis_x_eval + ioffs, 1, Xx_y_i_ss, 1 );
+      const double rhoy_zy_ss = blas::dot( nbe, dbasis_y_eval + ioffs, 1, Xx_x_i_ss, 1 );
+
+      auto rhoy_ss =  rhoy_yy_ss - rhoy_xx_ss - rhoy_zz_ss - rhoy_xy_ss - rhoy_yx_ss - rhoy_yz_ss - rhoy_zy_ss; 
+
+      // y anti
+
+      const double rhoy_zx_im = blas::dot( nbe, dbasis_z_eval + ioffs, 1, immat_x_s, 1 );
+      const double rhoy_xz_im = blas::dot( nbe, dbasis_x_eval + ioffs, 1, immat_z_s, 1 );   
+      
+      rhoy_ss += rhoy_zx_im - rhoy_xz_im;
 
       // // total rho (LL + SS)
       if(RKB_factor * rhos > 1e-12){
@@ -1016,6 +1053,8 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
 
 
     }
+
+  //  std::cout<<"or not"<<std::endl;
 }
 
 
