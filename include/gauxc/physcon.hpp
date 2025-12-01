@@ -10,7 +10,7 @@
 
 namespace GauXC {
 
-	  constexpr double SpeedOfLight  = 13.7035999074;
+	  constexpr double SpeedOfLight  = 137.035999074;
 	  constexpr double RKB_factor = 1./(4.*SpeedOfLight*SpeedOfLight);
 
 };

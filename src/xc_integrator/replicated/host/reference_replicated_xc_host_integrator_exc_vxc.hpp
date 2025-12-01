@@ -760,6 +760,11 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
         lwd->inc_vxc( npts, nbf, nbe, dbasis_z_eval, submat_map, xmat_z_s_ss, nbe, VXCs_SS, ldvxcs_ss,
           nbe_scr, RKB_factor );
 
+        lwd->inc_vxc( npts, nbf, nbe, dbasis_x_eval, submat_map, xmat_y_s_ss, nbe, VXCs_SS_im, ldvxcs_ss,
+          nbe_scr, RKB_factor );
+        lwd->inc_vxc( npts, nbf, nbe, dbasis_y_eval, submat_map, zmat_s_ss, nbe, VXCs_SS_im, ldvxcs_ss,
+          nbe_scr, -1*RKB_factor );
+
 
 
         // Vxc z
@@ -769,6 +774,11 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
           nbe_scr, RKB_factor );
         lwd->inc_vxc( npts, nbf, nbe, dbasis_z_eval, submat_map, xmat_z_z_ss, nbe, VXCz_SS, ldvxcz_ss,
           nbe_scr, RKB_factor );
+
+        lwd->inc_vxc( npts, nbf, nbe, dbasis_x_eval, submat_map, xmat_y_z_ss, nbe, VXCz_SS_im, ldvxcs_ss,
+          nbe_scr, RKB_factor );
+        lwd->inc_vxc( npts, nbf, nbe, dbasis_y_eval, submat_map, zmat_z_ss, nbe, VXCz_SS_im, ldvxcs_ss,
+          nbe_scr, -1*RKB_factor );
 
         // lwd->inc_vxc( npts, nbf, nbe, dbasis_x_eval, submat_map, xmat_z_z_ss, nbe, VXCz_SS, ldvxcs_ss,
         //   nbe_scr, 2*RKB_factor );
