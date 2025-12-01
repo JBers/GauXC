@@ -691,7 +691,7 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
 
 
       auto rhos_ss = rhos_yy_ss + rhos_xx_ss + rhos_zz_ss; 
-      rhos_ss -= rhos_z_yx - rhos_z_xy + rhos_x_yz - rhos_x_zy + rhos_y_zx - rhos_y_xz;
+      rhos_ss += rhos_z_yx - rhos_z_xy + rhos_x_yz - rhos_x_zy + rhos_y_zx - rhos_y_xz;
 
       // z
       const double rhoz_xx_ss = blas::dot( nbe, dbasis_x_eval + ioffz, 1, Xz_x_i_ss, 1 );
@@ -711,7 +711,7 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
       const double rhoz_yx_im = blas::dot( nbe, dbasis_y_eval + ioffs, 1, immat_x_s, 1 );
       const double rhoz_xy_im = blas::dot( nbe, dbasis_x_eval + ioffs, 1, immat_y_s, 1 );
 
-      rhoz_ss += rhoz_yx_im - rhoz_xy_im;
+      rhoz_ss -= rhoz_yx_im - rhoz_xy_im;
 
       // x
       const double rhox_xx_ss = blas::dot( nbe, dbasis_x_eval + ioffz, 1, Xx_x_i_ss, 1 );
@@ -731,7 +731,7 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
       const double rhox_zy_im = blas::dot( nbe, dbasis_z_eval + ioffs, 1, immat_y_s, 1 );
       const double rhox_yz_im = blas::dot( nbe, dbasis_y_eval + ioffs, 1, immat_z_s, 1 );   
       
-      rhox_ss += rhox_zy_im - rhox_yz_im;
+      rhox_ss -= rhox_zy_im - rhox_yz_im;
 
 
       // y
@@ -752,7 +752,7 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
       const double rhoy_zx_im = blas::dot( nbe, dbasis_z_eval + ioffs, 1, immat_x_s, 1 );
       const double rhoy_xz_im = blas::dot( nbe, dbasis_x_eval + ioffs, 1, immat_z_s, 1 );   
       
-      rhoy_ss += rhoy_zx_im - rhoy_xz_im;
+      rhoy_ss -= rhoy_zx_im - rhoy_xz_im;
 
       // // total rho (LL + SS)
       if(RKB_factor * rhos > 1e-12){
