@@ -391,7 +391,7 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
 
       immat_y_z = immat_z_y  + nbe * npts;
       immat_z_x = immat_x_z + nbe * npts;
-      immat_x_y = immat_y_x + nbe * npts;
+      immat_x_y = immat_z_x + nbe * npts;
 
     }
      
