@@ -235,6 +235,7 @@ void LocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, const dou
     const double* Xx_z_SS, const double* Xy_z_SS, 
     const double* immat_x_z, const double* immat_y_x, const double* immat_z_y,
     const double* immat_y_z, const double* immat_z_x, const double* immat_x_y,
+    const double* immat_x_s, const double* immat_y_s, const double* immat_z_s,
     double* den_eval, double* dden_x_eval, double* dden_y_eval, double* dden_z_eval, 
     double* gamma, double* K, double* H, const double dtol ) {
 
@@ -249,6 +250,7 @@ void LocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, const dou
     Xs_z_SS, Xz_z_SS, Xx_z_SS, Xy_z_SS,
     immat_x_z, immat_y_x, immat_z_y,
     immat_y_z, immat_z_x, immat_x_y,
+    immat_x_s, immat_y_s, immat_z_s,
     den_eval, dden_x_eval, dden_y_eval, dden_z_eval,
     gamma, K, H, dtol);
 
