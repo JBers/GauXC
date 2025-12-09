@@ -1,7 +1,11 @@
 /**
  * GauXC Copyright (c) 2020-2024, The Regents of the University of California,
  * through Lawrence Berkeley National Laboratory (subject to receipt of
- * any required approvals from the U.S. Dept. of Energy). All rights reserved.
+ * any required approvals from the U.S. Dept. of Energy).
+ *
+ * (c) 2024-2025, Microsoft Corporation
+ *
+ * All rights reserved.
  *
  * See LICENSE.txt for details
  */
@@ -16,7 +20,7 @@
 namespace XCPU {
 void integral_4_0(size_t npts,
                   double *_points,
-                  point rA,
+                  point /*rA*/,
                   point /*rB*/,
                   int nprim_pairs,
                   prim_pair *prim_pairs,

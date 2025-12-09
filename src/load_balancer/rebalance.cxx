@@ -1,7 +1,11 @@
 /**
  * GauXC Copyright (c) 2020-2024, The Regents of the University of California,
  * through Lawrence Berkeley National Laboratory (subject to receipt of
- * any required approvals from the U.S. Dept. of Energy). All rights reserved.
+ * any required approvals from the U.S. Dept. of Energy).
+ *
+ * (c) 2024-2025, Microsoft Corporation
+ *
+ * All rights reserved.
  *
  * See LICENSE.txt for details
  */
@@ -58,7 +62,7 @@ auto rebalance(TaskIterator begin, TaskIterator end, const CostFunctor& cost, MP
   std::vector<task_message> task_outgoing;
   auto it = local_prefix_sum.begin();
   for( int i = 0; i < world_size; ++i) {
-    auto n_it = std::lower_bound(it, local_prefix_sum.end(), i,
+    auto n_it = std::lower_bound(it, local_prefix_sum.end(), (size_t)i,
       [=](auto a, auto b) { return a / task_avg < b+1; });
     size_t st_idx = std::distance(local_prefix_sum.begin(), it  );
     size_t en_idx = std::distance(local_prefix_sum.begin(), n_it);
@@ -257,8 +261,8 @@ auto rebalance(TaskIterator begin, TaskIterator end, const CostFunctor& cost, MP
     auto lps_begin = local_prefix_sum.begin();
     auto lps_end   = local_prefix_sum.end();
     auto local_begin =
-      world_rank ? std::lower_bound(lps_begin,lps_end,world_rank-1,func) : lps_begin;
-    auto local_end = std::lower_bound(local_begin, lps_end, world_rank,func);
+      world_rank ? std::lower_bound(lps_begin,lps_end,(size_t)(world_rank-1),func) : lps_begin;
+    auto local_end = std::lower_bound(local_begin, lps_end, (size_t)world_rank,func);
     size_t st_idx = std::distance(lps_begin, local_begin);
     size_t en_idx = std::distance(lps_begin, local_end  );
 
@@ -375,7 +379,6 @@ void LoadBalancerImpl::rebalance_weights() {
 void LoadBalancerImpl::rebalance_exc_vxc() {
 #ifdef GAUXC_HAS_MPI
   auto& tasks = get_tasks();
-  const size_t natoms = molecule().natoms();
   auto cost = [=](const auto& task){ return task.cost_exc_vxc(1); };
   auto new_tasks = rebalance( tasks.begin(), tasks.end(), cost, runtime_.comm());
   tasks = std::move(new_tasks);

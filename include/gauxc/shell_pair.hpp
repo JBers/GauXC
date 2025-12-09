@@ -1,7 +1,11 @@
 /**
  * GauXC Copyright (c) 2020-2024, The Regents of the University of California,
  * through Lawrence Berkeley National Laboratory (subject to receipt of
- * any required approvals from the U.S. Dept. of Energy). All rights reserved.
+ * any required approvals from the U.S. Dept. of Energy).
+ *
+ * (c) 2024-2025, Microsoft Corporation
+ *
+ * All rights reserved.
  *
  * See LICENSE.txt for details
  */
@@ -19,7 +23,7 @@ namespace detail {
   };
 
   template <typename Integral>
-  inline intmax_t csr_index( size_t i, size_t j, Integral* row_ptr, Integral* col_ind ) {
+  inline std::intmax_t csr_index( size_t i, size_t j, Integral* row_ptr, Integral* col_ind ) {
     const auto j_st = col_ind + row_ptr[i];
     const auto j_en = col_ind + row_ptr[i+1];
     auto it = std::lower_bound(j_st, j_en, j);

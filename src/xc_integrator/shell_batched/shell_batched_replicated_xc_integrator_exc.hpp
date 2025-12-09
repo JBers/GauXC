@@ -1,7 +1,11 @@
 /**
  * GauXC Copyright (c) 2020-2024, The Regents of the University of California,
  * through Lawrence Berkeley National Laboratory (subject to receipt of
- * any required approvals from the U.S. Dept. of Energy). All rights reserved.
+ * any required approvals from the U.S. Dept. of Energy).
+ *
+ * (c) 2024-2025, Microsoft Corporation
+ *
+ * All rights reserved.
  *
  * See LICENSE.txt for details
  */
@@ -34,7 +38,7 @@ void ShellBatchedReplicatedXCIntegrator<BaseIntegratorType, IncoreIntegratorType
              const value_type* Pz, int64_t ldpz,
              const value_type* Py, int64_t ldpy,
              const value_type* Px, int64_t ldpx,
-             value_type* EXC, const IntegratorSettingsXC& ks_settings) {
+             value_type* EXC, const IntegratorSettingsXC& /*ks_settings*/) {
 
 
   const auto& basis = this->load_balancer_->basis();

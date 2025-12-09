@@ -1,7 +1,11 @@
 /**
  * GauXC Copyright (c) 2020-2024, The Regents of the University of California,
  * through Lawrence Berkeley National Laboratory (subject to receipt of
- * any required approvals from the U.S. Dept. of Energy). All rights reserved.
+ * any required approvals from the U.S. Dept. of Energy).
+ *
+ * (c) 2024-2025, Microsoft Corporation
+ *
+ * All rights reserved.
  *
  * See LICENSE.txt for details
  */
@@ -83,7 +87,7 @@ void read_hdf5_record( std::vector<Atom>& mol, std::string fname, std::string ds
 }
 
 
-void read_hdf5_record( int32_t M, int32_t N, double* A, int32_t LDA, 
+void read_hdf5_record( int32_t /*M*/, int32_t /*N*/, double* /*A*/, int32_t /*LDA*/, 
   std::string fname, std::string dset ) {
 
 

@@ -1,7 +1,11 @@
 /**
  * GauXC Copyright (c) 2020-2024, The Regents of the University of California,
  * through Lawrence Berkeley National Laboratory (subject to receipt of
- * any required approvals from the U.S. Dept. of Energy). All rights reserved.
+ * any required approvals from the U.S. Dept. of Energy).
+ *
+ * (c) 2024-2025, Microsoft Corporation
+ *
+ * All rights reserved.
  *
  * See LICENSE.txt for details
  */
@@ -252,9 +256,6 @@ namespace XCPU {
 
 // Scalar SIMD Emulation
 #else
-
-  #warning "Warning: ISA Not Specified: Using Scalar Code"
-
   #define SIMD_TYPE double
   
   #define SIMD_LENGTH 1

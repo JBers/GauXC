@@ -1,7 +1,11 @@
 /**
  * GauXC Copyright (c) 2020-2024, The Regents of the University of California,
  * through Lawrence Berkeley National Laboratory (subject to receipt of
- * any required approvals from the U.S. Dept. of Energy). All rights reserved.
+ * any required approvals from the U.S. Dept. of Energy).
+ *
+ * (c) 2024-2025, Microsoft Corporation
+ *
+ * All rights reserved.
  *
  * See LICENSE.txt for details
  */
@@ -108,13 +112,11 @@ inline constexpr double real_solid_harmonic_coeff( int l, int m, int lx, int ly,
 
 class SphericalHarmonicTransform {
 
-  int max_l_;
   std::vector< std::vector<double> > table_;
 
 public:
 
-  inline SphericalHarmonicTransform( int max_l ) :
-    max_l_(max_l) {
+  inline SphericalHarmonicTransform( int max_l ) {
 
     table_.resize(max_l+1);
     for( auto l = 0; l <= max_l; ++ l ) {
