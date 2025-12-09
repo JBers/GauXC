@@ -362,7 +362,7 @@ namespace GauXC {
       // rhoy += RKB_factor * rhoy_ss;
      // total rho (LL + SS)
      auto rhos_ss = rhos_yy_ss + rhos_xx_ss + rhos_zz_ss; 
-     std::cout<<rhos<<" "<<rhos_ss<<" "<<rhos+rhos_ss<<std::endl;
+    //  std::cout<<rhos<<" "<<rhos_ss<<" "<<rhos+rhos_ss<<std::endl;
      
      rhos += RKB_factor * (rhos_ss);
      rhoz += RKB_factor * (rhoz_zz_ss + rhoz_yy_ss + rhoz_xx_ss);          
@@ -756,7 +756,7 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
    double dtolsq = dtol*dtol;
 
 
-     std::cout<<"dx rhos rhos_ss rhos+rhos_ss"<<std::endl;
+    //  std::cout<<"dx rhos rhos_ss rhos+rhos_ss"<<std::endl;
 
    for( int32_t i = 0; i < (int32_t)npts; ++i ) {
 
@@ -1141,7 +1141,7 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
       const auto dMydz_ss = dMydz_zzx_ss + dMydz_xzz_ss + dMydz_yzz_ss + dMydz_zzy_ss;
 
       // Form total density gradients (LL + SS)
-      std::cout<<dndx<<" "<<dndx_ss<<std::endl;
+      // std::cout<<dndx<<" "<<dndx_ss<<std::endl;
       dndx += dndx_ss;
       dndy += dndy_ss;
       dndz += dndz_ss;
