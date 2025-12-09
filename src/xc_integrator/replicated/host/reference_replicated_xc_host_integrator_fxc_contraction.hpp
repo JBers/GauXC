@@ -566,9 +566,9 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
     {
 
       // Increment VXC
-      lwd->inc_vxc( mgga_dim_scal * npts, nbf, nbe, basis_eval, submat_map, zmat, nbe, FXCa, ldfxca, nbe_scr );
+      lwd->inc_vxc( mgga_dim_scal * npts, nbf, nbe, basis_eval, submat_map, zmat, nbe, FXCa, ldfxca, nbe_scr, 1. );
       if( not is_rks )
-        lwd->inc_vxc( mgga_dim_scal * npts, nbf, nbe, basis_eval, submat_map, zmat_z, nbe, FXCb, ldfxcb, nbe_scr);
+        lwd->inc_vxc( mgga_dim_scal * npts, nbf, nbe, basis_eval, submat_map, zmat_z, nbe, FXCb, ldfxcb, nbe_scr, 1.);
     }
 
   } // Loop over tasks

@@ -39,14 +39,8 @@ static inline std::string& trim_left(std::string &s) {
  *  \param [in/out] s std::string to be trimmed
  */
 static inline std::string& trim_right(std::string &s) {
-<<<<<<< HEAD
      s.erase(std::find_if(s.rbegin(), s.rend(), [](int c) {return !std::isspace(c);}).base(), s.end());
      return s;
-=======
-    s.erase(std::find_if(s.rbegin(), s.rend(),
-            [](int ch) { return !std::isspace(ch); }).base(), s.end());
-    return s;
->>>>>>> wf19_master
 }; // trim_right
 
 

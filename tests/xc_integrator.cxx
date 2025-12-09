@@ -43,7 +43,7 @@ void test_xc_integrator( ExecutionSpace ex, const RuntimeEnvironment& rt,
   matrix_type P, Pz, Py, Px, VXC_ref, VXCz_ref, VXCy_ref, VXCx_ref, K_ref;
   double EXC_ref;
   std::vector<double> EXC_GRAD_ref;
-  bool has_k = false, has_exc_grad = false, rks = true, uks = false, gks = false;
+
   // For NEO-DFT Test:
   bool neo = false;
   BasisSet<double> protonic_basis;
@@ -386,7 +386,7 @@ void test_xc_integrator( ExecutionSpace ex, const RuntimeEnvironment& rt,
   if( check_grad and has_exc_grad_full ) {
     IntegratorSettingsEXC_GRAD exc_grad_settings;
     exc_grad_settings.include_weight_derivatives = true; // Use full gradient (default)
-    auto EXC_GRAD = rks ? integrator.eval_exc_grad( P, exc_grad_settings ) : integrator.eval_exc_grad( P, Pz, exc_grad_settings );
+    auto EXC_GRAD = rks ? integrator->eval_exc_grad( P, exc_grad_settings ) : integrator->eval_exc_grad( P, Pz, exc_grad_settings );
     using map_type = Eigen::Map<Eigen::MatrixXd>;
     map_type EXC_GRAD_ref_map( EXC_GRAD_ref_Full.data(), mol.size(), 3 );
     map_type EXC_GRAD_map( EXC_GRAD.data(), mol.size(), 3 );
@@ -397,7 +397,7 @@ void test_xc_integrator( ExecutionSpace ex, const RuntimeEnvironment& rt,
   if( check_grad and has_exc_grad_HellFey ) {
     IntegratorSettingsEXC_GRAD exc_grad_settings;
     exc_grad_settings.include_weight_derivatives = false; // Use Hellmann-Feynman gradient
-    auto EXC_GRAD = rks ? integrator.eval_exc_grad( P, exc_grad_settings ) : integrator.eval_exc_grad( P, Pz, exc_grad_settings );
+    auto EXC_GRAD = rks ? integrator->eval_exc_grad( P, exc_grad_settings ) : integrator->eval_exc_grad( P, Pz, exc_grad_settings );
     using map_type = Eigen::Map<Eigen::MatrixXd>;
     map_type EXC_GRAD_ref_map( EXC_GRAD_ref_HellFey.data(), mol.size(), 3 );
     map_type EXC_GRAD_map( EXC_GRAD.data(), mol.size(), 3 );
