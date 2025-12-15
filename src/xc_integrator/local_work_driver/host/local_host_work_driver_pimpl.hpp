@@ -237,6 +237,10 @@ struct LocalHostWorkDriverPIMPL {
     const double* basis_eval, const submat_map_t& submat_map, const double* Z, 
     size_t ldz, double* VXC, size_t ldvxc, double* scr, const double factor ) = 0;
 
+  virtual void inc_vxc_anti( size_t npts, size_t nbf, size_t nbe, 
+    const double* basis_eval, const submat_map_t& submat_map, const double* Z, 
+    size_t ldz, double* VXC, size_t ldvxc, double* scr, const double factor ) = 0;
+
   virtual void eval_tmat_lda_vxc_rks( size_t npts, const double* v2rho2, const double* tden_eval, double* A) = 0;
   virtual void eval_tmat_lda_vxc_uks( size_t npts, const double* v2rho2, const double* trho, double* A) = 0;
   

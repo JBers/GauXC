@@ -538,6 +538,16 @@ void LocalHostWorkDriver::inc_vxc( size_t npts, size_t nbf, size_t nbe,
 
 }
 
+// Increment VXC by Z antisymmetric
+void LocalHostWorkDriver::inc_vxc_anti( size_t npts, size_t nbf, size_t nbe, 
+  const double* basis_eval, const submat_map_t& submat_map, const double* Z, 
+  size_t ldz, double* VXC, size_t ldvxc, double* scr, const double factor ) {
+
+  throw_if_invalid_pimpl(pimpl_);
+  pimpl_->inc_vxc_anti(npts, nbf, nbe, basis_eval, submat_map, Z, ldz, VXC, ldvxc, scr, factor );
+
+}
+
 
 // eval_tmat LDA RKS
 void LocalHostWorkDriver::eval_tmat_lda_vxc_rks( size_t npts, const double* v2rho2, const double* trho, double* A) {

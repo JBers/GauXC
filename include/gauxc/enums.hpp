@@ -35,7 +35,8 @@ enum class AtomicGridSizeDefault {
   UltraFineGrid,  ///< Ultrafine grid (appropriate accuracy)
   SuperFineGrid,  ///< Superfine grid (most accurate)
   GM3,            ///< Treutler-Ahlrichs GM3
-  GM5             ///< Treutlet-Ahlrichs GM5
+  GM5,             ///< Treutlet-Ahlrichs GM5
+  TOY             ///< Crude Toy Grid for testing
 };
 
 /**
