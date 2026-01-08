@@ -182,7 +182,7 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
   const bool is_rks = not is_uks and not is_gks and not is_dks;
 
   std::cout<<"is rks uks gks dks "<<is_rks<<is_uks<<is_gks<<is_dks<<std::endl;
-  print_grid_vals = true;
+  
         std::ofstream weights_out;
       std::ofstream coords_out;
       std::ofstream mnorm_out;
@@ -762,10 +762,10 @@ for(int i =0; i<npts;++i){weights_out<<weights[i]<<std::endl;}
       EXC_local += eps[i]     * den;
       // std::cout<<"EXC_local += eps[i]     * den "<<EXC_local<<" += "<<eps[i]<<"     * "<<den<<std::endl;
 
-      if(print_grid_vals){
+    
         den_out<<den<<std::endl;
         mnorm_out<<spin_den<<std::endl;
-      }
+      
       if(is_dks){
       const auto denL = rho[2*i];
       const auto denS = rho[2*i+1];
