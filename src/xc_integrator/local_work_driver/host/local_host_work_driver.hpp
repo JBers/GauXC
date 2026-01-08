@@ -282,7 +282,7 @@ public:
     const double* immat_x_z, const double* immat_y_x, const double* immat_z_y,
     const double* immat_y_z, const double* immat_x_x, const double* immat_x_y,
     const double* immat_x_s, const double* immat_y_s, const double* immat_z_s,
-    double* den_eval, double* K, const double dtol);
+    double* den_eval, double* K, const double dtol, double* rho);
 
 
 
@@ -341,7 +341,7 @@ public:
     const double* immat_y_z, const double* immat_z_x, const double* immat_x_y,
     const double* immat_x_s, const double* immat_y_s, const double* immat_z_s,
     double* den_eval, double* dden_x_eval, double* dden_y_eval, double* dden_z_eval, 
-    double* gamma, double* K, double* H, const double dtol);
+    double* gamma, double* K, double* H, const double dtol, double* rho);
   
 
 

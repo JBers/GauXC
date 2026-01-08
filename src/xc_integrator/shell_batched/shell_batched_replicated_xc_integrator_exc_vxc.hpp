@@ -94,6 +94,9 @@ void ShellBatchedReplicatedXCIntegrator<BaseIntegratorType, IncoreIntegratorType
   value_type N_EL;
   value_type spin_N_EL;
 
+  value_type rhoL;
+  value_type rhoS;
+
   // Compute local contributions to EXC/VXC
   this->timer_.time_op("XCIntegrator.LocalWork", [&](){
     exc_vxc_local_work_( basis, Ps, ldps, Pz, ldpz, Py, ldpy, Px, ldpx,
@@ -102,7 +105,7 @@ void ShellBatchedReplicatedXCIntegrator<BaseIntegratorType, IncoreIntegratorType
       VXCs, ldvxcs, VXCz, ldvxcz, VXCy, ldvxcy, VXCx, ldvxcx,
       nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, 
       nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, EXC, 
-      &N_EL, &spin_N_EL, tasks.begin(), tasks.end(), incore_integrator );
+      &N_EL, &spin_N_EL, &rhoL, &rhoS, tasks.begin(), tasks.end(), incore_integrator );
   });
 
   // Release ownership of LWD back to this integrator instance
@@ -258,6 +261,7 @@ void ShellBatchedReplicatedXCIntegrator<BaseIntegratorType, IncoreIntegratorType
                        value_type* VXCy_SS_im, int64_t ldvxcy_ss_im,
                        value_type* VXCx_SS_im, int64_t ldvxcx_ss_im,
                        value_type* EXC, value_type *N_EL, value_type *spin_N_EL,
+                       value_type* rhoL, value_type* rhoS,
                        host_task_iterator task_begin, host_task_iterator task_end,
                        incore_integrator_type& incore_integrator ) {
 
@@ -439,7 +443,7 @@ void ShellBatchedReplicatedXCIntegrator<BaseIntegratorType, IncoreIntegratorType
 
 
   // Allocate host temporaries
-  double EXC_tmp, NEL_tmp, spin_NEL_tmp;
+  double EXC_tmp, NEL_tmp, spin_NEL_tmp, rhoL_tmp, rhoS_tmp;
   std::vector<double> Ps_submat_host(nbe*nbe); 
   double* Ps_submat   = Ps_submat_host.data();
   std::vector<double> VXCs_submat_host(VXCs ? nbe*nbe : 0); 
@@ -519,7 +523,7 @@ void ShellBatchedReplicatedXCIntegrator<BaseIntegratorType, IncoreIntegratorType
       VXCs_submat, nbe, VXCz_submat, nbe, VXCy_submat, nbe, VXCx_submat, nbe,
       nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0,
       nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0,
-      &EXC_tmp, &NEL_tmp, &spin_NEL_tmp, IntegratorSettingsKS{}, task_begin, task_end );
+      &EXC_tmp, &NEL_tmp, &spin_NEL_tmp, &rhoL_tmp, &rhoS_tmp, IntegratorSettingsKS{}, task_begin, task_end );
 #ifdef GAUXC_HAS_DEVICE
   }
 #endif

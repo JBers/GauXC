@@ -64,6 +64,9 @@ std::cout<<"Hello from eval_exc_"<<std::endl;
   value_type N_EL;
   value_type spin_N_EL;
 
+  value_type rhoL;
+  value_type rhoS;
+
   // Compute Local contributions to EXC / VXC
   this->timer_.time_op("XCIntegrator.LocalWork", [&](){
     //exc_vxc_local_work_( P, ldp, VXC, ldvxc, EXC, &N_EL );
@@ -73,7 +76,7 @@ std::cout<<"Hello from eval_exc_"<<std::endl;
                          nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0,
                          nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0,
                          nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0,
-                         EXC, &N_EL, &spin_N_EL, ks_settings, tasks.begin(), tasks.end());
+                         EXC, &N_EL, &spin_N_EL, &rhoL, &rhoS, ks_settings, tasks.begin(), tasks.end());
   });
 
 
@@ -86,6 +89,8 @@ std::cout<<"Hello from eval_exc_"<<std::endl;
     this->reduction_driver_->allreduce_inplace( EXC,   1    , ReductionOp::Sum );
     this->reduction_driver_->allreduce_inplace( &N_EL, 1    , ReductionOp::Sum );
     this->reduction_driver_->allreduce_inplace( &spin_N_EL, 1    , ReductionOp::Sum );
+    this->reduction_driver_->allreduce_inplace( &rhoL, 1    , ReductionOp::Sum );
+    this->reduction_driver_->allreduce_inplace( &rhoS, 1    , ReductionOp::Sum );
 
   });
 
