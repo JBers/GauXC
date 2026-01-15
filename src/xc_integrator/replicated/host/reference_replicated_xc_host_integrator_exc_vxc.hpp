@@ -513,13 +513,13 @@ rhoS_out.open("rhoSs.txt");
 
 // std::cout<<"npts = "<<npts<<std::endl;
 
-
+coords_out<<std::setprecision(10);
 for(int i =0; i<npts;++i){for(int j = 0;j<3;++j){coords_out<<points[3*i+j]<<" ";}coords_out<<std::endl;}
 
 
 // std::cout<<"Weights"<<std::endl;
 // output.open("weights.txt", std::ofstream::out | std::ofstream::app);
-
+weights_out<<std::setprecision(10);
 for(int i =0; i<npts;++i){weights_out<<weights[i]<<std::endl;}
 
 

@@ -341,7 +341,7 @@ namespace GauXC {
 
 
       auto rhos_ss = rhos_yy_ss + rhos_xx_ss + rhos_zz_ss; 
-      auto rhos_anti = rhos_z_xy - rhos_z_yx; + rhos_x_yz - rhos_x_zy + rhos_y_zx - rhos_y_xz;
+      auto rhos_anti = rhos_z_xy - rhos_z_yx + rhos_x_yz - rhos_x_zy + rhos_y_zx - rhos_y_xz;
       rhos_ss += rhos_anti;
 
       // z
@@ -911,8 +911,8 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
 
 
       auto rhos_ss = rhos_yy_ss + rhos_xx_ss + rhos_zz_ss; 
-      auto rhos_anti = rhos_z_xy - rhos_z_yx; + rhos_x_yz - rhos_x_zy + rhos_y_zx - rhos_y_xz;
-      // rhos_ss += rhos_anti;
+      auto rhos_anti = rhos_z_xy - rhos_z_yx + rhos_x_yz - rhos_x_zy + rhos_y_zx - rhos_y_xz;
+      rhos_ss += rhos_anti;
 
       // z
       const double rhoz_xx_ss = blas::dot( nbe, dbasis_x_eval + ioffz, 1, Xz_x_i_ss, 1 );
