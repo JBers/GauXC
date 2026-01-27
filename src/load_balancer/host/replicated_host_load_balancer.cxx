@@ -49,6 +49,8 @@ std::vector< XCTask > HostReplicatedLoadBalancer::create_local_tasks_() const  {
     batcher.quadrature().recenter( center );
     const size_t nbatches = batcher.nbatches();
 
+    std::cout<<"nbatches "<<nbatches<<std::endl;
+
     #pragma omp parallel for
     for( size_t ibatch = 0; ibatch < nbatches; ++ibatch ) {
     
@@ -78,6 +80,7 @@ std::vector< XCTask > HostReplicatedLoadBalancer::create_local_tasks_() const  {
       task.iParent    = iCurrent;
       // This enables lazy assignment of points vector (see CUDA impl)
       task.npts       = points.size(); 
+      std::cout<<"task.npts "<<task.npts<<std::endl;
       task.points     = std::move( points );
       task.weights    = std::move( weights );
       task.bfn_screening.shell_list = std::move(shell_list);
