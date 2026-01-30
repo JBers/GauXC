@@ -117,8 +117,27 @@ std::tuple<RadialSize,AngularSize>
     case AtomicGridSizeDefault::GM5:
       return std::make_tuple( RadialSize(50), AngularSize(302) );
 
+    // l = 29. !!!! ORIGINAL !!!!
     case AtomicGridSizeDefault::FineGrid:
       return std::make_tuple( RadialSize(75), AngularSize(302) );
+
+    // l = 23
+    // case AtomicGridSizeDefault::FineGrid:
+    //   return std::make_tuple( RadialSize(75), AngularSize(194) );
+
+        // l = 17
+    // case AtomicGridSizeDefault::FineGrid:
+    //   return std::make_tuple( RadialSize(75), AngularSize(110) );
+
+          // l = 35
+    // case AtomicGridSizeDefault::FineGrid:
+    //   return std::make_tuple( RadialSize(75), AngularSize(434) );
+
+          // l = 41
+    // case AtomicGridSizeDefault::FineGrid:
+    //   return std::make_tuple( RadialSize(75), AngularSize(590) );
+
+      ////
 
     case AtomicGridSizeDefault::UltraFineGrid:
       return std::make_tuple( RadialSize(99), AngularSize(590) );

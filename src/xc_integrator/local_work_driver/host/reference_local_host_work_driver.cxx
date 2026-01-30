@@ -29,6 +29,8 @@
 
 #include <gauxc/physcon.hpp>
 
+#include <fstream>
+
 namespace GauXC {
 
   ReferenceLocalHostWorkDriver::ReferenceLocalHostWorkDriver() {
@@ -836,10 +838,15 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
 
    double dtolsq = dtol*dtol;
 
+   std::ofstream rhom_out;
+   rhom_out.open("rhom.txt");
 
     //  std::cout<<"rhos rhos_ss rhos+rhos_ss"<<std::endl;
 
    for( int32_t i = 0; i < (int32_t)npts; ++i ) {
+
+      // std::cout<<"i "<<i<<std::endl;
+      std::cout<<std::setprecision(std::numeric_limits<double>::max_digits10);
 
       const size_t ioffs = size_t(i) * ldxs;
       const size_t ioffz = size_t(i) * ldxz;
@@ -1126,6 +1133,20 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
 
       dMzdx_ss += dMzdx_cross + dMzdx_anti;
       // std::cout<<"dMzdx_ss dMzdx "<<dMzdx_ss<<" "<<dMzdx<<std::endl;
+      // std::cout<<"dMzdx before ss "<<dMzdx<<std::endl;
+      // std::cout<<"dden_x_eval[4 * i + 1] before"<<dden_x_eval[4 * i + 1]<<std::endl;
+      // std::cout<<"2 * RKB_factor * dMzdx_ss "<<2 * RKB_factor * dMzdx_ss<<std::endl;
+      // std::cout<<"dMzdx_xxx_ss = " <<2 * RKB_factor *dMzdx_xxx_ss<<std::endl;
+      // std::cout<<"dMzdx_yxy_ss = " <<2 * RKB_factor *dMzdx_yxy_ss<<std::endl;
+      // std::cout<<"dMzdx_zxz_ss = " <<2 * RKB_factor *dMzdx_zxz_ss<<std::endl;
+
+      // std::cout<<"dMzdx_xz_ss = "<<2 * RKB_factor *dMzdx_xz_ss<<std::endl; 
+      // std::cout<<"dMzdx_zx_ss = "<<2 * RKB_factor *dMzdx_zx_ss<<std::endl; 
+      // std::cout<<"dMzdx_yz_ss = "<<2 * RKB_factor *dMzdx_yz_ss<<std::endl; 
+      // std::cout<<"dMzdx_zy_ss = "<<2 * RKB_factor *dMzdx_zy_ss<<std::endl; 
+      // std::cout<<"dMzdx_s_yx  = "<<2 * RKB_factor *dMzdx_s_yx <<std::endl; 
+      // std::cout<<"dMzdx_s_xy  = "<<2 * RKB_factor *dMzdx_s_xy <<std::endl; 
+      // std::cout<<std::endl;
 
 
       /// dMzdy SS
@@ -1324,6 +1345,16 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
       const auto dMydz_anti = dMydz_zx_im - dMydz_xz_im;
 
       dMydz_ss += dMydz_cross  + dMydz_anti;
+      // std::cout<<"dMydz before ss "<<dMydz<<std::endl;
+      // std::cout<<"dMydz_xzx_ss = "<<2 * RKB_factor * dMydz_xzx_ss<<std::endl;
+      // std::cout<<"dMydz_yzy_ss = "<<2 * RKB_factor * dMydz_yzy_ss<<std::endl;
+      // std::cout<<"dMydz_zzz_ss = "<<2 * RKB_factor * dMydz_zzz_ss<<std::endl;
+      // std::cout<<" dMydz_zy_ss = "<<2 * RKB_factor *  dMydz_zy_ss<<std::endl; 
+      // std::cout<<" dMydz_yz_ss = "<<2 * RKB_factor *  dMydz_yz_ss<<std::endl; 
+      // std::cout<<" dMydz_yx_ss = "<<2 * RKB_factor *  dMydz_yx_ss<<std::endl; 
+      // std::cout<<" dMydz_xy_ss = "<<2 * RKB_factor *  dMydz_xy_ss<<std::endl; 
+      // std::cout<<" dMydz_zx_im = "<<2 * RKB_factor *  dMydz_zx_im<<std::endl; 
+      // std::cout<<" dMydz_xz_im = "<<2 * RKB_factor *  dMydz_xz_im<<std::endl;  
 
       // std::cout<<"dMydzss dMydz "<<dMydz_ss<<" "<<dMydz<<std::endl;
 
@@ -1338,13 +1369,15 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
       dMzdx += 2 * RKB_factor * dMzdx_ss;
       dMzdy += 2 * RKB_factor * dMzdy_ss;
       dMzdz += 2 * RKB_factor * dMzdz_ss;
-      dMzdx += 2 * RKB_factor * dMydx_ss;
+      dMydx += 2 * RKB_factor * dMydx_ss;
       dMydy += 2 * RKB_factor * dMydy_ss;
       dMydz += 2 * RKB_factor * dMydz_ss;
       dMxdx += 2 * RKB_factor * dMxdx_ss;
       dMxdy += 2 * RKB_factor * dMxdy_ss;
       dMxdz += 2 * RKB_factor * dMxdz_ss;
 
+      // std::cout<<"dMydz before assigment to dden "<<dMydz<<std::endl;
+      // std::cout<<"dden_x_eval[4 * i + 2] before "<<dden_z_eval[4 * i + 2]<<std::endl;
       // Store Pauli Spin Density Gradients in the derivative density eval objects (dden_k_eval)
       dden_x_eval[4 * i] = dndx;
       dden_y_eval[4 * i] = dndy;
@@ -1361,6 +1394,9 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
       dden_x_eval[4 * i + 3] = dMxdx;
       dden_y_eval[4 * i + 3] = dMxdy;
       dden_z_eval[4 * i + 3] = dMxdz;
+
+      // std::cout<<"dden_x_eval[4 * i + 2] after "<<dden_z_eval[4 * i + 2]<<std::endl;
+      // std::cout<<std::endl;
 
      // rho_k dot rho_k
       double mtemp = rhoz * rhoz + rhox * rhox + rhoy * rhoy;
@@ -1407,6 +1443,7 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
 
 
 
+
       // std::cout<<"den_eval[2 * i]"<<den_eval[2 * i] <<std::endl;
       // std::cout<<"den_eval[2 * i + 1]"<<den_eval[2 * i + 1] <<std::endl;
 
@@ -1421,8 +1458,18 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
       // std::cout<<gamma[3 * i + 2]<< std::endl;
 
 
-    }
+      // COLLINEAR TESTING
+      // den_eval[2 * i] = 0.5 * (rhos + rhoz);
+      // den_eval[2 * i + 1] = 0.5 * (rhos - rhoz);
 
+      // gamma[3 * i] = 0.25 * (dels_dot_dels +2*dels_dot_delz + delz_dot_delz);
+      // gamma[3 * i + 1] = 0.25 * (dels_dot_dels - 2*dels_dot_delz + delz_dot_delz);
+      // gamma[3 * i + 2] = 0.25 * (dels_dot_dels - delz_dot_delz);
+        rhom_out<<std::setprecision(std::numeric_limits<double>::max_digits10);
+        rhom_out<<rhos<<" "<<rhox<<" "<<rhoy<<" "<<rhoz<<std::endl;
+
+    }
+rhom_out.close();
 }
 
 
