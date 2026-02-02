@@ -333,13 +333,13 @@ dden_out.open("dden.txt");
     host_data.nbe_scr .resize(nbe  * nbe);
     host_data.zmat    .resize(npts * nbe * spin_dim_scal * mgga_dim_scal * dks_scal + gks_mod_KH + dks_im_mats); 
     host_data.eps     .resize(npts);
-    host_data.vrho    .resize(npts * spin_dim_scal);
+    host_data.vrho    .resize(npts * sds);
 
     // LDA data requirements
     if( func.is_lda() ){
       if( is_dks ){
         host_data.basis_eval .resize( 4 * npts * nbe );
-        host_data.den_scr    .resize( spin_dim_scal * 4 * npts + 2 * npts);
+        host_data.den_scr    .resize( spin_dim_scal * 3 * npts + 2 * 2 * npts);
       } else {
         host_data.basis_eval .resize( npts * nbe );
         host_data.den_scr    .resize( npts * spin_dim_scal);
@@ -351,7 +351,7 @@ dden_out.open("dden.txt");
     if( func.is_gga() ){
       if (is_dks ){
         host_data.basis_eval .resize( 10 * npts * nbe ); // basis + grad (3) + hess (6)
-        host_data.den_scr    .resize( spin_dim_scal * 4 * npts + 2 * npts);
+        host_data.den_scr    .resize( spin_dim_scal * 3 * npts + 2 * 2 * npts);
         host_data.gamma      .resize( gga_dim_scal * npts );
         host_data.vgamma     .resize( gga_dim_scal * npts );
       } else {
@@ -500,7 +500,7 @@ dden_out.open("dden.txt");
         dbasis_y_eval = dbasis_x_eval + npts * nbe;
         dbasis_z_eval = dbasis_y_eval + npts * nbe;
         rho = den_eval + 2 * npts;
-        dden_x_eval   = rho    + spin_dim_scal * npts;
+        dden_x_eval   = rho    + 2 * npts;
         dden_y_eval   = dden_x_eval + spin_dim_scal * npts;
         dden_z_eval   = dden_y_eval + spin_dim_scal * npts;
         d2basis_xx_eval = dbasis_z_eval + npts * nbe;
@@ -515,7 +515,7 @@ dden_out.open("dden.txt");
         dbasis_y_eval = dbasis_x_eval + npts * nbe;
         dbasis_z_eval = dbasis_y_eval + npts * nbe;
         rho = den_eval + 2 * npts;
-        dden_x_eval   = rho    + spin_dim_scal * npts;
+        dden_x_eval   = rho    + 2 * npts;
         dden_y_eval   = dden_x_eval + spin_dim_scal * npts;
         dden_z_eval   = dden_y_eval + spin_dim_scal * npts;
       if (is_gks) { H = K + 3*npts;}
@@ -527,7 +527,7 @@ dden_out.open("dden.txt");
       dbasis_y_eval = dbasis_x_eval + npts * nbe;
       dbasis_z_eval = dbasis_y_eval + npts * nbe;
       rho = den_eval + 2 * npts;
-      dden_x_eval   = rho    + spin_dim_scal * npts;
+      dden_x_eval   = rho    + 2 * npts;
       dden_y_eval   = dden_x_eval + spin_dim_scal * npts;
       dden_z_eval   = dden_y_eval + spin_dim_scal * npts;
       mmat_x        = zmat + npts * nbe;
@@ -827,7 +827,7 @@ for(int i =0; i<npts;++i){weights_out<<weights[i]<<std::endl;}
       }
     }
 
-
+    std::cout<<"EXC_LOCAL "<<EXC_local<<std::endl;
     // Atomic updates
     #pragma omp atomic
     EXC_WORK += EXC_local;
@@ -974,11 +974,6 @@ for(int i =0; i<npts;++i){weights_out<<weights[i]<<std::endl;}
         lwd->inc_vxc( npts, nbf, nbe, dbasis_z_eval, submat_map, xmat_y_z_ss, nbe, VXCz_SS, ldvxcs_ss,
           nbe_scr, RKB_factor );
 
-        // lwd->inc_vxc( npts, nbf, nbe, dbasis_x_eval, submat_map, xmat_z_z_ss, nbe, VXCz_SS, ldvxcs_ss,
-        //   nbe_scr, 2*RKB_factor );
-        // lwd->inc_vxc( npts, nbf, nbe, dbasis_y_eval, submat_map, xmat_z_z_ss, nbe, VXCz_SS, ldvxcs_ss,
-        //   nbe_scr, -2*RKB_factor );
-
         // Vxc z im anti
                 // std::cout<<"inc vxc z anti xy - yx"<<std::endl;
 
@@ -1010,18 +1005,8 @@ for(int i =0; i<npts;++i){weights_out<<weights[i]<<std::endl;}
           nbe_scr, RKB_factor );
         lwd->inc_vxc( npts, nbf, nbe, dbasis_x_eval, submat_map, xmat_y_x_ss, nbe, VXCx_SS, ldvxcs_ss,
           nbe_scr, RKB_factor );
-//Rep
-        // lwd->inc_vxc( npts, nbf, nbe, dbasis_z_eval, submat_map, zmat_x_ss, nbe, VXCx_SS, ldvxcz_ss,
-        //   nbe_scr, -1.*RKB_factor );
-        // lwd->inc_vxc( npts, nbf, nbe, dbasis_x_eval, submat_map, xmat_z_x_ss, nbe, VXCx_SS, ldvxcz_ss,
-        //   nbe_scr, RKB_factor );
 
-        // lwd->inc_vxc( npts, nbf, nbe, dbasis_y_eval, submat_map, xmat_z_x_ss, nbe, VXCx_SS, ldvxcz_ss,
-        //   nbe_scr, RKB_factor );
-        // lwd->inc_vxc( npts, nbf, nbe, dbasis_z_eval, submat_map, xmat_y_x_ss, nbe, VXCx_SS, ldvxcz_ss,
-        //   nbe_scr, RKB_factor );
-
-                // Vxc x im anti
+          // Vxc x im anti
                 // std::cout<<"inc vxc x anti yz - zy"<<std::endl;
         lwd->inc_vxc_anti( npts, nbf, nbe, dbasis_z_eval, submat_map, xmat_y_x_ss, nbe, VXCx_SS_im, ldvxcs_ss,
           nbe_scr, -1*RKB_factor );
@@ -1054,32 +1039,16 @@ for(int i =0; i<npts;++i){weights_out<<weights[i]<<std::endl;}
           nbe_scr, RKB_factor );
         lwd->inc_vxc( npts, nbf, nbe, dbasis_x_eval, submat_map, xmat_y_y_ss, nbe, VXCy_SS, ldvxcs_ss,
           nbe_scr, RKB_factor );
-        // lwd->inc_vxc( npts, nbf, nbe, dbasis_y_eval, submat_map, zmat_y_ss, nbe, VXCy_SS, ldvxcz_ss,
-        //   nbe_scr, RKB_factor );
-        // lwd->inc_vxc( npts, nbf, nbe, dbasis_z_eval, submat_map, zmat_y_ss, nbe, VXCy_SS, ldvxcz_ss,
-        //   nbe_scr, RKB_factor );
-        // lwd->inc_vxc( npts, nbf, nbe, dbasis_y_eval, submat_map, zmat_y_ss, nbe, VXCy_SS, ldvxcz_ss,
-        //   nbe_scr, RKB_factor );
-        // lwd->inc_vxc( npts, nbf, nbe, dbasis_z_eval, submat_map, zmat_y_ss, nbe, VXCy_SS, ldvxcz_ss,
-        //   nbe_scr, RKB_factor );
 
-                // Vxc y im anti
+
+          // Vxc y im anti
                 // std::cout<<"inc Vxc y yz"<<std::endl;
         lwd->inc_vxc_anti( npts, nbf, nbe, dbasis_z_eval, submat_map, zmat_y_ss, nbe, VXCy_SS_im, ldvxcs_ss,
-          nbe_scr, RKB_factor );
+          nbe_scr, -1*RKB_factor );
           // std::cout<<"inc Vxc y zy"<<std::endl;
         lwd->inc_vxc_anti( npts, nbf, nbe, dbasis_x_eval, submat_map, xmat_z_y_ss, nbe, VXCy_SS_im, ldvxcs_ss,
-          nbe_scr, -1*RKB_factor );
-//Rep
-        // lwd->inc_vxc( npts, nbf, nbe, dbasis_z_eval, submat_map, zmat_y_ss, nbe, VXCy_SS, ldvxcz_ss,
-        //   nbe_scr, RKB_factor );
-        // lwd->inc_vxc( npts, nbf, nbe, dbasis_x_eval, submat_map, xmat_z_y_ss, nbe, VXCy_SS, ldvxcz_ss,
-        //   nbe_scr, RKB_factor );
+          nbe_scr, RKB_factor );
 
-        // lwd->inc_vxc( npts, nbf, nbe, dbasis_y_eval, submat_map, xmat_z_y_ss, nbe, VXCy_SS, ldvxcz_ss,
-        //   nbe_scr, RKB_factor );
-        // lwd->inc_vxc( npts, nbf, nbe, dbasis_z_eval, submat_map, xmat_y_y_ss, nbe, VXCy_SS, ldvxcz_ss,
-        //   nbe_scr, -1.*RKB_factor );
       }
        
     }

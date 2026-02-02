@@ -839,7 +839,9 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
    double dtolsq = dtol*dtol;
 
    std::ofstream rhom_out;
+   std::ofstream gamma_out;
    rhom_out.open("rhom.txt");
+   gamma_out.open("gammas.txt");
 
     //  std::cout<<"rhos rhos_ss rhos+rhos_ss"<<std::endl;
 
@@ -1376,6 +1378,19 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
       dMxdy += 2 * RKB_factor * dMxdy_ss;
       dMxdz += 2 * RKB_factor * dMxdz_ss;
 
+      // dMzdx*=-1;
+      // dMzdy*=-1;
+      // dMzdz*=-1;
+      // dMydx*=-1;
+      // dMydy*=-1;
+      // dMydz*=-1;
+      // dMxdx*=-1;
+      // dMxdy*=-1;
+      // dMxdz*=-1;
+      // rhoz*=-1;
+      // rhoy*=-1;
+      // rhox*=-1;
+
       // std::cout<<"dMydz before assigment to dden "<<dMydz<<std::endl;
       // std::cout<<"dden_x_eval[4 * i + 2] before "<<dden_z_eval[4 * i + 2]<<std::endl;
       // Store Pauli Spin Density Gradients in the derivative density eval objects (dden_k_eval)
@@ -1438,24 +1453,17 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
         HY[i] = sign / 3.;
         HX[i] = sign / 3.;
       }
+
+      // NON-COLLINEAR
       den_eval[2 * i] = 0.5 * (rhos + mnorm);
       den_eval[2 * i + 1] = 0.5 * (rhos - mnorm);
-
-
-
 
       // std::cout<<"den_eval[2 * i]"<<den_eval[2 * i] <<std::endl;
       // std::cout<<"den_eval[2 * i + 1]"<<den_eval[2 * i + 1] <<std::endl;
 
-      
       gamma[3 * i] = 0.25 * (dels_dot_dels + sum) + 0.5 * sign * sqsum2;
       gamma[3 * i + 1] = 0.25 * (dels_dot_dels - sum);
       gamma[3 * i + 2] = 0.25 * (dels_dot_dels + sum) - 0.5 * sign * sqsum2;
-
-      // std::cout<<"ypp ymm ypm"<<std::endl;
-      // std::cout<<gamma[3 * i]<<" ";
-      // std::cout<<gamma[3 * i + 1]<<" ";
-      // std::cout<<gamma[3 * i + 2]<< std::endl;
 
 
       // COLLINEAR TESTING
@@ -1463,13 +1471,20 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
       // den_eval[2 * i + 1] = 0.5 * (rhos - rhoz);
 
       // gamma[3 * i] = 0.25 * (dels_dot_dels +2*dels_dot_delz + delz_dot_delz);
-      // gamma[3 * i + 1] = 0.25 * (dels_dot_dels - 2*dels_dot_delz + delz_dot_delz);
-      // gamma[3 * i + 2] = 0.25 * (dels_dot_dels - delz_dot_delz);
+      // gamma[3 * i + 1] = 0.25 * (dels_dot_dels - delz_dot_delz);
+      // gamma[3 * i + 2] = 0.25 * (dels_dot_dels - 2*dels_dot_delz + delz_dot_delz);
+      
         rhom_out<<std::setprecision(std::numeric_limits<double>::max_digits10);
         rhom_out<<rhos<<" "<<rhox<<" "<<rhoy<<" "<<rhoz<<std::endl;
+        gamma_out<<gamma[3 * i]<<" "<<gamma[3 * i + 1]<<" "<<gamma[3 * i + 2]<<std::endl;
+      // std::cout<<"ypp ymm ypm"<<std::endl;
+      // std::cout<<gamma[3 * i]<<" ";
+      // std::cout<<gamma[3 * i + 1]<<" ";
+      // std::cout<<gamma[3 * i + 2]<< std::endl;
 
     }
 rhom_out.close();
+gamma_out.close();
 }
 
 
@@ -2303,14 +2318,8 @@ void ReferenceLocalHostWorkDriver::eval_zmat_gga_vxc_dks( size_t npts, size_t nb
       blas::axpy(nbf, z_fact_s, bf_zx_col, 1, zs_x_ss_col, 1);
 
       blas::axpy(nbf, x_fact_z, bf_xx_col, 1, zz_x_ss_col, 1);
-      //             for(int i=0;i<nbf;i++){std::cout<<zz_x_ss_col[i]<<" ";}
-      // std::cout<<std::endl;
       blas::axpy(nbf, y_fact_z, bf_yx_col, 1, zz_x_ss_col, 1);
-      //                   for(int i=0;i<nbf;i++){std::cout<<zz_x_ss_col[i]<<" ";}
-      // std::cout<<std::endl;
       blas::axpy(nbf, z_fact_z, bf_zx_col, 1, zz_x_ss_col, 1);
-      //                   for(int i=0;i<nbf;i++){std::cout<<zz_x_ss_col[i]<<" ";}
-      // std::cout<<std::endl;
 
       blas::axpy(nbf, x_fact_x, bf_xx_col, 1, zx_x_ss_col, 1);
       blas::axpy(nbf, y_fact_x, bf_yx_col, 1, zx_x_ss_col, 1);
@@ -2326,14 +2335,8 @@ void ReferenceLocalHostWorkDriver::eval_zmat_gga_vxc_dks( size_t npts, size_t nb
       blas::axpy(nbf, z_fact_s, bf_zy_col, 1, zs_y_ss_col, 1);
 
       blas::axpy(nbf, x_fact_z, bf_xy_col, 1, zz_y_ss_col, 1);
-      //       for(int i=0;i<nbf;i++){std::cout<<zz_y_ss_col[i]<<" ";}
-      // std::cout<<std::endl;
       blas::axpy(nbf, y_fact_z, bf_yy_col, 1, zz_y_ss_col, 1);
-      //       for(int i=0;i<nbf;i++){std::cout<<zz_y_ss_col[i]<<" ";}
-      // std::cout<<std::endl;
       blas::axpy(nbf, z_fact_z, bf_zy_col, 1, zz_y_ss_col, 1);
-      //       for(int i=0;i<nbf;i++){std::cout<<zz_y_ss_col[i]<<" ";}
-      // std::cout<<std::endl;
 
       blas::axpy(nbf, x_fact_x, bf_xy_col, 1, zx_y_ss_col, 1);
       blas::axpy(nbf, y_fact_x, bf_yy_col, 1, zx_y_ss_col, 1);
@@ -2359,8 +2362,6 @@ void ReferenceLocalHostWorkDriver::eval_zmat_gga_vxc_dks( size_t npts, size_t nb
       blas::axpy(nbf, x_fact_y, bf_xz_col, 1, zy_z_ss_col, 1);
       blas::axpy(nbf, y_fact_y, bf_yz_col, 1, zy_z_ss_col, 1);
       blas::axpy(nbf, z_fact_y, bf_zz_col, 1, zy_z_ss_col, 1);
-
-
 
     }
 }
