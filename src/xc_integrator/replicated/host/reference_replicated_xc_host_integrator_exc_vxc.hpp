@@ -339,7 +339,7 @@ dden_out.open("dden.txt");
     if( func.is_lda() ){
       if( is_dks ){
         host_data.basis_eval .resize( 4 * npts * nbe );
-        host_data.den_scr    .resize( spin_dim_scal * 3 * npts + 2 * 2 * npts);
+        host_data.den_scr    .resize( spin_dim_scal * npts + 2 * npts);
       } else {
         host_data.basis_eval .resize( npts * nbe );
         host_data.den_scr    .resize( npts * spin_dim_scal);
@@ -351,7 +351,7 @@ dden_out.open("dden.txt");
     if( func.is_gga() ){
       if (is_dks ){
         host_data.basis_eval .resize( 10 * npts * nbe ); // basis + grad (3) + hess (6)
-        host_data.den_scr    .resize( spin_dim_scal * 3 * npts + 2 * 2 * npts);
+        host_data.den_scr    .resize( spin_dim_scal * 4 * npts + 2 * npts);
         host_data.gamma      .resize( gga_dim_scal * npts );
         host_data.vgamma     .resize( gga_dim_scal * npts );
       } else {
@@ -499,10 +499,11 @@ dden_out.open("dden.txt");
         dbasis_x_eval = basis_eval    + npts * nbe;
         dbasis_y_eval = dbasis_x_eval + npts * nbe;
         dbasis_z_eval = dbasis_y_eval + npts * nbe;
-        rho = den_eval + 2 * npts;
-        dden_x_eval   = rho    + 2 * npts;
+        
+        dden_x_eval   = den_eval    + spin_dim_scal * npts;
         dden_y_eval   = dden_x_eval + spin_dim_scal * npts;
         dden_z_eval   = dden_y_eval + spin_dim_scal * npts;
+        rho = dden_z_eval + 2 * npts;
         d2basis_xx_eval = dbasis_z_eval + npts * nbe;
         d2basis_xy_eval = d2basis_xx_eval + npts * nbe;
         d2basis_xz_eval = d2basis_xy_eval + npts * nbe;
@@ -514,10 +515,10 @@ dden_out.open("dden.txt");
         dbasis_x_eval = basis_eval    + npts * nbe;
         dbasis_y_eval = dbasis_x_eval + npts * nbe;
         dbasis_z_eval = dbasis_y_eval + npts * nbe;
-        rho = den_eval + 2 * npts;
-        dden_x_eval   = rho    + 2 * npts;
+        dden_x_eval   = den_eval    + spin_dim_scal * npts;
         dden_y_eval   = dden_x_eval + spin_dim_scal * npts;
         dden_z_eval   = dden_y_eval + spin_dim_scal * npts;
+        rho = dden_z_eval + 2 * npts;
       if (is_gks) { H = K + 3*npts;}
       }
     }
@@ -526,10 +527,10 @@ dden_out.open("dden.txt");
       dbasis_x_eval = basis_eval    + npts * nbe;
       dbasis_y_eval = dbasis_x_eval + npts * nbe;
       dbasis_z_eval = dbasis_y_eval + npts * nbe;
-      rho = den_eval + 2 * npts;
-      dden_x_eval   = rho    + 2 * npts;
+      dden_x_eval   = den_eval    + spin_dim_scal * npts;
       dden_y_eval   = dden_x_eval + spin_dim_scal * npts;
       dden_z_eval   = dden_y_eval + spin_dim_scal * npts;
+      rho = dden_z_eval + 2 * npts;
       mmat_x        = zmat + npts * nbe;
       mmat_y        = mmat_x + npts * nbe;
       mmat_z        = mmat_y + npts * nbe;
