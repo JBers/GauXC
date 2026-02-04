@@ -244,7 +244,7 @@ namespace GauXC {
     const double* immat_x_z, const double* immat_y_x, const double* immat_z_y,
     const double* immat_y_z, const double* immat_z_x, const double* immat_x_y,
     const double* immat_x_s, const double* immat_y_s, const double* immat_z_s,
-    double* den_eval, double* K, const double dtol, double* rho) {
+    double* den_eval, double* K, const double dtol ) {
 
     auto *KZ = K; // KZ // store K in the Z matrix
     auto *KY = KZ + npts;
@@ -423,10 +423,7 @@ namespace GauXC {
       // rhox += RKB_factor * rhox_ss;
       // rhoy += RKB_factor * rhoy_ss;
      // total rho (LL + SS)
-                 // store rho L s and rho S s temporarily
-      rho[2 * i] = rhos;
-      rho[2 * i + 1] = RKB_factor * rhos_ss;
-     
+
     // //  std::cout<<rhos<<" "<<rhos_ss<<" "<<rhos+rhos_ss<<std::endl;
     //     std::cout<<"rhos rhos_ss rhos+rhos_ss"<<std::endl;
     // std::cout<<rhos<<" "<<RKB_factor * rhos_ss<<" "<<rhos+RKB_factor * rhos_ss<<std::endl;
@@ -826,7 +823,7 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
     const double* immat_y_z, const double* immat_z_x, const double* immat_x_y,
     const double* immat_x_s, const double* immat_y_s, const double* immat_z_s,
     double* den_eval, double* dden_x_eval, double* dden_y_eval, double* dden_z_eval, 
-    double* gamma, double* K, double* H, const double dtol, double* rho) {
+    double* gamma, double* K, double* H, const double dtol ) {
 
    auto *KZ = K; // KZ // store K in the Z matrix
    auto *KY = KZ + npts;
@@ -990,9 +987,7 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
 
       // // total rho (LL + SS)
 
-            // store rho L s and rho S s temporarily
-      rho[2 * i] = rhos;
-      rho[2 * i + 1] = RKB_factor * rhos_ss;
+
 
      
     //  std::cout<<rhos<<" "<<rhos_ss<<" "<<rhos+rhos_ss<<std::endl;

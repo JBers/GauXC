@@ -95,10 +95,6 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
   value_type N_EL;
   value_type spin_N_EL;
 
-  value_type rhoL;
-  value_type rhoS;
-
-
 
   // Compute Local contributions to EXC / VXC
   this->timer_.time_op("XCIntegrator.LocalWork", [&](){
@@ -111,7 +107,7 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
                          VXCy_SS, ldvxcy_ss, VXCx_SS, ldvxcx_ss,
                          VXCs_SS_im, ldvxcs_ss_im, VXCz_SS_im, ldvxcz_ss_im,
                          VXCy_SS_im, ldvxcy_ss_im, VXCx_SS_im, ldvxcx_ss_im,
-                         EXC, &N_EL, &spin_N_EL, &rhoL, &rhoS, ks_settings,
+                         EXC, &N_EL, &spin_N_EL, ks_settings,
                          tasks.begin(), tasks.end() );
   });
 
@@ -130,12 +126,14 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
     if(VXCz_SS) this->reduction_driver_->allreduce_inplace( VXCz_SS, nbf*nbf, ReductionOp::Sum );
     if(VXCy_SS) this->reduction_driver_->allreduce_inplace( VXCy_SS, nbf*nbf, ReductionOp::Sum ); 
     if(VXCx_SS) this->reduction_driver_->allreduce_inplace( VXCx_SS, nbf*nbf, ReductionOp::Sum );
+    if(VXCs_SS_im) this->reduction_driver_->allreduce_inplace( VXCx_SS_im, nbf*nbf, ReductionOp::Sum );
+    if(VXCz_SS_im) this->reduction_driver_->allreduce_inplace( VXCz_SS_im, nbf*nbf, ReductionOp::Sum );
+    if(VXCy_SS_im) this->reduction_driver_->allreduce_inplace( VXCy_SS_im, nbf*nbf, ReductionOp::Sum ); 
+    if(VXCx_SS_im) this->reduction_driver_->allreduce_inplace( VXCx_SS_im, nbf*nbf, ReductionOp::Sum );
 
     this->reduction_driver_->allreduce_inplace( EXC,   1    , ReductionOp::Sum );
     this->reduction_driver_->allreduce_inplace( &N_EL, 1    , ReductionOp::Sum );
     this->reduction_driver_->allreduce_inplace( &spin_N_EL, 1    , ReductionOp::Sum );
-    this->reduction_driver_->allreduce_inplace( &rhoL, 1    , ReductionOp::Sum );
-    this->reduction_driver_->allreduce_inplace( &rhoS, 1    , ReductionOp::Sum );
 
   });
 
@@ -172,7 +170,6 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
                        value_type* VXCy_SS_im, int64_t ldvxcy_ss_im,
                        value_type* VXCx_SS_im, int64_t ldvxcx_ss_im,
                        value_type* EXC, value_type *N_EL, value_type *spin_N_EL,
-                       value_type* rhoL, value_type* rhoS,
                        const IntegratorSettingsXC& settings,
                        task_iterator task_begin, task_iterator task_end ) {
     
@@ -187,16 +184,12 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
       std::ofstream coords_out;
       std::ofstream mnorm_out;
       std::ofstream den_out;
-      std::ofstream rhoL_out;
-      std::ofstream rhoS_out;
       std::ofstream dden_out;
 
 weights_out.open("weights.txt");
 coords_out.open("coords.txt");
 mnorm_out.open("mnorm.txt");
 den_out.open("dens.txt");
-rhoL_out.open("rhoLs.txt");
-rhoS_out.open("rhoSs.txt");
 dden_out.open("dden.txt");
 
   if (not is_rks and not is_uks and not is_gks and not is_dks) {
@@ -291,8 +284,6 @@ dden_out.open("dden.txt");
   double EXC_WORK = 0.0;
   double NEL_WORK = 0.0;
   double spin_NEL_WORK = 0.0;
-  double RHOL_WORK = 0.0;
-  double RHOS_WORK = 0.0;  
 
   // Loop over tasks
   const size_t ntasks = std::distance(task_begin, task_end);
@@ -351,7 +342,7 @@ dden_out.open("dden.txt");
     if( func.is_gga() ){
       if (is_dks ){
         host_data.basis_eval .resize( 10 * npts * nbe ); // basis + grad (3) + hess (6)
-        host_data.den_scr    .resize( spin_dim_scal * 4 * npts + 2 * npts);
+        host_data.den_scr    .resize( spin_dim_scal * 4 * npts );
         host_data.gamma      .resize( gga_dim_scal * npts );
         host_data.vgamma     .resize( gga_dim_scal * npts );
       } else {
@@ -371,7 +362,7 @@ dden_out.open("dden.txt");
         host_data.basis_eval .resize( 4 * npts * nbe ); // basis + grad (3)
       }
 
-      host_data.den_scr    .resize( spin_dim_scal * 4 * npts + 2 * npts);
+      host_data.den_scr    .resize( spin_dim_scal * 4 * npts );
       host_data.gamma      .resize( gga_dim_scal * npts );
       host_data.vgamma     .resize( gga_dim_scal * npts );
       host_data.tau        .resize( npts * spin_dim_scal );
@@ -464,7 +455,6 @@ dden_out.open("dden.txt");
     auto* vtau       = host_data.vtau.data();
     auto* vlapl      = host_data.vlapl.data();
 
-    value_type* rho = nullptr;
     value_type* dbasis_x_eval = nullptr;
     value_type* dbasis_y_eval = nullptr;
     value_type* dbasis_z_eval = nullptr;
@@ -492,7 +482,6 @@ dden_out.open("dden.txt");
         dbasis_x_eval = basis_eval    + npts * nbe;
         dbasis_y_eval = dbasis_x_eval + npts * nbe;
         dbasis_z_eval = dbasis_y_eval + npts * nbe;
-        rho = den_eval + 2 * npts;
     }
     if( func.is_gga() ) {
       if( is_dks ){
@@ -503,7 +492,6 @@ dden_out.open("dden.txt");
         dden_x_eval   = den_eval    + spin_dim_scal * npts;
         dden_y_eval   = dden_x_eval + spin_dim_scal * npts;
         dden_z_eval   = dden_y_eval + spin_dim_scal * npts;
-        rho = dden_z_eval + 2 * npts;
         d2basis_xx_eval = dbasis_z_eval + npts * nbe;
         d2basis_xy_eval = d2basis_xx_eval + npts * nbe;
         d2basis_xz_eval = d2basis_xy_eval + npts * nbe;
@@ -518,7 +506,6 @@ dden_out.open("dden.txt");
         dden_x_eval   = den_eval    + spin_dim_scal * npts;
         dden_y_eval   = dden_x_eval + spin_dim_scal * npts;
         dden_z_eval   = dden_y_eval + spin_dim_scal * npts;
-        rho = dden_z_eval + 2 * npts;
       if (is_gks) { H = K + 3*npts;}
       }
     }
@@ -530,7 +517,6 @@ dden_out.open("dden.txt");
       dden_x_eval   = den_eval    + spin_dim_scal * npts;
       dden_y_eval   = dden_x_eval + spin_dim_scal * npts;
       dden_z_eval   = dden_y_eval + spin_dim_scal * npts;
-      rho = dden_z_eval + 2 * npts;
       mmat_x        = zmat + npts * nbe;
       mmat_y        = mmat_x + npts * nbe;
       mmat_z        = mmat_y + npts * nbe;
@@ -712,7 +698,7 @@ for(int i =0; i<npts;++i){weights_out<<weights[i]<<std::endl;}
           immat_y_z, immat_z_x, immat_x_y,
           immat_x_s, immat_y_s, immat_z_s,
           den_eval, dden_x_eval, dden_y_eval, dden_z_eval, 
-          gamma, K, H, gks_dtol, rho );
+          gamma, K, H, gks_dtol );
       }
 
      } else {
@@ -733,7 +719,7 @@ for(int i =0; i<npts;++i){weights_out<<weights[i]<<std::endl;}
           immat_x_z, immat_y_x, immat_z_y,
           immat_y_z, immat_z_x, immat_x_y,
           immat_x_s, immat_y_s, immat_z_s,
-          den_eval, K, gks_dtol, rho );
+          den_eval, K, gks_dtol );
       }
      }
     
@@ -789,9 +775,6 @@ for(int i =0; i<npts;++i){weights_out<<weights[i]<<std::endl;}
     double spin_NEL_local = 0.0;
     double EXC_local  = 0.0;
 
-    double rhoL_local = 0.0;
-    double rhoS_local = 0.0;
-
 
     for( int32_t i = 0; i < npts; ++i ) {
       const auto den = is_rks ? den_eval[i] : (den_eval[2*i] + den_eval[2*i+1]);
@@ -815,17 +798,6 @@ for(int i =0; i<npts;++i){weights_out<<weights[i]<<std::endl;}
       }
         den_out<<den<<std::endl;
         mnorm_out<<spin_den<<std::endl;
-      
-      if(is_dks){
-      const auto denL = rho[2*i];
-      const auto denS = rho[2*i+1];
-
-      rhoL_out<<denL<<std::endl;
-      rhoS_out<<denS<<std::endl;
-
-      rhoL_local += weights[i] * denL;
-      rhoS_local += weights[i] * denS;
-      }
     }
 
     std::cout<<"EXC_LOCAL "<<EXC_local<<std::endl;
@@ -836,12 +808,7 @@ for(int i =0; i<npts;++i){weights_out<<weights[i]<<std::endl;}
     NEL_WORK += NEL_local;
     #pragma omp atomic
     spin_NEL_WORK += spin_NEL_local;
-    #pragma omp atomic
-    RHOL_WORK += rhoL_local;
-    #pragma omp atomic
-    RHOS_WORK += rhoS_local;
 
-    
 
     if(is_exc_only) continue;
 
@@ -1064,13 +1031,10 @@ for(int i =0; i<npts;++i){weights_out<<weights[i]<<std::endl;}
   *N_EL = NEL_WORK;
   *spin_N_EL = spin_NEL_WORK;
 
-  *rhoL = RHOL_WORK;
-  *rhoS = RHOS_WORK;
-
   std::cout<<"N_EL =  "<<*N_EL<<std::endl;
   std::cout<<"spin N_EL =  "<<*spin_N_EL<<std::endl;
   std::cout<<"EXC =  "<<*EXC<<std::endl;
-  std::cout<<"N_EL L S "<<*rhoL<<" "<<*rhoS<<std::endl;
+
 
 
   if(not is_exc_only) {
@@ -1115,8 +1079,6 @@ weights_out.close();
 coords_out.close();
 mnorm_out.close();
 den_out.close();
-rhoL_out.close();
-rhoS_out.close();
 dden_out.close();
 
 } 

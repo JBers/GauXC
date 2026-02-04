@@ -224,7 +224,6 @@ protected:
                             value_type* VXCy_SS_im, int64_t ldvxcy_ss_im,
                             value_type* VXCx_SS_im, int64_t ldvxcx_ss_im,
                             value_type* EXC, value_type *N_EL, value_type *spin_N_EL,
-                            value_type* rhoL, value_type* rhoS,
                             host_task_iterator task_begin, host_task_iterator task_end, incore_integrator_type& incore_integrator
                              );
 
