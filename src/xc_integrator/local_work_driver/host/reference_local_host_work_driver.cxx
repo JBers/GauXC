@@ -835,10 +835,10 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
 
    double dtolsq = dtol*dtol;
 
-   std::ofstream rhom_out;
-   std::ofstream gamma_out;
-   rhom_out.open("rhom.txt");
-   gamma_out.open("gammas.txt");
+  //  std::ofstream rhom_out;
+  //  std::ofstream gamma_out;
+  //  rhom_out.open("rhom.txt");
+  //  gamma_out.open("gammas.txt");
 
     //  std::cout<<"rhos rhos_ss rhos+rhos_ss"<<std::endl;
 
@@ -1469,17 +1469,17 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
       // gamma[3 * i + 1] = 0.25 * (dels_dot_dels - delz_dot_delz);
       // gamma[3 * i + 2] = 0.25 * (dels_dot_dels - 2*dels_dot_delz + delz_dot_delz);
       
-        rhom_out<<std::setprecision(std::numeric_limits<double>::max_digits10);
-        rhom_out<<rhos<<" "<<rhox<<" "<<rhoy<<" "<<rhoz<<std::endl;
-        gamma_out<<gamma[3 * i]<<" "<<gamma[3 * i + 1]<<" "<<gamma[3 * i + 2]<<std::endl;
+        // rhom_out<<std::setprecision(std::numeric_limits<double>::max_digits10);
+        // rhom_out<<rhos<<" "<<rhox<<" "<<rhoy<<" "<<rhoz<<std::endl;
+        // gamma_out<<gamma[3 * i]<<" "<<gamma[3 * i + 1]<<" "<<gamma[3 * i + 2]<<std::endl;
       // std::cout<<"ypp ymm ypm"<<std::endl;
       // std::cout<<gamma[3 * i]<<" ";
       // std::cout<<gamma[3 * i + 1]<<" ";
       // std::cout<<gamma[3 * i + 2]<< std::endl;
 
     }
-rhom_out.close();
-gamma_out.close();
+// rhom_out.close();
+// gamma_out.close();
 }
 
 
