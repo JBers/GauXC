@@ -32,7 +32,7 @@ RadialScale default_mk_radial_scaling_factor( AtomicNumber _Z ) {
     case 88:
       return RadialScale(7.0);
     default:
-      return RadialScale(3.0);
+      return RadialScale(7.0);
   }
 }
 
@@ -83,7 +83,7 @@ RadialScale default_ta_radial_scaling_factor( AtomicNumber _Z ) {
 
 RadialScale default_mhl_radial_scaling_factor( AtomicNumber _Z ) {
   auto Z = _Z.get(); 
-  const double fac = (Z!=1) ? 0.5 : 2.0;
+  const double fac = (Z!=1) ? 0.5 : 0.5;
   return RadialScale( default_atomic_radius(_Z) * fac );
 }
 
