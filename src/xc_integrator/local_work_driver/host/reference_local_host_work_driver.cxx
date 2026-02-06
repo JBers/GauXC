@@ -2906,9 +2906,9 @@ void ReferenceLocalHostWorkDriver::eval_mmat_mgga_vxc_uks_ts(size_t npts, size_t
       detail::inc_by_submat_atomic( nbf, nbf, nbe, nbe, VXC, ldvxc, scr, nbe, submat_map );
 
 //       std::cout<<"Z npts = "<<npts<<std::endl;
-// for(int i =0; i<npts;++i){for(int j = 0; j<nbe; j++)std::cout<<Z[i+j]<<", ";}
+// for(int i =0; i<npts;++i){for(int j = 0; j<nbe; j++)std::cout<<Z[i+j]<<std::endl;}
 // std::cout<<std::endl;
-// for(int i =0; i<npts;++i){for(int j = 0; j<nbe; j++)std::cout<<basis_eval[i+j]<<", ";}
+// for(int i =0; i<npts;++i){for(int j = 0; j<nbe; j++)std::cout<<basis_eval[i+j]<<std::endl;}
 // std::cout<<std::endl;
 // for(int i = 0; i<nbe;i++){for(int j = 0; j<nbe; j++)std::cout<<scr[i+j]<<" ";}
 // std::cout<<std::endl;
@@ -2927,18 +2927,18 @@ void ReferenceLocalHostWorkDriver::eval_mmat_mgga_vxc_uks_ts(size_t npts, size_t
 
       // blas::ger( nbe, nbe, -1*factor, basis_eval, nbe, Z, ldz, scr, nbe );
 
-      blas::gemm( 'N', 'T', nbe, nbe, npts, 1., basis_eval, nbe, Z, ldz, 0., scr, nbe );
-      blas::gemm( 'N', 'T', nbe, nbe, npts, 1.,  Z, ldz, basis_eval, nbe, -1., scr, nbe );
+      blas::gemm( 'N', 'T', nbe, nbe, npts, factor, basis_eval, nbe, Z, ldz, 0., scr, nbe );
+      blas::gemm( 'N', 'T', nbe, nbe, npts, factor,  Z, ldz, basis_eval, nbe, -1., scr, nbe );
 
 
 
 
       detail::inc_by_submat_atomic( nbf, nbf, nbe, nbe, VXC, ldvxc, scr, nbe, submat_map );
 
-//       std::cout<<"Z npts = "<<npts<<std::endl;
-// for(int i =0; i<npts;++i){for(int j = 0; j<nbe; j++)std::cout<<Z[i+j]<<", ";}
+      // std::cout<<"Z anti npts = "<<npts<<std::endl;
+// for(int i =0; i<npts;++i){for(int j = 0; j<nbe; j++)std::cout<<Z[i+j]<<std::endl;}
 // std::cout<<std::endl;
-// for(int i =0; i<npts;++i){for(int j = 0; j<nbe; j++)std::cout<<basis_eval[i+j]<<", ";}
+// for(int i =0; i<npts;++i){for(int j = 0; j<nbe; j++)std::cout<<basis_eval[i+j]<<std::endl;}
 // std::cout<<std::endl;
 // for(int i = 0; i<nbe;i++){for(int j = 0; j<nbe; j++)std::cout<<scr[i+j]<<" ";}
 // std::cout<<std::endl;
