@@ -1184,15 +1184,6 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
           VXCz_SS_im[ j + i*ldvxcz_ss ] = -1. * VXCz_SS_im[ i + j*ldvxcz_ss ];
           VXCy_SS_im[ j + i*ldvxcy_ss ] = -1. * VXCy_SS_im[ i + j*ldvxcy_ss ];
           VXCx_SS_im[ j + i*ldvxcx_ss ] = -1. * VXCx_SS_im[ i + j*ldvxcx_ss ];
-          std::cout<<"VXCs s im"<<std::endl;
-          std::cout<<VXCs_SS_im[ j + i*ldvxcs_ss ]<<std::endl;
-          std::cout<<"VXCz s im"<<std::endl;
-          std::cout<<VXCz_SS_im[ j + i*ldvxcs_ss ]<<std::endl;
-          std::cout<<"VXCy s im"<<std::endl;
-          std::cout<<VXCy_SS_im[ j + i*ldvxcs_ss ]<<std::endl;
-          std::cout<<"VXCx s im"<<std::endl;
-          std::cout<<VXCx_SS_im[ j + i*ldvxcs_ss ]<<std::endl;
-
         }
       }
     }
