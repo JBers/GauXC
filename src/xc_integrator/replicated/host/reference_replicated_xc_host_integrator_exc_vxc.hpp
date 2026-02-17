@@ -977,14 +977,9 @@ for(int i =0; i<npts;++i){weights_out<<weights[i]<<std::endl;}
           // std::cout<<"inc vxc x xz + zx"<<std::endl;
         lwd->inc_vxc( npts, nbf, nbe, dbasis_x_eval, submat_map, xmat_z_x_ss, nbe, VXCz_SS, ldvxcs_ss,
           nbe_scr, RKB_factor );
-        //   for( int32_t j = 0;   j < nbf; ++j ) {
-        // for( int32_t i = 0; i < nbf; ++i ) {
-        //   std::cout<<VXCz_SS[ i + j*ldvxcs_ss ]<<std::endl;}}
         lwd->inc_vxc( npts, nbf, nbe, dbasis_z_eval, submat_map, zmat_x_ss, nbe, VXCz_SS, ldvxcs_ss,
           nbe_scr, RKB_factor );
-        //   for( int32_t j = 0;   j < nbf; ++j ) {
-        // for( int32_t i = 0; i < nbf; ++i ) {
-        //   std::cout<<VXCz_SS[ i + j*ldvxcs_ss ]<<std::endl;}}
+
 
           // xy + yx
           // std::cout<<"inc vxc x xy + yx"<<std::endl;
