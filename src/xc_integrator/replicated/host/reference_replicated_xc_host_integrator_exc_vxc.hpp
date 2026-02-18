@@ -799,7 +799,7 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
       //   mnorm_out<<spin_den<<std::endl;
     }
 
-    std::cout<<"EXC_LOCAL "<<EXC_local<<std::endl;
+    // std::cout<<"EXC_LOCAL "<<EXC_local<<std::endl;
     // Atomic updates
     #pragma omp atomic
     EXC_WORK += EXC_local;
