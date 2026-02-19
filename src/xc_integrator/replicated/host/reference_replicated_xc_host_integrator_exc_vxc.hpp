@@ -180,17 +180,9 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
 
   std::cout<<"is rks uks gks dks "<<is_rks<<is_uks<<is_gks<<is_dks<<std::endl;
   
-      std::ofstream weights_out;
-      std::ofstream coords_out;
-      // std::ofstream mnorm_out;
-      // std::ofstream den_out;
-      std::ofstream dden_out;
 
-weights_out.open("weights.txt");
-coords_out.open("coords.txt");
-// mnorm_out.open("mnorm.txt");
-// den_out.open("dens.txt");
-dden_out.open("dden.txt");
+
+
 
   if (not is_rks and not is_uks and not is_gks and not is_dks) {
     GAUXC_GENERIC_EXCEPTION("Must Be Either RKS, UKS, GKS, or DKS!");
@@ -538,13 +530,7 @@ dden_out.open("dden.txt");
 
 // std::cout<<"npts = "<<npts<<std::endl;
 
-coords_out<<std::setprecision(std::numeric_limits<double>::max_digits10);
-for(int i =0; i<npts;++i){for(int j = 0;j<3;++j){coords_out<<points[3*i+j]<<" ";}coords_out<<std::endl;}
 
-
-
-weights_out<<std::setprecision(std::numeric_limits<double>::max_digits10);
-for(int i =0; i<npts;++i){weights_out<<weights[i]<<std::endl;}
 
 
     // Get the submatrix map for batch
@@ -781,25 +767,9 @@ for(int i =0; i<npts;++i){weights_out<<weights[i]<<std::endl;}
       NEL_local += weights[i] * den;
       spin_NEL_local += weights[i] * spin_den;
       EXC_local += eps[i]     * den;
-      // std::cout<<"EXC_local += eps[i]     * den "<<EXC_local<<" += "<<eps[i]<<"     * "<<den<<std::endl;
-
-      if( func.is_gga()){
-        dden_out<<std::setprecision(std::numeric_limits<double>::max_digits10);
-        // n dx dy dz
-        // mz
-        // my
-        // mx
-        dden_out<<dden_x_eval[4 * i]<<" "<<dden_y_eval[4 * i]<<" "<<dden_z_eval[4 * i]<<std::endl;
-        dden_out<<dden_x_eval[4 * i+1]<<" "<<dden_y_eval[4 * i+1]<<" "<<dden_z_eval[4 * i+1]<<std::endl;
-        dden_out<<dden_x_eval[4 * i+2]<<" "<<dden_y_eval[4 * i+2]<<" "<<dden_z_eval[4 * i+2]<<std::endl;
-        dden_out<<dden_x_eval[4 * i+3]<<" "<<dden_y_eval[4 * i+3]<<" "<<dden_z_eval[4 * i+3]<<std::endl;
-        // dden_out<<std::endl;
-      }
-      //   den_out<<den<<std::endl;
-      //   mnorm_out<<spin_den<<std::endl;
     }
 
-    std::cout<<"EXC_LOCAL "<<EXC_local<<std::endl;
+
     // Atomic updates
     #pragma omp atomic
     EXC_WORK += EXC_local;
@@ -1091,11 +1061,7 @@ for(int i =0; i<npts;++i){weights_out<<weights[i]<<std::endl;}
       }
     }
   }
-weights_out.close();
-coords_out.close();
-// mnorm_out.close();
-// den_out.close();
-dden_out.close();
+
 
 } 
 
