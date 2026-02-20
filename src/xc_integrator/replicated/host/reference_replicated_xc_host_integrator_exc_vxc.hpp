@@ -329,8 +329,8 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
     // LDA data requirements
     if( func.is_lda() ){
       if( is_dks ){
-        host_data.basis_eval .resize( 4 * npts * nbe );
-        host_data.den_scr    .resize( spin_dim_scal * npts + 2 * npts);
+        host_data.basis_eval .resize( 4 * npts * nbe ); // basis + grad
+        host_data.den_scr    .resize( spin_dim_scal * npts);
       } else {
         host_data.basis_eval .resize( npts * nbe );
         host_data.den_scr    .resize( npts * spin_dim_scal);
@@ -889,6 +889,8 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
           nbe_scr, 1.);
       }
       if(is_dks) {
+
+        auto flip = -1.0;
         // Vxc s
           // xx + yy + zz
           // std::cout<<"inc vxc s xx yy zz"<<std::endl;
@@ -902,27 +904,25 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
 
           // std::cout<<"inc vxc anti z xy-yx"<<std::endl;
         lwd->inc_vxc_anti( npts, nbf, nbe, dbasis_y_eval, submat_map, zmat_s_ss, nbe, VXCz_SS_im, ldvxcs_ss,
-          nbe_scr, RKB_factor );
-
+          nbe_scr, flip*RKB_factor );
         //   std::cout<<"inc vxc  anti z xy-yx"<<std::endl;
         lwd->inc_vxc_anti( npts, nbf, nbe, dbasis_x_eval, submat_map, xmat_y_s_ss, nbe, VXCz_SS_im, ldvxcs_ss,
-          nbe_scr, -1*RKB_factor );
+          nbe_scr, flip*-1*RKB_factor );
 
         //     std::cout<<"inc vxc anti x yz-zy"<<std::endl;
         lwd->inc_vxc_anti( npts, nbf, nbe, dbasis_z_eval, submat_map, xmat_y_s_ss, nbe, VXCx_SS_im, ldvxcs_ss,
           nbe_scr, RKB_factor );
-        
         //    std::cout<<"inc vxc anti x yz-zy"<<std::endl;
         lwd->inc_vxc_anti( npts, nbf, nbe, dbasis_y_eval, submat_map, xmat_z_s_ss, nbe, VXCx_SS_im, ldvxcs_ss,
-          nbe_scr, -1*RKB_factor );
+          nbe_scr, flip*-1*RKB_factor );
 
           
         //   std::cout<<"inc vxc anti y zx-xz"<<std::endl;
         lwd->inc_vxc_anti( npts, nbf, nbe, dbasis_x_eval, submat_map, xmat_z_s_ss, nbe, VXCy_SS_im, ldvxcs_ss,
-          nbe_scr, RKB_factor );
+          nbe_scr, flip*RKB_factor );
         //   std::cout<<"inc vxc anti y zx-xz"<<std::endl;
         lwd->inc_vxc_anti( npts, nbf, nbe, dbasis_z_eval, submat_map, zmat_s_ss, nbe, VXCy_SS_im, ldvxcs_ss,
-          nbe_scr, -1*RKB_factor );
+          nbe_scr, flip*-1*RKB_factor );
 
 
 
@@ -957,10 +957,10 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
                 // std::cout<<"inc vxc s anti - yx"<<std::endl;
 
         lwd->inc_vxc_anti( npts, nbf, nbe, dbasis_y_eval, submat_map, zmat_z_ss, nbe, VXCs_SS_im, ldvxcs_ss,
-          nbe_scr, -1*RKB_factor );
+          nbe_scr, flip*-1*RKB_factor );
         //   std::cout<<"inc vxc s anti xy "<<std::endl;
         lwd->inc_vxc_anti( npts, nbf, nbe, dbasis_x_eval, submat_map, xmat_y_z_ss, nbe, VXCs_SS_im, ldvxcs_ss,
-          nbe_scr, RKB_factor );
+          nbe_scr, flip*RKB_factor );
 
         // Vxc x
           // xx - yy - zz
@@ -992,10 +992,10 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
           // Vxc x im anti
                 // std::cout<<"inc vxc s anti - zy"<<std::endl;
         lwd->inc_vxc_anti( npts, nbf, nbe, dbasis_z_eval, submat_map, xmat_y_x_ss, nbe, VXCs_SS_im, ldvxcs_ss,
-          nbe_scr, -1*RKB_factor );
+          nbe_scr,flip* -1*RKB_factor );
         //   std::cout<<"inc vxc s anti yz "<<std::endl;
         lwd->inc_vxc_anti( npts, nbf, nbe, dbasis_y_eval, submat_map, xmat_z_x_ss, nbe, VXCs_SS_im, ldvxcs_ss,
-          nbe_scr, RKB_factor );
+          nbe_scr, flip*RKB_factor );
 
 
 
@@ -1029,10 +1029,10 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
           // Vxc y im anti
                 // std::cout<<"inc anti Vxc s yz"<<std::endl;
         lwd->inc_vxc_anti( npts, nbf, nbe, dbasis_z_eval, submat_map, zmat_y_ss, nbe, VXCs_SS_im, ldvxcs_ss,
-          nbe_scr, -1*RKB_factor );
+          nbe_scr, flip*-1*RKB_factor );
         //   std::cout<<"inc anti Vxc s zy"<<std::endl;
         lwd->inc_vxc_anti( npts, nbf, nbe, dbasis_x_eval, submat_map, xmat_z_y_ss, nbe, VXCs_SS_im, ldvxcs_ss,
-          nbe_scr, RKB_factor );
+          nbe_scr, flip*RKB_factor );
 
       }
        
