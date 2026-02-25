@@ -122,11 +122,11 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
     if(VXCz) this->reduction_driver_->allreduce_inplace( VXCz, nbf*nbf, ReductionOp::Sum );
     if(VXCy) this->reduction_driver_->allreduce_inplace( VXCy, nbf*nbf, ReductionOp::Sum ); 
     if(VXCx) this->reduction_driver_->allreduce_inplace( VXCx, nbf*nbf, ReductionOp::Sum );
-    if(VXCs_SS) this->reduction_driver_->allreduce_inplace( VXCx_SS, nbf*nbf, ReductionOp::Sum );
+    if(VXCs_SS) this->reduction_driver_->allreduce_inplace( VXCs_SS, nbf*nbf, ReductionOp::Sum );
     if(VXCz_SS) this->reduction_driver_->allreduce_inplace( VXCz_SS, nbf*nbf, ReductionOp::Sum );
     if(VXCy_SS) this->reduction_driver_->allreduce_inplace( VXCy_SS, nbf*nbf, ReductionOp::Sum ); 
     if(VXCx_SS) this->reduction_driver_->allreduce_inplace( VXCx_SS, nbf*nbf, ReductionOp::Sum );
-    if(VXCs_SS_im) this->reduction_driver_->allreduce_inplace( VXCx_SS_im, nbf*nbf, ReductionOp::Sum );
+    if(VXCs_SS_im) this->reduction_driver_->allreduce_inplace( VXCs_SS_im, nbf*nbf, ReductionOp::Sum );
     if(VXCz_SS_im) this->reduction_driver_->allreduce_inplace( VXCz_SS_im, nbf*nbf, ReductionOp::Sum );
     if(VXCy_SS_im) this->reduction_driver_->allreduce_inplace( VXCy_SS_im, nbf*nbf, ReductionOp::Sum ); 
     if(VXCx_SS_im) this->reduction_driver_->allreduce_inplace( VXCx_SS_im, nbf*nbf, ReductionOp::Sum );
@@ -649,11 +649,11 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
       lwd->eval_xmat( npts, nbf, nbe, submat_map, 1.0, Px_SS_imag, ldpx_ss, dbasis_z_eval, nbe,
         immat_z_x, nbe, nbe_scr);
 
-      lwd->eval_xmat( npts, nbf, nbe, submat_map, 1.0, Ps_SS_imag, ldpx_ss, dbasis_x_eval, nbe,
+      lwd->eval_xmat( npts, nbf, nbe, submat_map, 1.0, Ps_SS_imag, ldps_ss, dbasis_x_eval, nbe,
         immat_x_s, nbe, nbe_scr);
-      lwd->eval_xmat( npts, nbf, nbe, submat_map, 1.0, Ps_SS_imag, ldpx_ss, dbasis_y_eval, nbe,
+      lwd->eval_xmat( npts, nbf, nbe, submat_map, 1.0, Ps_SS_imag, ldps_ss, dbasis_y_eval, nbe,
         immat_y_s, nbe, nbe_scr);
-      lwd->eval_xmat( npts, nbf, nbe, submat_map, 1.0, Ps_SS_imag, ldpx_ss, dbasis_z_eval, nbe,
+      lwd->eval_xmat( npts, nbf, nbe, submat_map, 1.0, Ps_SS_imag, ldps_ss, dbasis_z_eval, nbe,
         immat_z_s, nbe, nbe_scr);
 
     }
@@ -907,10 +907,10 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
 
           // std::cout<<"inc vxc anti z xy-yx"<<std::endl;
         lwd->inc_vxc_anti( npts, nbf, nbe, dbasis_y_eval, submat_map, zmat_z_ss, nbe, VXCs_SS_im, ldvxcs_ss,
-          nbe_scr, flip*RKB_factor );
+          nbe_scr, flip*-1*RKB_factor );
         //   std::cout<<"inc vxc  anti z xy-yx"<<std::endl;
         lwd->inc_vxc_anti( npts, nbf, nbe, dbasis_x_eval, submat_map, xmat_y_z_ss, nbe, VXCs_SS_im, ldvxcs_ss,
-          nbe_scr, flip*-1*RKB_factor );
+          nbe_scr, flip*RKB_factor );
 
         //     std::cout<<"inc vxc anti x yz-zy"<<std::endl;
         lwd->inc_vxc_anti( npts, nbf, nbe, dbasis_z_eval, submat_map, xmat_y_x_ss, nbe, VXCs_SS_im, ldvxcs_ss,
@@ -960,10 +960,10 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
                 // std::cout<<"inc vxc s anti - yx"<<std::endl;
 
         lwd->inc_vxc_anti( npts, nbf, nbe, dbasis_y_eval, submat_map, zmat_s_ss, nbe, VXCz_SS_im, ldvxcs_ss,
-          nbe_scr, flip*-1*RKB_factor );
+          nbe_scr, flip*RKB_factor );
         //   std::cout<<"inc vxc s anti xy "<<std::endl;
         lwd->inc_vxc_anti( npts, nbf, nbe, dbasis_x_eval, submat_map, xmat_y_s_ss, nbe, VXCz_SS_im, ldvxcs_ss,
-          nbe_scr, flip*RKB_factor );
+          nbe_scr, flip*-1*RKB_factor );
 
         // Vxc x
           // xx - yy - zz
@@ -986,19 +986,19 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
 
           // xy + yx
           // std::cout<<"inc vxc x xy + yx"<<std::endl;
-        lwd->inc_vxc( npts, nbf, nbe, dbasis_y_eval, submat_map, zmat_y_ss, nbe, VXCz_SS, ldvxcs_ss,
+        lwd->inc_vxc( npts, nbf, nbe, dbasis_y_eval, submat_map, zmat_y_ss, nbe, VXCx_SS, ldvxcs_ss,
           nbe_scr, RKB_factor );
-        lwd->inc_vxc( npts, nbf, nbe, dbasis_x_eval, submat_map, xmat_y_y_ss, nbe, VXCz_SS, ldvxcs_ss,
+        lwd->inc_vxc( npts, nbf, nbe, dbasis_x_eval, submat_map, xmat_y_y_ss, nbe, VXCx_SS, ldvxcs_ss,
           nbe_scr, RKB_factor );
 
 
           // Vxc x im anti
                 // std::cout<<"inc vxc s anti - zy"<<std::endl;
-        lwd->inc_vxc_anti( npts, nbf, nbe, dbasis_z_eval, submat_map, xmat_y_s_ss, nbe, VXCz_SS_im, ldvxcs_ss,
-          nbe_scr,flip* -1*RKB_factor );
+        lwd->inc_vxc_anti( npts, nbf, nbe, dbasis_z_eval, submat_map, xmat_y_s_ss, nbe, VXCx_SS_im, ldvxcs_ss,
+          nbe_scr,flip* RKB_factor );
         //   std::cout<<"inc vxc s anti yz "<<std::endl;
-        lwd->inc_vxc_anti( npts, nbf, nbe, dbasis_y_eval, submat_map, xmat_z_s_ss, nbe, VXCz_SS_im, ldvxcs_ss,
-          nbe_scr, flip*RKB_factor );
+        lwd->inc_vxc_anti( npts, nbf, nbe, dbasis_y_eval, submat_map, xmat_z_s_ss, nbe, VXCx_SS_im, ldvxcs_ss,
+          nbe_scr, flip*-1*RKB_factor );
 
 
 
@@ -1032,10 +1032,10 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
           // Vxc y im anti
                 // std::cout<<"inc anti Vxc s yz"<<std::endl;
         lwd->inc_vxc_anti( npts, nbf, nbe, dbasis_z_eval, submat_map, zmat_s_ss, nbe, VXCy_SS_im, ldvxcs_ss,
-          nbe_scr, flip*-1*RKB_factor );
+          nbe_scr, flip*RKB_factor );
         //   std::cout<<"inc anti Vxc s zy"<<std::endl;
         lwd->inc_vxc_anti( npts, nbf, nbe, dbasis_x_eval, submat_map, xmat_z_s_ss, nbe, VXCy_SS_im, ldvxcs_ss,
-          nbe_scr, flip*RKB_factor );
+          nbe_scr, flip*-1*RKB_factor );
 
       }
        
