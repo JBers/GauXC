@@ -1435,22 +1435,22 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
       if (std::signbit(s_sum))
         sign = -1.;
       
-      if (mtemp > dtolsq) {
-        mnorm = sqrt(mtemp);
-        auto sqsum2 =
-          sqrt(dels_dot_delz * dels_dot_delz + dels_dot_delx * dels_dot_delx +
-               dels_dot_dely * dels_dot_dely);
-        KZ[i] = rhoz / mnorm;
-        KY[i] = rhoy / mnorm;
-        KX[i] = rhox / mnorm;
-        HZ[i] = sign * dels_dot_delz / sqsum2;
-        HY[i] = sign * dels_dot_dely / sqsum2;
-        HX[i] = sign * dels_dot_delx / sqsum2;
+      // if (mtemp > 1.) {
+      //   mnorm = sqrt(mtemp);
+      //   auto sqsum2 =
+      //     sqrt(dels_dot_delz * dels_dot_delz + dels_dot_delx * dels_dot_delx +
+      //          dels_dot_dely * dels_dot_dely);
+      //   KZ[i] = rhoz / mnorm;
+      //   KY[i] = rhoy / mnorm;
+      //   KX[i] = rhox / mnorm;
+      //   HZ[i] = sign * dels_dot_delz / sqsum2;
+      //   HY[i] = sign * dels_dot_dely / sqsum2;
+      //   HX[i] = sign * dels_dot_delx / sqsum2;
 
-        gamma[3 * i] = 0.25 * (dels_dot_dels + sum) + 0.5 * sign * sqsum2;
-        gamma[3 * i + 1] = 0.25 * (dels_dot_dels - sum);
-        gamma[3 * i + 2] = 0.25 * (dels_dot_dels + sum) - 0.5 * sign * sqsum2;
-      } else {
+      //   gamma[3 * i] = 0.25 * (dels_dot_dels + sum) + 0.5 * sign * sqsum2;
+      //   gamma[3 * i + 1] = 0.25 * (dels_dot_dels - sum);
+      //   gamma[3 * i + 2] = 0.25 * (dels_dot_dels + sum) - 0.5 * sign * sqsum2;
+      // } else {
         mnorm = (1. / 3.) * (rhox + rhoy + rhoz);
         
         KZ[i] = 1. / 3.;
@@ -1465,7 +1465,7 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
         gamma[3 * i] = 0.25 * (dels_dot_dels + sum) + 0.5 * sign * dels_dot_delms;
         gamma[3 * i + 1] = 0.25 * (dels_dot_dels - sum);
         gamma[3 * i + 2] = 0.25 * (dels_dot_dels + sum) - 0.5 * sign * dels_dot_delms;
-      }
+      // }
 
       // NON-COLLINEAR
       den_eval[2 * i] = 0.5 * (rhos + mnorm);
