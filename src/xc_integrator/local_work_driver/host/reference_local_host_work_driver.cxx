@@ -1426,21 +1426,26 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
       auto sum = delz_dot_delz + delx_dot_delx + dely_dot_dely;
       auto s_sum =
           dels_dot_delz * rhoz + dels_dot_delx * rhox + dels_dot_dely * rhoy;
-      auto sqsum2 =
-          sqrt(dels_dot_delz * dels_dot_delz + dels_dot_delx * dels_dot_delx +
-               dels_dot_dely * dels_dot_dely);
-         double sign = 1.;
+
+      double sign = 1.;
       if (std::signbit(s_sum))
         sign = -1.;
-
+      
       if (mtemp > dtolsq) {
         mnorm = sqrt(mtemp);
+        auto sqsum2 =
+          sqrt(dels_dot_delz * dels_dot_delz + dels_dot_delx * dels_dot_delx +
+               dels_dot_dely * dels_dot_dely);
         KZ[i] = rhoz / mnorm;
         KY[i] = rhoy / mnorm;
         KX[i] = rhox / mnorm;
         HZ[i] = sign * dels_dot_delz / sqsum2;
         HY[i] = sign * dels_dot_dely / sqsum2;
         HX[i] = sign * dels_dot_delx / sqsum2;
+
+        gamma[3 * i] = 0.25 * (dels_dot_dels + sum) + 0.5 * sign * sqsum2;
+        gamma[3 * i + 1] = 0.25 * (dels_dot_dels - sum);
+        gamma[3 * i + 2] = 0.25 * (dels_dot_dels + sum) - 0.5 * sign * sqsum2;
       } else {
         mnorm = (1. / 3.) * (rhox + rhoy + rhoz);
         
@@ -1451,6 +1456,11 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
         HZ[i] = sign / 3.;
         HY[i] = sign / 3.;
         HX[i] = sign / 3.;
+
+        auto dels_dot_delms = (1./3.)*(dels_dot_delx + dels_dot_dely + dels_dot_delz);
+        gamma[3 * i] = 0.25 * (dels_dot_dels + sum) + 0.5 * sign * dels_dot_delms;
+        gamma[3 * i + 1] = 0.25 * (dels_dot_dels - sum);
+        gamma[3 * i + 2] = 0.25 * (dels_dot_dels + sum) - 0.5 * sign * dels_dot_delms;
       }
 
       // NON-COLLINEAR
@@ -1462,9 +1472,9 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
       // std::cout<<"den_eval[2 * i]"<<den_eval[2 * i] <<std::endl;
       // std::cout<<"den_eval[3 * i + 1]"<<den_eval[3 * i + 1] <<std::endl;
 
-      gamma[3 * i] = 0.25 * (dels_dot_dels + sum) + 0.5 * sign * sqsum2;
-      gamma[3 * i + 1] = 0.25 * (dels_dot_dels - sum);
-      gamma[3 * i + 2] = 0.25 * (dels_dot_dels + sum) - 0.5 * sign * sqsum2;
+      // gamma[3 * i] = 0.25 * (dels_dot_dels + sum) + 0.5 * sign * sqsum2;
+      // gamma[3 * i + 1] = 0.25 * (dels_dot_dels - sum);
+      // gamma[3 * i + 2] = 0.25 * (dels_dot_dels + sum) - 0.5 * sign * sqsum2;
 
 
       // COLLINEAR TESTING
