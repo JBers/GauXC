@@ -773,7 +773,7 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
     double NEL_local = 0.0;
     double spin_NEL_local = 0.0;
     double EXC_local  = 0.0;
-
+    std::cout<< std::fixed << std::setprecision(10);
 
     for( int32_t i = 0; i < npts; ++i ) {
       const auto den = is_rks ? den_eval[i] : (den_eval[2*i] + den_eval[2*i+1]);
@@ -781,6 +781,9 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
       NEL_local += weights[i] * den;
       spin_NEL_local += weights[i] * spin_den;
       EXC_local += eps[i]     * den;
+
+      // std::cout<<den_eval[2*i]<<" "<<den_eval[2*i+1]<<std::endl;
+
       // std::cout<<"EXC_local += eps[i]     * den "<<EXC_local<<" += "<<eps[i]<<"     * "<<den<<std::endl;
 
       // if( func.is_gga()){
@@ -890,7 +893,7 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
       }
       if(is_dks) {
 
-        auto flip = -1.0;
+        auto flip = 1.0;
         // Vxc s
           // xx + yy + zz
           // std::cout<<"inc vxc s xx yy zz"<<std::endl;
@@ -903,25 +906,25 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
 
 
           // std::cout<<"inc vxc anti z xy-yx"<<std::endl;
-        lwd->inc_vxc_anti( npts, nbf, nbe, dbasis_y_eval, submat_map, zmat_s_ss, nbe, VXCz_SS_im, ldvxcs_ss,
+        lwd->inc_vxc_anti( npts, nbf, nbe, dbasis_y_eval, submat_map, zmat_z_ss, nbe, VXCs_SS_im, ldvxcs_ss,
           nbe_scr, flip*RKB_factor );
         //   std::cout<<"inc vxc  anti z xy-yx"<<std::endl;
-        lwd->inc_vxc_anti( npts, nbf, nbe, dbasis_x_eval, submat_map, xmat_y_s_ss, nbe, VXCz_SS_im, ldvxcs_ss,
+        lwd->inc_vxc_anti( npts, nbf, nbe, dbasis_x_eval, submat_map, xmat_y_z_ss, nbe, VXCs_SS_im, ldvxcs_ss,
           nbe_scr, flip*-1*RKB_factor );
 
         //     std::cout<<"inc vxc anti x yz-zy"<<std::endl;
-        lwd->inc_vxc_anti( npts, nbf, nbe, dbasis_z_eval, submat_map, xmat_y_s_ss, nbe, VXCx_SS_im, ldvxcs_ss,
+        lwd->inc_vxc_anti( npts, nbf, nbe, dbasis_z_eval, submat_map, xmat_y_x_ss, nbe, VXCs_SS_im, ldvxcs_ss,
           nbe_scr, RKB_factor );
         //    std::cout<<"inc vxc anti x yz-zy"<<std::endl;
-        lwd->inc_vxc_anti( npts, nbf, nbe, dbasis_y_eval, submat_map, xmat_z_s_ss, nbe, VXCx_SS_im, ldvxcs_ss,
+        lwd->inc_vxc_anti( npts, nbf, nbe, dbasis_y_eval, submat_map, xmat_z_x_ss, nbe, VXCs_SS_im, ldvxcs_ss,
           nbe_scr, flip*-1*RKB_factor );
 
           
         //   std::cout<<"inc vxc anti y zx-xz"<<std::endl;
-        lwd->inc_vxc_anti( npts, nbf, nbe, dbasis_x_eval, submat_map, xmat_z_s_ss, nbe, VXCy_SS_im, ldvxcs_ss,
+        lwd->inc_vxc_anti( npts, nbf, nbe, dbasis_x_eval, submat_map, xmat_z_y_ss, nbe, VXCs_SS_im, ldvxcs_ss,
           nbe_scr, flip*RKB_factor );
         //   std::cout<<"inc vxc anti y zx-xz"<<std::endl;
-        lwd->inc_vxc_anti( npts, nbf, nbe, dbasis_z_eval, submat_map, zmat_s_ss, nbe, VXCy_SS_im, ldvxcs_ss,
+        lwd->inc_vxc_anti( npts, nbf, nbe, dbasis_z_eval, submat_map, zmat_y_ss, nbe, VXCs_SS_im, ldvxcs_ss,
           nbe_scr, flip*-1*RKB_factor );
 
 
@@ -940,26 +943,26 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
 
           // zx + xz
           // std::cout<<"inc vxc z zx + xz"<<std::endl;
-        lwd->inc_vxc( npts, nbf, nbe, dbasis_x_eval, submat_map, xmat_z_z_ss, nbe, VXCx_SS, ldvxcs_ss,
+        lwd->inc_vxc( npts, nbf, nbe, dbasis_x_eval, submat_map, xmat_z_x_ss, nbe, VXCz_SS, ldvxcs_ss,
           nbe_scr, RKB_factor );
-        lwd->inc_vxc( npts, nbf, nbe, dbasis_z_eval, submat_map, zmat_z_ss, nbe, VXCx_SS, ldvxcs_ss,
+        lwd->inc_vxc( npts, nbf, nbe, dbasis_z_eval, submat_map, zmat_x_ss, nbe, VXCz_SS, ldvxcs_ss,
           nbe_scr, RKB_factor );
 
 
           // zy + yz
           // std::cout<<"inc vxc z zy + yz"<<std::endl;
-        lwd->inc_vxc( npts, nbf, nbe, dbasis_y_eval, submat_map, xmat_z_z_ss, nbe, VXCy_SS, ldvxcs_ss,
+        lwd->inc_vxc( npts, nbf, nbe, dbasis_y_eval, submat_map, xmat_z_y_ss, nbe, VXCz_SS, ldvxcs_ss,
           nbe_scr, RKB_factor );
-        lwd->inc_vxc( npts, nbf, nbe, dbasis_z_eval, submat_map, xmat_y_z_ss, nbe, VXCy_SS, ldvxcs_ss,
+        lwd->inc_vxc( npts, nbf, nbe, dbasis_z_eval, submat_map, xmat_y_y_ss, nbe, VXCz_SS, ldvxcs_ss,
           nbe_scr, RKB_factor );
 
         // Vxc z im anti
                 // std::cout<<"inc vxc s anti - yx"<<std::endl;
 
-        lwd->inc_vxc_anti( npts, nbf, nbe, dbasis_y_eval, submat_map, zmat_z_ss, nbe, VXCs_SS_im, ldvxcs_ss,
+        lwd->inc_vxc_anti( npts, nbf, nbe, dbasis_y_eval, submat_map, zmat_s_ss, nbe, VXCz_SS_im, ldvxcs_ss,
           nbe_scr, flip*-1*RKB_factor );
         //   std::cout<<"inc vxc s anti xy "<<std::endl;
-        lwd->inc_vxc_anti( npts, nbf, nbe, dbasis_x_eval, submat_map, xmat_y_z_ss, nbe, VXCs_SS_im, ldvxcs_ss,
+        lwd->inc_vxc_anti( npts, nbf, nbe, dbasis_x_eval, submat_map, xmat_y_s_ss, nbe, VXCz_SS_im, ldvxcs_ss,
           nbe_scr, flip*RKB_factor );
 
         // Vxc x
@@ -975,26 +978,26 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
 
           // xz + zx
           // std::cout<<"inc vxc x xz + zx"<<std::endl;
-        lwd->inc_vxc( npts, nbf, nbe, dbasis_x_eval, submat_map, xmat_z_x_ss, nbe, VXCz_SS, ldvxcs_ss,
+        lwd->inc_vxc( npts, nbf, nbe, dbasis_x_eval, submat_map, xmat_z_z_ss, nbe, VXCx_SS, ldvxcs_ss,
           nbe_scr, RKB_factor );
-        lwd->inc_vxc( npts, nbf, nbe, dbasis_z_eval, submat_map, zmat_x_ss, nbe, VXCz_SS, ldvxcs_ss,
+        lwd->inc_vxc( npts, nbf, nbe, dbasis_z_eval, submat_map, zmat_z_ss, nbe, VXCx_SS, ldvxcs_ss,
           nbe_scr, RKB_factor );
 
 
           // xy + yx
           // std::cout<<"inc vxc x xy + yx"<<std::endl;
-        lwd->inc_vxc( npts, nbf, nbe, dbasis_y_eval, submat_map, zmat_x_ss, nbe, VXCy_SS, ldvxcs_ss,
+        lwd->inc_vxc( npts, nbf, nbe, dbasis_y_eval, submat_map, zmat_y_ss, nbe, VXCz_SS, ldvxcs_ss,
           nbe_scr, RKB_factor );
-        lwd->inc_vxc( npts, nbf, nbe, dbasis_x_eval, submat_map, xmat_y_x_ss, nbe, VXCy_SS, ldvxcs_ss,
+        lwd->inc_vxc( npts, nbf, nbe, dbasis_x_eval, submat_map, xmat_y_y_ss, nbe, VXCz_SS, ldvxcs_ss,
           nbe_scr, RKB_factor );
 
 
           // Vxc x im anti
                 // std::cout<<"inc vxc s anti - zy"<<std::endl;
-        lwd->inc_vxc_anti( npts, nbf, nbe, dbasis_z_eval, submat_map, xmat_y_x_ss, nbe, VXCs_SS_im, ldvxcs_ss,
+        lwd->inc_vxc_anti( npts, nbf, nbe, dbasis_z_eval, submat_map, xmat_y_s_ss, nbe, VXCz_SS_im, ldvxcs_ss,
           nbe_scr,flip* -1*RKB_factor );
         //   std::cout<<"inc vxc s anti yz "<<std::endl;
-        lwd->inc_vxc_anti( npts, nbf, nbe, dbasis_y_eval, submat_map, xmat_z_x_ss, nbe, VXCs_SS_im, ldvxcs_ss,
+        lwd->inc_vxc_anti( npts, nbf, nbe, dbasis_y_eval, submat_map, xmat_z_s_ss, nbe, VXCz_SS_im, ldvxcs_ss,
           nbe_scr, flip*RKB_factor );
 
 
@@ -1012,26 +1015,26 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
 
           // yz + zy
           //  std::cout<<"inc vx c y yz+zy"<<std::endl;
-        lwd->inc_vxc( npts, nbf, nbe, dbasis_y_eval, submat_map, xmat_z_y_ss, nbe, VXCz_SS, ldvxcs_ss,
+        lwd->inc_vxc( npts, nbf, nbe, dbasis_y_eval, submat_map, xmat_z_z_ss, nbe, VXCy_SS, ldvxcs_ss,
           nbe_scr, RKB_factor );
-        lwd->inc_vxc( npts, nbf, nbe, dbasis_z_eval, submat_map, xmat_y_y_ss, nbe, VXCz_SS, ldvxcs_ss,
+        lwd->inc_vxc( npts, nbf, nbe, dbasis_z_eval, submat_map, xmat_y_z_ss, nbe, VXCy_SS, ldvxcs_ss,
           nbe_scr, RKB_factor );
 
 
           // xy + yx
           //  std::cout<<"inc vx c y xy+yx"<<std::endl;
-        lwd->inc_vxc( npts, nbf, nbe, dbasis_y_eval, submat_map, zmat_y_ss, nbe, VXCx_SS, ldvxcs_ss,
+        lwd->inc_vxc( npts, nbf, nbe, dbasis_y_eval, submat_map, zmat_x_ss, nbe, VXCy_SS, ldvxcs_ss,
           nbe_scr, RKB_factor );
-        lwd->inc_vxc( npts, nbf, nbe, dbasis_x_eval, submat_map, xmat_y_y_ss, nbe, VXCx_SS, ldvxcs_ss,
+        lwd->inc_vxc( npts, nbf, nbe, dbasis_x_eval, submat_map, xmat_y_x_ss, nbe, VXCy_SS, ldvxcs_ss,
           nbe_scr, RKB_factor );
 
 
           // Vxc y im anti
                 // std::cout<<"inc anti Vxc s yz"<<std::endl;
-        lwd->inc_vxc_anti( npts, nbf, nbe, dbasis_z_eval, submat_map, zmat_y_ss, nbe, VXCs_SS_im, ldvxcs_ss,
+        lwd->inc_vxc_anti( npts, nbf, nbe, dbasis_z_eval, submat_map, zmat_s_ss, nbe, VXCy_SS_im, ldvxcs_ss,
           nbe_scr, flip*-1*RKB_factor );
         //   std::cout<<"inc anti Vxc s zy"<<std::endl;
-        lwd->inc_vxc_anti( npts, nbf, nbe, dbasis_x_eval, submat_map, xmat_z_y_ss, nbe, VXCs_SS_im, ldvxcs_ss,
+        lwd->inc_vxc_anti( npts, nbf, nbe, dbasis_x_eval, submat_map, xmat_z_s_ss, nbe, VXCy_SS_im, ldvxcs_ss,
           nbe_scr, flip*RKB_factor );
 
       }
