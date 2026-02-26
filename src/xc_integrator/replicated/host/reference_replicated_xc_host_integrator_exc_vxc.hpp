@@ -893,7 +893,7 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
       }
       if(is_dks) {
 
-        auto flip = 1.0;
+        auto flip = -1.0;
         // Vxc s
           // xx + yy + zz
           // std::cout<<"inc vxc s xx yy zz"<<std::endl;

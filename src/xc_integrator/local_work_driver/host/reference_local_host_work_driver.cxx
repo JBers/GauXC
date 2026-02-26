@@ -839,8 +839,8 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
 
    double dtolsq = dtol*dtol;
 
-   auto flip = 1.0; //grad
-   auto rhoflip = 1.0; //rho
+   auto flip = -1.0; //grad
+   auto rhoflip = -1.0; //rho
 
   //  std::ofstream rhom_out;
   // //  std::ofstream gamma_out;
