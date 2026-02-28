@@ -438,10 +438,10 @@ namespace GauXC {
     //  std::cout<<RKB_factor*rhoy_ss<<" ";
     //  std::cout<<rhoy+RKB_factor*rhoy_ss<<std::endl;;
 
-     rhos += RKB_factor * rhos_ss;
-     rhoz += RKB_factor * rhoz_ss; 
-     rhox += RKB_factor * rhox_ss;
-     rhoy += RKB_factor * rhoy_ss;
+    //  rhos += RKB_factor * rhos_ss;
+    //  rhoz += RKB_factor * rhoz_ss; 
+    //  rhox += RKB_factor * rhox_ss;
+    //  rhoy += RKB_factor * rhoy_ss;
 
       double mtemp = rhoz * rhoz + rhox * rhox + rhoy * rhoy;
       double mnorm = 0;
@@ -1011,10 +1011,10 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
     //  std::cout<<RKB_factor*rhoy_ss<<" ";
     //  std::cout<<rhoy+RKB_factor*rhoy_ss<<std::endl;;
 
-     rhos += RKB_factor * rhos_ss;
-     rhoz += RKB_factor * rhoz_ss; 
-     rhox += RKB_factor * rhox_ss;
-     rhoy += RKB_factor * rhoy_ss;
+    //  rhos += RKB_factor * rhos_ss;
+    //  rhoz += RKB_factor * rhoz_ss; 
+    //  rhox += RKB_factor * rhox_ss;
+    //  rhoy += RKB_factor * rhoy_ss;
 
 
       // dV/dk LL
@@ -1367,18 +1367,18 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
       // std::cout<<"dndy "<<dndy<<" "<<dndy_ss<<std::endl;
       // std::cout<<"dndz "<<dndz<<" "<<dndz_ss<<std::endl;
       
-      dndx +=  2 * RKB_factor * dndx_ss;
-      dndy +=  2 * RKB_factor * dndy_ss;
-      dndz +=  2 * RKB_factor * dndz_ss;
-      dMzdx += 2 * RKB_factor * dMzdx_ss;
-      dMzdy += 2 * RKB_factor * dMzdy_ss;
-      dMzdz += 2 * RKB_factor * dMzdz_ss;
-      dMydx += 2 * RKB_factor * dMydx_ss;
-      dMydy += 2 * RKB_factor * dMydy_ss;
-      dMydz += 2 * RKB_factor * dMydz_ss;
-      dMxdx += 2 * RKB_factor * dMxdx_ss;
-      dMxdy += 2 * RKB_factor * dMxdy_ss;
-      dMxdz += 2 * RKB_factor * dMxdz_ss;
+      // dndx +=  2 * RKB_factor * dndx_ss;
+      // dndy +=  2 * RKB_factor * dndy_ss;
+      // dndz +=  2 * RKB_factor * dndz_ss;
+      // dMzdx += 2 * RKB_factor * dMzdx_ss;
+      // dMzdy += 2 * RKB_factor * dMzdy_ss;
+      // dMzdz += 2 * RKB_factor * dMzdz_ss;
+      // dMydx += 2 * RKB_factor * dMydx_ss;
+      // dMydy += 2 * RKB_factor * dMydy_ss;
+      // dMydz += 2 * RKB_factor * dMydz_ss;
+      // dMxdx += 2 * RKB_factor * dMxdx_ss;
+      // dMxdy += 2 * RKB_factor * dMxdy_ss;
+      // dMxdz += 2 * RKB_factor * dMxdz_ss;
 
       // dMzdx*=-1;
       // dMzdy*=-1;
