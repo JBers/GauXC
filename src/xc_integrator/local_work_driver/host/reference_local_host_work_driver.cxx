@@ -253,7 +253,7 @@ namespace GauXC {
     double dtolsq = dtol*dtol;
 
   
-    auto flip = 1.0;
+    auto flip = -1.0;
 
  
     for( int32_t i = 0; i < (int32_t)npts; ++i ) {
@@ -343,7 +343,7 @@ namespace GauXC {
 
 
       auto rhos_ss = rhos_yy_ss + rhos_xx_ss + rhos_zz_ss; 
-      auto rhos_anti = rhos_z_xy - rhos_z_yx + rhos_x_yz - rhos_x_zy + rhos_y_xz - rhos_y_zx;
+      auto rhos_anti = rhos_z_xy - rhos_z_yx + rhos_x_yz - rhos_x_zy + rhos_y_zx - rhos_y_xz;
       rhos_ss -= flip*rhos_anti;
 
       // z
