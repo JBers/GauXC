@@ -32,7 +32,7 @@ RadialScale default_mk_radial_scaling_factor( AtomicNumber _Z ) {
     case 88:
       return RadialScale(7.0);
     default:
-      return RadialScale(9.0);
+      return RadialScale(0.5);
   }
 }
 
