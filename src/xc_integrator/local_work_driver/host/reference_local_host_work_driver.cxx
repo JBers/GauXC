@@ -362,7 +362,7 @@ namespace GauXC {
 
       const auto rhoz_ss_dot = rhoz_zz_ss - rhoz_yy_ss - rhoz_xx_ss;
       const auto rhoz_ss_cross = rhoz_xz_ss + rhoz_zx_ss + rhoz_yz_ss + rhoz_zy_ss; 
-      const auto rhoz_ss_anti = rhoz_s_yx - rhoz_s_xy;
+      const auto rhoz_ss_anti = rhoz_s_xy - rhoz_s_yx;
       const auto rhoz_ss = rhoz_ss_dot + rhoz_ss_anti + rhoz_ss_cross;
 
       // x
@@ -384,7 +384,7 @@ namespace GauXC {
       const double rhox_zy_im = blas::dot( nbe, dbasis_z_eval + ioffs, 1, Xs_y_i_im, 1 );
       const double rhox_yz_im = blas::dot( nbe, dbasis_y_eval + ioffs, 1, Xs_z_i_im, 1 );   
       
-      const auto rhox_ss_anti = rhox_zy_im - rhox_yz_im;
+      const auto rhox_ss_anti = rhox_yz_im - rhox_zy_im;
       const auto rhox_ss = rhox_ss_dot + rhox_ss_anti + rhox_ss_cross;
 
       // y
@@ -406,7 +406,7 @@ namespace GauXC {
       const double rhoy_zx_im = blas::dot( nbe, dbasis_z_eval + ioffs, 1, Xs_x_i_im, 1 );
       const double rhoy_xz_im = blas::dot( nbe, dbasis_x_eval + ioffs, 1, Xs_z_i_im, 1 );   
     
-      const auto rhoy_ss_anti = rhoy_xz_im - rhoy_zx_im;
+      const auto rhoy_ss_anti = rhoy_zx_im - rhoy_xz_im;
       const auto rhoy_ss = rhoy_ss_dot + rhoy_ss_anti + rhoy_ss_cross;
 
       // std::cout<<"rhom_ss breakdown"<<std::endl;
@@ -943,7 +943,7 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
 
       const auto rhoz_ss_dot = rhoz_zz_ss - rhoz_yy_ss - rhoz_xx_ss;
       const auto rhoz_ss_cross = rhoz_xz_ss + rhoz_zx_ss + rhoz_yz_ss + rhoz_zy_ss; 
-      const auto rhoz_ss_anti = rhoz_s_yx - rhoz_s_xy;
+      const auto rhoz_ss_anti = rhoz_s_xy - rhoz_s_yx;
       const auto rhoz_ss = rhoz_ss_dot + rhoz_ss_anti + rhoz_ss_cross;
 
       // x
@@ -965,7 +965,7 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
       const double rhox_zy = blas::dot( nbe, dbasis_z_eval + ioffs, 1, Xs_y_i_im, 1 );
       const double rhox_yz = blas::dot( nbe, dbasis_y_eval + ioffs, 1, Xs_z_i_im, 1 );   
       
-      const auto rhox_ss_anti = rhox_zy - rhox_yz;
+      const auto rhox_ss_anti = rhox_yz - rhox_zy;
       const auto rhox_ss = rhox_ss_dot + rhox_ss_anti + rhox_ss_cross;
 
       // y
@@ -987,7 +987,7 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
       const double rhoy_zx = blas::dot( nbe, dbasis_z_eval + ioffs, 1, Xs_x_i_im, 1 );
       const double rhoy_xz = blas::dot( nbe, dbasis_x_eval + ioffs, 1, Xs_z_i_im, 1 );   
     
-      const auto rhoy_ss_anti = rhoy_xz - rhoy_zx;
+      const auto rhoy_ss_anti = rhoy_zx - rhoy_xz;
       const auto rhoy_ss = rhoy_ss_dot + rhoy_ss_anti + rhoy_ss_cross;
 
 
@@ -1133,7 +1133,7 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
       const double dMzdx_s_xy = blas::dot( nbe, d2basis_xx_eval + ioffs, 1, Xs_y_i_im, 1 );
 
       const auto dMzdx_cross = dMzdx_xz_ss + dMzdx_zx_ss + dMzdx_yz_ss + dMzdx_zy_ss;
-      const auto dMzdx_anti = dMzdx_s_yx - dMzdx_s_xy;
+      const auto dMzdx_anti = dMzdx_s_xy - dMzdx_s_yx;
 
       dMzdx_ss += dMzdx_cross + dMzdx_anti;
       // std::cout<<"dMzdx_ss dMzdx "<<dMzdx_ss<<" "<<dMzdx<<std::endl;
@@ -1172,7 +1172,7 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
       const double dMzdy_s_xy = blas::dot( nbe, d2basis_xy_eval + ioffs, 1, Xs_y_i_im, 1 );
 
       const auto dMzdy_cross = dMzdy_xz_ss + dMzdy_zx_ss + dMzdy_yz_ss + dMzdy_zy_ss;
-      const auto dMzdy_anti = dMzdy_s_yx - dMzdy_s_xy;
+      const auto dMzdy_anti = dMzdy_s_xy - dMzdy_s_yx;
 
       dMzdy_ss += dMzdy_cross + dMzdy_anti;
 
@@ -1196,7 +1196,7 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
       const double dMzdz_s_xy = blas::dot( nbe, d2basis_xz_eval + ioffs, 1, Xs_y_i_im, 1 );
 
       const auto dMzdz_cross = dMzdz_xz_ss + dMzdz_zx_ss + dMzdz_yz_ss + dMzdz_zy_ss;
-      const auto dMzdz_anti = dMzdz_s_yx - dMzdz_s_xy;
+      const auto dMzdz_anti = dMzdz_s_xy - dMzdz_s_yx;
 
       dMzdz_ss += dMzdz_cross + dMzdz_anti;
 
@@ -1224,7 +1224,7 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
       const double dMxdx_yz_im = blas::dot( nbe, d2basis_xy_eval + ioffs, 1, Xs_z_i_im, 1 );  
 
       const auto dMxdx_cross = dMxdx_xz_ss + dMxdx_zx_ss + dMxdx_yx_ss + dMxdx_xy_ss;
-      const auto dMxdx_anti = dMxdx_zy_im - dMxdx_yz_im;
+      const auto dMxdx_anti = dMxdx_yz_im - dMxdx_zy_im;
 
       dMxdx_ss += dMxdx_cross  + dMxdx_anti;
 
@@ -1248,7 +1248,7 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
       const double dMxdy_yz_im = blas::dot( nbe, d2basis_yy_eval + ioffs, 1, Xs_z_i_im, 1 );  
 
       const auto dMxdy_cross = dMxdy_xz_ss + dMxdy_zx_ss + dMxdy_yx_ss + dMxdy_xy_ss;
-      const auto dMxdy_anti = dMxdy_zy_im - dMxdy_yz_im;
+      const auto dMxdy_anti = dMxdy_yz_im - dMxdy_zy_im;
 
       dMxdy_ss += dMxdy_cross  + dMxdy_anti;
 
@@ -1272,7 +1272,7 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
       const double dMxdz_yz_im = blas::dot( nbe, d2basis_yz_eval + ioffs, 1, Xs_z_i_im, 1 );  
 
       const auto dMxdz_cross = dMxdz_xz_ss + dMxdz_zx_ss + dMxdz_yx_ss + dMxdz_xy_ss;
-      const auto dMxdz_anti = dMxdz_zy_im - dMxdz_yz_im;
+      const auto dMxdz_anti = dMxdz_yz_im - dMxdz_zy_im;
 
       dMxdz_ss += dMxdz_cross  + dMxdz_anti;
 
@@ -1298,7 +1298,7 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
       const double dMydx_xz_im = blas::dot( nbe, d2basis_xx_eval + ioffs, 1, Xs_z_i_im, 1 ); 
 
       const auto dMydx_cross = dMydx_zy_ss + dMydx_yz_ss + dMydx_yx_ss + dMydx_xy_ss;
-      const auto dMydx_anti = dMydx_xz_im - dMydx_zx_im;
+      const auto dMydx_anti = dMydx_zx_im - dMydx_xz_im;
 
       dMydx_ss += dMydx_cross  + dMydx_anti;
 
@@ -1322,7 +1322,7 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
       const double dMydy_xz_im = blas::dot( nbe, d2basis_xy_eval + ioffs, 1, Xs_z_i_im, 1 ); 
 
       const auto dMydy_cross = dMydy_zy_ss + dMydy_yz_ss + dMydy_yx_ss + dMydy_xy_ss;
-      const auto dMydy_anti = dMydy_xz_im - dMydy_zx_im;
+      const auto dMydy_anti = dMydy_zx_im - dMydy_xz_im;
 
       dMydy_ss += dMydy_cross  + dMydy_anti;
 
@@ -1346,7 +1346,7 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
       const double dMydz_xz_im = blas::dot( nbe, d2basis_xz_eval + ioffs, 1, Xs_z_i_im, 1 ); 
 
       const auto dMydz_cross = dMydz_zy_ss + dMydz_yz_ss + dMydz_yx_ss + dMydz_xy_ss;
-      const auto dMydz_anti = dMydz_xz_im - dMydz_zx_im;
+      const auto dMydz_anti = dMydz_zx_im - dMydz_xz_im;
 
       dMydz_ss += dMydz_cross  + dMydz_anti;
       // std::cout<<"dMydz before ss "<<dMydz<<std::endl;
