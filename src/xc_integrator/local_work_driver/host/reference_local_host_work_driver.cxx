@@ -1367,9 +1367,9 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
       // std::cout<<"dndy "<<dndy<<" "<<dndy_ss<<std::endl;
       // std::cout<<"dndz "<<dndz<<" "<<dndz_ss<<std::endl;
       
-      dndx +=  2 * RKB_factor * dndx_ss;
-      dndy +=  2 * RKB_factor * dndy_ss;
-      dndz +=  2 * RKB_factor * dndz_ss;
+      dndx  +=  2 * RKB_factor * dndx_ss;
+      dndy  +=  2 * RKB_factor * dndy_ss;
+      dndz  +=  2 * RKB_factor * dndz_ss;
       dMzdx += 2 * RKB_factor * dMzdx_ss;
       dMzdy += 2 * RKB_factor * dMzdy_ss;
       dMzdz += 2 * RKB_factor * dMzdz_ss;
@@ -1497,7 +1497,7 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
       // std::cout<<gamma[3 * i + 1]<<" ";
       // std::cout<<gamma[3 * i + 2]<< std::endl;
 
-    }
+   }
 // rhom_out.close();
 // gamma_out.close();
 }
