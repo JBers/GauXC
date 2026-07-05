@@ -59,11 +59,23 @@ std::vector< XCTask > HostReplicatedLoadBalancer::create_local_tasks_() const  {
 
       if( points.size() == 0 ) continue;
 
-      // Microbatch Screening
-      auto [shell_list, nbe] = micro_batch_screen( (*this->basis_), lo, up );
+      // Microbatch screening for every basis on the shared grid
+      std::vector<XCTask::screening_data> bfn_screenings;
+      bfn_screenings.reserve( this->basis_count() );
+      for( size_t i = 0; i < this->basis_count(); ++i ) {
+        auto [shell_list, nbe] = micro_batch_screen( this->basis(i), lo, up );
+        auto& screening = bfn_screenings.emplace_back();
+        screening.shell_list = std::move(shell_list);
+        screening.nbe        = static_cast<int32_t>(nbe);
+      }
+
+      const auto& primary_screening = bfn_screenings.front();
+      const bool has_screened_basis =
+        std::any_of( bfn_screenings.begin(), bfn_screenings.end(),
+          []( const auto& screening ) { return not screening.shell_list.empty(); } );
 
       // Course grain screening
-      if( not shell_list.size() ) continue; 
+      if( not has_screened_basis ) continue;
 
       // Copy task data
       XCTask task;
@@ -72,8 +84,8 @@ std::vector< XCTask > HostReplicatedLoadBalancer::create_local_tasks_() const  {
       task.npts       = static_cast<int32_t>(points.size());
       task.points     = std::move( points );
       task.weights    = std::move( weights );
-      task.bfn_screening.shell_list = std::move(shell_list);
-      task.bfn_screening.nbe        = static_cast<int32_t>(nbe);
+      task.bfn_screening = primary_screening;
+      task.bfn_screenings = std::move(bfn_screenings);
       task.dist_nearest = molmeta_->dist_nearest()[iCurrent];
 
       #pragma omp critical
@@ -136,8 +148,20 @@ std::vector< XCTask > HostReplicatedLoadBalancer::create_local_tasks_() const  {
     if( a.iParent < b.iParent )      return true;
     else if( a.iParent > b.iParent ) return false;
 
-    // Equal iParent: lex sort on shell list
-    else return a.bfn_screening.shell_list < b.bfn_screening.shell_list;
+    // Equal iParent: lex sort on all active basis screening data.
+    if( not a.bfn_screenings.empty() or not b.bfn_screenings.empty() ) {
+      auto screen_less = []( const auto& x, const auto& y ) {
+        if( x.shell_list < y.shell_list ) return true;
+        if( y.shell_list < x.shell_list ) return false;
+        return x.shell_pair_list < y.shell_pair_list;
+      };
+      return std::lexicographical_compare(
+        a.bfn_screenings.begin(), a.bfn_screenings.end(),
+        b.bfn_screenings.begin(), b.bfn_screenings.end(),
+        screen_less );
+    }
+
+    return a.bfn_screening.shell_list < b.bfn_screening.shell_list;
 
   };
 

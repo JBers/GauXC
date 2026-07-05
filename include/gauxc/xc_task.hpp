@@ -53,13 +53,33 @@ struct XCTask {
   };
 
   inline size_t volume() const {
+    const auto bfn_volume = bfn_screenings.empty() ?
+      bfn_screening.volume() :
+      std::accumulate( bfn_screenings.begin(), bfn_screenings.end(), size_t{0},
+        []( const auto& v, const auto& s ) { return v + s.volume(); } );
+
     return 2 * sizeof(int32_t) +
       (3*points.size() + weights.size() + 2) * sizeof(double) +
-      bfn_screening.volume() + cou_screening.volume();
+      bfn_volume + cou_screening.volume();
   }
 
   screening_data bfn_screening;
+  std::vector<screening_data> bfn_screenings;
   screening_data cou_screening;
+
+  const screening_data& basis_screening( size_t i ) const {
+    if( bfn_screenings.empty() ) {
+      if( i == 0 ) return bfn_screening;
+      GAUXC_GENERIC_EXCEPTION("Requested basis screening is not available");
+    }
+    return bfn_screenings.at(i);
+  }
+
+  screening_data& basis_screening( size_t i ) {
+    if( bfn_screenings.empty() )
+      bfn_screenings.push_back( bfn_screening );
+    return bfn_screenings.at(i);
+  }
 
   void merge_with( const XCTask& other ) {
     if( !equiv_with(other) )
@@ -95,8 +115,17 @@ struct XCTask {
   }
 
   inline bool equiv_with( const XCTask& other ) const {
-    return iParent == other.iParent and 
-      bfn_screening.equiv_with(other.bfn_screening);
+    if( iParent != other.iParent ) return false;
+
+    if( bfn_screenings.empty() and other.bfn_screenings.empty() )
+      return bfn_screening.equiv_with(other.bfn_screening);
+
+    if( bfn_screenings.size() != other.bfn_screenings.size() )
+      return false;
+
+    return std::equal( bfn_screenings.begin(), bfn_screenings.end(),
+      other.bfn_screenings.begin(),
+      []( const auto& a, const auto& b ) { return a.equiv_with(b); } );
   }
 
   template <typename Archive>
@@ -107,10 +136,16 @@ struct XCTask {
 
 
   inline size_t cost(size_t n_deriv, size_t natoms) const {
-    return (bfn_screening.nbe * ( 1 + bfn_screening.nbe + n_deriv ) + natoms * natoms) * npts;
+    const size_t nbe = bfn_screenings.empty() ? bfn_screening.nbe :
+      std::accumulate( bfn_screenings.begin(), bfn_screenings.end(), size_t{0},
+        []( const auto& v, const auto& s ) { return v + s.nbe; } );
+    return (nbe * ( 1 + nbe + n_deriv ) + natoms * natoms) * npts;
   }
   inline size_t cost_exc_vxc(size_t n_deriv) const {
-    return bfn_screening.nbe * ( 1 + bfn_screening.nbe + n_deriv ) * npts;
+    const size_t nbe = bfn_screenings.empty() ? bfn_screening.nbe :
+      std::accumulate( bfn_screenings.begin(), bfn_screenings.end(), size_t{0},
+        []( const auto& v, const auto& s ) { return v + s.nbe; } );
+    return nbe * ( 1 + nbe + n_deriv ) * npts;
   }
   inline size_t cost_exx() const {
     return ( bfn_screening.nbe + 2*cou_screening.nbe*bfn_screening.nbe +
