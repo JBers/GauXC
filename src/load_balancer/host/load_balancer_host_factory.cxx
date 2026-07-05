@@ -20,6 +20,15 @@ std::shared_ptr<LoadBalancer> LoadBalancerHostFactory::get_shared_instance(
   std::string kernel_name, const RuntimeEnvironment& rt,
   const Molecule& mol, const MolGrid& mg, const BasisSet<double>& basis
 ) {
+  return get_shared_instance( std::move(kernel_name), rt, mol, mg,
+    std::vector<BasisSet<double>>{basis} );
+}
+
+std::shared_ptr<LoadBalancer> LoadBalancerHostFactory::get_shared_instance(
+  std::string kernel_name, const RuntimeEnvironment& rt,
+  const Molecule& mol, const MolGrid& mg,
+  const std::vector<BasisSet<double>>& bases
+) {
 
   std::transform(kernel_name.begin(), kernel_name.end(),
     kernel_name.begin(), [](unsigned char c){ return static_cast<char>(std::toupper(c)); } );
@@ -31,12 +40,12 @@ std::shared_ptr<LoadBalancer> LoadBalancerHostFactory::get_shared_instance(
   std::unique_ptr<detail::LoadBalancerImpl> ptr = nullptr;
   if( kernel_name == "REPLICATED-PETITE" )
     ptr = std::make_unique<detail::PetiteHostReplicatedLoadBalancer>(
-      rt, mol, mg, basis
+      rt, mol, mg, bases
     );
 
   if( kernel_name == "REPLICATED-FILLIN" )
     ptr = std::make_unique<detail::FillInHostReplicatedLoadBalancer>(
-      rt, mol, mg, basis
+      rt, mol, mg, bases
     );
 
   if( ! ptr ) GAUXC_GENERIC_EXCEPTION("Load Balancer Kernel Not Recognized: " + kernel_name);
@@ -46,4 +55,3 @@ std::shared_ptr<LoadBalancer> LoadBalancerHostFactory::get_shared_instance(
 }
 
 }
-

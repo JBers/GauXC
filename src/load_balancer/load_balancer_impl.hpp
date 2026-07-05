@@ -30,8 +30,10 @@ protected:
   std::shared_ptr<Molecule>   mol_;
   std::shared_ptr<MolGrid>    mg_;
   std::shared_ptr<basis_type> basis_;
+  std::vector<std::shared_ptr<basis_type>> bases_;
   std::shared_ptr<MolMeta>    molmeta_;
   std::shared_ptr<basis_map_type> basis_map_;
+  std::vector<std::shared_ptr<basis_map_type>> basis_maps_;
   std::shared_ptr<shell_pair_type> shell_pairs_;
 
   std::vector< XCTask >     local_tasks_;
@@ -52,6 +54,12 @@ public:
     const basis_type&, const MolMeta& );
   LoadBalancerImpl( const RuntimeEnvironment&, const Molecule&, const MolGrid& mg,  
     const basis_type&, std::shared_ptr<MolMeta> );
+  LoadBalancerImpl( const RuntimeEnvironment&, const Molecule&, const MolGrid& mg,
+    const std::vector<basis_type>&, std::shared_ptr<MolMeta> );
+  LoadBalancerImpl( const RuntimeEnvironment&, const Molecule&, const MolGrid& mg,
+    const std::vector<basis_type>& );
+  LoadBalancerImpl( const RuntimeEnvironment&, const Molecule&, const MolGrid& mg,
+    const std::vector<basis_type>&, const MolMeta& );
 
   LoadBalancerImpl( const LoadBalancerImpl& );
   LoadBalancerImpl( LoadBalancerImpl&& ) noexcept;
@@ -75,8 +83,11 @@ public:
   const Molecule& molecule() const;
   const MolMeta&  molmeta()  const;
   const basis_type& basis()  const;
+  const basis_type& basis(size_t) const;
+  size_t basis_count() const;
   const RuntimeEnvironment& runtime() const;
   const basis_map_type& basis_map() const;
+  const basis_map_type& basis_map(size_t) const;
   const shell_pair_type& shell_pairs() const;
   const shell_pair_type& shell_pairs();
 

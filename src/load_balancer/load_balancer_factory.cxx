@@ -25,17 +25,27 @@ std::shared_ptr<LoadBalancer> LoadBalancerFactory::get_shared_instance(
   const RuntimeEnvironment& rt,
   const Molecule& mol, const MolGrid& mg, const BasisSet<double>& basis
 ) {
+  return get_shared_instance( rt, mol, mg, std::vector<BasisSet<double>>{basis} );
+}
+
+std::shared_ptr<LoadBalancer> LoadBalancerFactory::get_shared_instance(
+  const RuntimeEnvironment& rt,
+  const Molecule& mol, const MolGrid& mg,
+  const std::vector<BasisSet<double>>& bases
+) {
 
   switch(ex_) {
     case ExecutionSpace::Host:
       using host_factory = LoadBalancerHostFactory;
       return host_factory::get_shared_instance(kernel_name_,
-        rt, mol, mg, basis );
+        rt, mol, mg, bases );
     #ifdef GAUXC_HAS_DEVICE
     case ExecutionSpace::Device:
+      if( bases.size() != 1 )
+        GAUXC_GENERIC_EXCEPTION("Device LoadBalancer does not support multiple basis sets");
       using device_factory = LoadBalancerDeviceFactory;
       return device_factory::get_shared_instance(kernel_name_,
-        rt, mol, mg, basis );
+        rt, mol, mg, bases.front() );
     #endif
     default:
       GAUXC_GENERIC_EXCEPTION("Unrecognized Execution Space");
@@ -54,6 +64,16 @@ LoadBalancer LoadBalancerFactory::get_instance(
 
 }
 
+LoadBalancer LoadBalancerFactory::get_instance(
+  const RuntimeEnvironment& rt,
+  const Molecule& mol, const MolGrid& mg,
+  const std::vector<BasisSet<double>>& bases
+) {
+
+  auto ptr = get_shared_instance(rt, mol, mg, bases);
+  return LoadBalancer(std::move(*ptr));
 
 }
 
+
+}
