@@ -21,7 +21,32 @@ LoadBalancerImpl::LoadBalancerImpl( const RuntimeEnvironment& rt, const Molecule
   basis_( std::make_shared<basis_type>(basis) ),
   molmeta_( molmeta ) { 
 
+  bases_.push_back( basis_ );
   basis_map_   = std::make_shared<basis_map_type>(*basis_, mol);
+  basis_maps_.push_back( basis_map_ );
+
+}
+
+LoadBalancerImpl::LoadBalancerImpl( const RuntimeEnvironment& rt, const Molecule& mol,
+  const MolGrid& mg, const std::vector<basis_type>& bases, std::shared_ptr<MolMeta> molmeta ) :
+  runtime_(rt),
+  mol_( std::make_shared<Molecule>(mol) ),
+  mg_( std::make_shared<MolGrid>(mg)  ),
+  molmeta_( molmeta ) {
+
+  if( bases.empty() )
+    GAUXC_GENERIC_EXCEPTION("At least one basis set is required");
+
+  bases_.reserve( bases.size() );
+  basis_maps_.reserve( bases.size() );
+
+  for( const auto& basis : bases ) {
+    bases_.push_back( std::make_shared<basis_type>(basis) );
+    basis_maps_.push_back( std::make_shared<basis_map_type>(*bases_.back(), mol) );
+  }
+
+  basis_     = bases_.front();
+  basis_map_ = basis_maps_.front();
 
 }
 
@@ -32,6 +57,14 @@ LoadBalancerImpl::LoadBalancerImpl( const RuntimeEnvironment& rt, const Molecule
 LoadBalancerImpl::LoadBalancerImpl( const RuntimeEnvironment& rt, const Molecule& mol, 
   const MolGrid& mg, const basis_type& basis ) :
   LoadBalancerImpl( rt, mol, mg, basis, std::make_shared<MolMeta>(mol) ) { }
+
+LoadBalancerImpl::LoadBalancerImpl( const RuntimeEnvironment& rt, const Molecule& mol,
+  const MolGrid& mg, const std::vector<basis_type>& bases, const MolMeta& molmeta ) :
+  LoadBalancerImpl( rt, mol, mg, bases, std::make_shared<MolMeta>(molmeta) ) { }
+
+LoadBalancerImpl::LoadBalancerImpl( const RuntimeEnvironment& rt, const Molecule& mol,
+  const MolGrid& mg, const std::vector<basis_type>& bases ) :
+  LoadBalancerImpl( rt, mol, mg, bases, std::make_shared<MolMeta>(mol) ) { }
 
 
 LoadBalancerImpl::LoadBalancerImpl( const LoadBalancerImpl& ) = default;
@@ -118,8 +151,17 @@ const MolMeta& LoadBalancerImpl::molmeta() const {
 const LoadBalancerImpl::basis_type& LoadBalancerImpl::basis() const {
   return *basis_;
 }
+const LoadBalancerImpl::basis_type& LoadBalancerImpl::basis(size_t i) const {
+  return *bases_.at(i);
+}
+size_t LoadBalancerImpl::basis_count() const {
+  return bases_.size();
+}
 const LoadBalancerImpl::basis_map_type& LoadBalancerImpl::basis_map() const {
   return *basis_map_;
+}
+const LoadBalancerImpl::basis_map_type& LoadBalancerImpl::basis_map(size_t i) const {
+  return *basis_maps_.at(i);
 }
 const LoadBalancerImpl::shell_pair_type& LoadBalancerImpl::shell_pairs() const {
   if(!shell_pairs_) GAUXC_GENERIC_EXCEPTION("ShellPairs must be pregenerated for const-context");

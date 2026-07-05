@@ -116,6 +116,31 @@ TEST_CASE( "DefaultLoadBalancer", "[load_balancer]" ) {
 
   }
 
+  SECTION("Default Host Multiple Bases") {
+
+    BasisSet<double> basis2 = make_631Gd( mol, SphericalType(true) );
+    for( auto& sh : basis2 )
+      sh.set_shell_tolerance( std::numeric_limits<double>::epsilon() );
+
+    LoadBalancerFactory lb_factory( ExecutionSpace::Host, "Default" );
+    auto lb = lb_factory.get_instance( world, mol, mg,
+      std::vector<BasisSet<double>>{ basis, basis2 } );
+    auto& tasks = lb.get_tasks();
+
+    REQUIRE( lb.basis_count() == 2 );
+    REQUIRE( lb.basis(0).nbf() == basis.nbf() );
+    REQUIRE( lb.basis(1).nbf() == basis2.nbf() );
+    REQUIRE_FALSE( tasks.empty() );
+
+    for( const auto& task : tasks ) {
+      REQUIRE( task.bfn_screenings.size() == 2 );
+      CHECK( task.bfn_screening.shell_list == task.basis_screening(0).shell_list );
+      CHECK( task.bfn_screening.nbe == task.basis_screening(0).nbe );
+      CHECK( task.basis_screening(1).nbe >= 0 );
+    }
+
+  }
+
 #ifdef GAUXC_HAS_DEVICE
   SECTION("Default Device") {
 
