@@ -29,6 +29,20 @@ public:
 
   using value_type = ValueType;
   using basis_type = BasisSet< value_type >;
+  struct multiparticle_density {
+    int64_t m = 0;
+    int64_t n = 0;
+    const value_type* Ps = nullptr;
+    int64_t ldps = 0;
+    const value_type* Pz = nullptr;
+    int64_t ldpz = 0;
+  };
+  struct multiparticle_vxc {
+    value_type* VXCs = nullptr;
+    int64_t ldvxcs = 0;
+    value_type* VXCz = nullptr;
+    int64_t ldvxcz = 0;
+  };
 
 protected:
 
@@ -77,6 +91,13 @@ protected:
                               value_type* VXCy, int64_t ldvxcy,
                               value_type* VXCx, int64_t ldvxcx,
                               value_type* EXC, const IntegratorSettingsXC& ks_settings ) = 0;
+  virtual void eval_exc_vxc_( const std::vector<multiparticle_density>&,
+                              const MultiParticleFunctionalSpec&,
+                              std::vector<multiparticle_vxc>&,
+                              value_type*, value_type*,
+                              const IntegratorSettingsXC& ) {
+    GAUXC_GENERIC_EXCEPTION("MultiParticle EXC/VXC is not implemented for this integrator");
+  }
 
   virtual void eval_exc_grad_( int64_t m, int64_t n, const value_type* P, int64_t ldp, 
                                value_type* EXC_GRAD, const IntegratorSettingsXC& ks_settings ) = 0;
@@ -151,6 +172,13 @@ public:
                      value_type* VXCy, int64_t ldvxcy,
                      value_type* VXCx, int64_t ldvxcx,
                      value_type* EXC, const IntegratorSettingsXC& ks_settings );
+
+  void eval_exc_vxc( const std::vector<multiparticle_density>& densities,
+                     const MultiParticleFunctionalSpec& functional_spec,
+                     std::vector<multiparticle_vxc>& vxc,
+                     value_type* intra_exc,
+                     value_type* inter_exc,
+                     const IntegratorSettingsXC& ks_settings );
 
 
   void eval_exc_grad( int64_t m, int64_t n, const value_type* P, int64_t ldp, 

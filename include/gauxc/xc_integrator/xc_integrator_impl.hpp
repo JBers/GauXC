@@ -27,6 +27,8 @@ public:
   using exc_vxc_type_rks   = typename XCIntegrator<MatrixType>::exc_vxc_type_rks;
   using exc_vxc_type_uks   = typename XCIntegrator<MatrixType>::exc_vxc_type_uks;
   using exc_vxc_type_gks   = typename XCIntegrator<MatrixType>::exc_vxc_type_gks;
+  using multiparticle_density = typename XCIntegrator<MatrixType>::multiparticle_density;
+  using multiparticle_exc_vxc_type = typename XCIntegrator<MatrixType>::multiparticle_exc_vxc_type;
   using exc_grad_type  = typename XCIntegrator<MatrixType>::exc_grad_type;
   using exx_type       = typename XCIntegrator<MatrixType>::exx_type;
   using fxc_contraction_type_rks   = typename XCIntegrator<MatrixType>::fxc_contraction_type_rks;
@@ -46,6 +48,9 @@ protected:
   virtual exc_vxc_type_uks  eval_exc_vxc_ ( const MatrixType& Ps, const MatrixType& Pz, const IntegratorSettingsXC& ks_settings ) = 0;
   virtual exc_vxc_type_gks  eval_exc_vxc_ ( const MatrixType& Ps, const MatrixType& Pz, const MatrixType& Py, const MatrixType& Px, 
                                             const IntegratorSettingsXC& ks_settings ) = 0;
+  virtual multiparticle_exc_vxc_type eval_exc_vxc_( const std::vector<multiparticle_density>& densities,
+                                                    const MultiParticleFunctionalSpec& functional_spec,
+                                                    const IntegratorSettingsXC& ks_settings ) = 0;
   virtual exc_grad_type eval_exc_grad_( const MatrixType& P, const IntegratorSettingsXC& ks_settings ) = 0;
   virtual exc_grad_type eval_exc_grad_( const MatrixType& Ps, const MatrixType& Pz, const IntegratorSettingsXC& ks_settings ) = 0;
   virtual exx_type      eval_exx_     ( const MatrixType&     P, 
@@ -122,6 +127,12 @@ public:
 
   exc_vxc_type_gks eval_exc_vxc( const MatrixType& Ps, const MatrixType& Pz, const MatrixType& Py, const MatrixType& Px, const IntegratorSettingsXC& ks_settings ) {
     return eval_exc_vxc_(Ps, Pz, Py, Px, ks_settings);
+  }
+
+  multiparticle_exc_vxc_type eval_exc_vxc( const std::vector<multiparticle_density>& densities,
+                                           const MultiParticleFunctionalSpec& functional_spec,
+                                           const IntegratorSettingsXC& ks_settings ) {
+    return eval_exc_vxc_(densities, functional_spec, ks_settings);
   }
 
   /** Integrate EXC gradient for RKS

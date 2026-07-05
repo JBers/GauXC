@@ -79,6 +79,15 @@ typename XCIntegrator<MatrixType>::exc_vxc_type_gks
   };
 
 template <typename MatrixType>
+typename XCIntegrator<MatrixType>::multiparticle_exc_vxc_type
+  XCIntegrator<MatrixType>::eval_exc_vxc( const std::vector<multiparticle_density>& densities,
+                                          const MultiParticleFunctionalSpec& functional_spec,
+                                          const IntegratorSettingsXC& ks_settings ) {
+  if( not pimpl_ ) GAUXC_PIMPL_NOT_INITIALIZED();
+  return pimpl_->eval_exc_vxc(densities, functional_spec, ks_settings);
+};
+
+template <typename MatrixType>
 typename XCIntegrator<MatrixType>::exc_grad_type
   XCIntegrator<MatrixType>::eval_exc_grad( const MatrixType& P, const IntegratorSettingsXC& ks_settings ) {
   if( not pimpl_ ) GAUXC_PIMPL_NOT_INITIALIZED();
