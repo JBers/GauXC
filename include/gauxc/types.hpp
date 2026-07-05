@@ -11,6 +11,9 @@
  */
 #pragma once
 
+#include <memory>
+#include <vector>
+
 #include <exchcxx/xc_functional.hpp>
 #include <integratorxx/quadrature.hpp>
 #include <integratorxx/batch/spherical_micro_batcher.hpp>
@@ -20,6 +23,19 @@
 namespace GauXC {
 
 using functional_type = ExchCXX::XCFunctional;
+
+// Inter-particle kernels such as EPC expect the electronic density first.
+struct MultiParticlePairFunctional {
+  size_t electron = 0;
+  size_t particle = 0;
+  std::vector<std::shared_ptr<functional_type>> functionals;
+};
+
+struct MultiParticleFunctionalSpec {
+  std::vector<std::vector<std::shared_ptr<functional_type>>> intra_functionals;
+  std::vector<MultiParticlePairFunctional> inter_functionals;
+};
+
 //using quadrature_type = IntegratorXX::QuadratureBase<
 //  std::vector<std::array<double,3>>,
 //  std::vector<double>

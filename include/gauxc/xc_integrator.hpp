@@ -12,6 +12,8 @@
 #pragma once
 
 #include <memory>
+#include <tuple>
+#include <vector>
 
 #include <gauxc/types.hpp>
 #include <gauxc/load_balancer.hpp>
@@ -38,6 +40,16 @@ public:
   using exc_vxc_type_rks  = std::tuple< value_type, matrix_type >;
   using exc_vxc_type_uks  = std::tuple< value_type, matrix_type, matrix_type >;  
   using exc_vxc_type_gks  = std::tuple< value_type, matrix_type, matrix_type, matrix_type, matrix_type >;
+  struct multiparticle_density {
+    const matrix_type* Ps = nullptr;
+    const matrix_type* Pz = nullptr;
+  };
+  struct multiparticle_exc_vxc_type {
+    std::vector<value_type> intra_exc;
+    value_type inter_exc = 0;
+    std::vector<matrix_type> VXCs;
+    std::vector<matrix_type> VXCz;
+  };
   using exc_grad_type = std::vector< value_type >;
   using exx_type      = matrix_type;
   using fxc_contraction_type_rks = matrix_type;
@@ -73,6 +85,9 @@ public:
                                    const IntegratorSettingsXC& = IntegratorSettingsXC{} );
   exc_vxc_type_gks  eval_exc_vxc ( const MatrixType&, const MatrixType&, const MatrixType&, const MatrixType&,
                                    const IntegratorSettingsXC& = IntegratorSettingsXC{});
+  multiparticle_exc_vxc_type eval_exc_vxc( const std::vector<multiparticle_density>&,
+                                           const MultiParticleFunctionalSpec&,
+                                           const IntegratorSettingsXC& = IntegratorSettingsXC{} );
 
   exc_grad_type eval_exc_grad( const MatrixType&, const IntegratorSettingsXC& = IntegratorSettingsXC{} );
   exc_grad_type eval_exc_grad( const MatrixType&, const MatrixType&, const IntegratorSettingsXC& = IntegratorSettingsXC{} );

@@ -162,6 +162,67 @@ typename ReplicatedXCIntegrator<MatrixType>::exc_vxc_type_gks
 }
 
 template <typename MatrixType>
+typename ReplicatedXCIntegrator<MatrixType>::multiparticle_exc_vxc_type
+  ReplicatedXCIntegrator<MatrixType>::eval_exc_vxc_(
+    const std::vector<multiparticle_density>& densities,
+    const MultiParticleFunctionalSpec& functional_spec,
+    const IntegratorSettingsXC& ks_settings ) {
+
+  if( not pimpl_ ) GAUXC_PIMPL_NOT_INITIALIZED();
+
+  using raw_density = typename pimpl_type::multiparticle_density;
+  using raw_vxc_type = typename pimpl_type::multiparticle_vxc;
+
+  const size_t np = densities.size();
+  multiparticle_exc_vxc_type ret;
+  ret.intra_exc.assign(np, value_type{0});
+  ret.inter_exc = value_type{0};
+  ret.VXCs.reserve(np);
+  ret.VXCz.reserve(np);
+
+  std::vector<raw_density> raw_densities;
+  std::vector<raw_vxc_type> raw_vxcs;
+  raw_densities.reserve(np);
+  raw_vxcs.reserve(np);
+
+  for( size_t i = 0; i < np; ++i ) {
+    const auto& density = densities[i];
+    if( density.Ps == nullptr )
+      GAUXC_GENERIC_EXCEPTION("MultiParticle density is missing Ps");
+    if( density.Ps->rows() != density.Ps->cols() )
+      GAUXC_GENERIC_EXCEPTION("MultiParticle Ps must be square");
+    if( density.Pz and
+        ( density.Pz->rows() != density.Ps->rows() or
+          density.Pz->cols() != density.Ps->cols() ) )
+      GAUXC_GENERIC_EXCEPTION("MultiParticle Pz must match Ps dimensions");
+
+    ret.VXCs.emplace_back( density.Ps->rows(), density.Ps->cols() );
+    if( density.Pz )
+      ret.VXCz.emplace_back( density.Pz->rows(), density.Pz->cols() );
+    else
+      ret.VXCz.emplace_back();
+
+    raw_densities.push_back( raw_density{
+      density.Ps->rows(), density.Ps->cols(), density.Ps->data(), density.Ps->rows(),
+      density.Pz ? density.Pz->data() : nullptr,
+      density.Pz ? density.Pz->rows() : int64_t{0}
+    } );
+
+    raw_vxcs.push_back( raw_vxc_type{
+      ret.VXCs.back().data(), ret.VXCs.back().rows(),
+      density.Pz ? ret.VXCz.back().data() : nullptr,
+      density.Pz ? ret.VXCz.back().rows() : int64_t{0}
+    } );
+  }
+
+  pimpl_->eval_exc_vxc( raw_densities, functional_spec, raw_vxcs,
+                        ret.intra_exc.data(), &ret.inter_exc, ks_settings );
+
+  return ret;
+
+}
+
+template <typename MatrixType>
 typename ReplicatedXCIntegrator<MatrixType>::exc_grad_type 
   ReplicatedXCIntegrator<MatrixType>::eval_exc_grad_( const MatrixType& P, const IntegratorSettingsXC& ks_settings ) {
 
