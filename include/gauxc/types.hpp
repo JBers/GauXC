@@ -36,6 +36,14 @@ struct MultiParticleFunctionalSpec {
   std::vector<MultiParticlePairFunctional> inter_functionals;
 };
 
+// Dynamic plan requested from a static multiparticle functional setup.
+// Indices refer to the corresponding entries in MultiParticleFunctionalSpec.
+struct MultiParticleXCPlan {
+  std::vector<size_t> active_intra;
+  std::vector<size_t> active_inter;
+  std::vector<size_t> vxc_targets;
+};
+
 //using quadrature_type = IntegratorXX::QuadratureBase<
 //  std::vector<std::array<double,3>>,
 //  std::vector<double>

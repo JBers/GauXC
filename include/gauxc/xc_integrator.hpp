@@ -47,6 +47,7 @@ public:
   struct multiparticle_exc_vxc_type {
     std::vector<value_type> intra_exc;
     value_type inter_exc = 0;
+    std::vector<value_type> inter_pair_exc;
     std::vector<matrix_type> VXCs;
     std::vector<matrix_type> VXCz;
   };
@@ -87,6 +88,10 @@ public:
                                    const IntegratorSettingsXC& = IntegratorSettingsXC{});
   multiparticle_exc_vxc_type eval_exc_vxc( const std::vector<multiparticle_density>&,
                                            const MultiParticleFunctionalSpec&,
+                                           const IntegratorSettingsXC& = IntegratorSettingsXC{} );
+  multiparticle_exc_vxc_type eval_exc_vxc( const std::vector<multiparticle_density>&,
+                                           const MultiParticleFunctionalSpec&,
+                                           const MultiParticleXCPlan&,
                                            const IntegratorSettingsXC& = IntegratorSettingsXC{} );
 
   exc_grad_type eval_exc_grad( const MatrixType&, const IntegratorSettingsXC& = IntegratorSettingsXC{} );

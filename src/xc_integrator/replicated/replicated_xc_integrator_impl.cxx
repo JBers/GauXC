@@ -40,12 +40,14 @@ template <typename ValueType>
 void ReplicatedXCIntegratorImpl<ValueType>::
   eval_exc_vxc( const std::vector<multiparticle_density>& densities,
                 const MultiParticleFunctionalSpec& functional_spec,
+                const MultiParticleXCPlan& plan,
                 std::vector<multiparticle_vxc>& vxc,
                 value_type* intra_exc,
-                value_type* inter_exc,
+                value_type* inter_pair_exc,
                 const IntegratorSettingsXC& ks_settings ) {
 
-    eval_exc_vxc_( densities, functional_spec, vxc, intra_exc, inter_exc,
+    eval_exc_vxc_( densities, functional_spec, plan, vxc, intra_exc,
+                   inter_pair_exc,
                    ks_settings );
 
 }

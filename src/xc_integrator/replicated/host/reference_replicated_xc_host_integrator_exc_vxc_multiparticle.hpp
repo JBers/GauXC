@@ -26,9 +26,10 @@ template <typename ValueType>
 void ReferenceReplicatedXCHostIntegrator<ValueType>::
   eval_exc_vxc_( const std::vector<multiparticle_density>& densities,
                  const MultiParticleFunctionalSpec& functional_spec,
+                 const MultiParticleXCPlan& plan,
                  std::vector<multiparticle_vxc>& vxc,
                  value_type* intra_exc,
-                 value_type* inter_exc,
+                 value_type* inter_pair_exc,
                  const IntegratorSettingsXC& settings ) {
 
   static_cast<void>(settings);
@@ -46,6 +47,27 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
   auto* lwd = dynamic_cast<LocalHostWorkDriver*>(this->local_work_driver_.get());
   if( not lwd )
     GAUXC_GENERIC_EXCEPTION("MultiParticle EXC/VXC requires a host local work driver");
+
+  const size_t ninter = functional_spec.inter_functionals.size();
+  std::vector<bool> active_intra(np, false);
+  std::vector<bool> active_inter(ninter, false);
+  std::vector<bool> build_vxc(np, false);
+
+  for( auto p : plan.active_intra ) {
+    if( p >= functional_spec.intra_functionals.size() )
+      GAUXC_GENERIC_EXCEPTION("Invalid MultiParticle active intra index");
+    active_intra[p] = true;
+  }
+  for( auto i : plan.active_inter ) {
+    if( i >= ninter )
+      GAUXC_GENERIC_EXCEPTION("Invalid MultiParticle active inter index");
+    active_inter[i] = true;
+  }
+  for( auto p : plan.vxc_targets ) {
+    if( p >= np )
+      GAUXC_GENERIC_EXCEPTION("Invalid MultiParticle VXC target index");
+    build_vxc[p] = true;
+  }
 
   // Validate particle blocks and decide which bases need density evaluation.
   std::vector<int64_t> nbf(np);
@@ -66,16 +88,17 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
       GAUXC_GENERIC_EXCEPTION("Invalid MultiParticle LDPS");
     if( den.Pz and den.ldpz < nbf[p] )
       GAUXC_GENERIC_EXCEPTION("Invalid MultiParticle LDPZ");
-    if( vxc[p].ldvxcs < nbf[p] )
+    if( build_vxc[p] and (not vxc[p].VXCs or vxc[p].ldvxcs < nbf[p]) )
       GAUXC_GENERIC_EXCEPTION("Invalid MultiParticle LDVXCS");
 
     has_z[p] = den.Pz != nullptr;
-    if( has_z[p] and (not vxc[p].VXCz or vxc[p].ldvxcz < nbf[p]) )
+    if( build_vxc[p] and has_z[p] and
+        (not vxc[p].VXCz or vxc[p].ldvxcz < nbf[p]) )
       GAUXC_GENERIC_EXCEPTION("Invalid MultiParticle LDVXCZ");
 
     const auto* funcs = p < functional_spec.intra_functionals.size() ?
       &functional_spec.intra_functionals[p] : nullptr;
-    if( funcs )
+    if( active_intra[p] and funcs )
     for( const auto& func : *funcs ) {
       participates[p] = true;
       if( func->is_mgga() )
@@ -84,16 +107,18 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
         need_grad[p] = true;
     }
 
-    std::fill(vxc[p].VXCs, vxc[p].VXCs + nbf[p] * vxc[p].ldvxcs, 0.0);
-    if( has_z[p] )
+    if( build_vxc[p] )
+      std::fill(vxc[p].VXCs, vxc[p].VXCs + nbf[p] * vxc[p].ldvxcs, 0.0);
+    if( build_vxc[p] and has_z[p] )
       std::fill(vxc[p].VXCz, vxc[p].VXCz + nbf[p] * vxc[p].ldvxcz, 0.0);
     intra_exc[p] = 0.0;
   }
 
-  for( const auto& pair : functional_spec.inter_functionals ) {
+  for( size_t i = 0; i < ninter; ++i ) {
+    const auto& pair = functional_spec.inter_functionals[i];
     if( pair.electron >= np or pair.particle >= np )
       GAUXC_GENERIC_EXCEPTION("Invalid MultiParticle inter functional index");
-    if( not pair.functionals.empty() ) {
+    if( active_inter[i] and not pair.functionals.empty() ) {
       participates[pair.electron] = true;
       participates[pair.particle] = true;
     }
@@ -101,9 +126,8 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
       if( func->is_gga() or func->is_mgga() )
         GAUXC_GENERIC_EXCEPTION("MultiParticle GGA/mGGA inter-XC is not implemented");
     }
+    inter_pair_exc[i] = 0.0;
   }
-
-  *inter_exc = 0.0;
 
   // Sort high-cost batches first, matching the existing reference host driver.
   auto& tasks = this->load_balancer_->get_tasks();
@@ -124,7 +148,7 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
     GAUXC_GENERIC_EXCEPTION("Weights Have Not Been Modified");
 
   std::vector<value_type> intra_work(np, 0.0);
-  value_type inter_work = 0.0;
+  std::vector<value_type> inter_work(ninter, 0.0);
 
   #pragma omp parallel
   {
@@ -151,7 +175,7 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
 
   std::vector<particle_scratch> scratch(np);
   std::vector<value_type> intra_local(np, 0.0);
-  value_type inter_local = 0.0;
+  std::vector<value_type> inter_local(ninter, 0.0);
   std::vector<value_type> eps_tmp;
   std::vector<value_type> vrho_tmp;
   std::vector<value_type> vgamma_tmp;
@@ -280,6 +304,7 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
 
     //----------------------Start Intra-Particle XC Evaluation------------------------
     for( size_t p = 0; p < np; ++p ) {
+      if( not active_intra[p] ) continue;
       const auto* funcs = p < functional_spec.intra_functionals.size() ?
         &functional_spec.intra_functionals[p] : nullptr;
       if( !funcs or funcs->empty() ) continue;
@@ -330,7 +355,9 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
     //----------------------End Intra-Particle XC Evaluation------------------------
 
     //----------------------Start Inter-Particle XC Evaluation------------------------
-    for( const auto& pair : functional_spec.inter_functionals ) {
+    for( size_t iPair = 0; iPair < ninter; ++iPair ) {
+      if( not active_inter[iPair] ) continue;
+      const auto& pair = functional_spec.inter_functionals[iPair];
       if( pair.functionals.empty() ) continue;
       auto& se = scratch[pair.electron];
       auto& sp = scratch[pair.particle];
@@ -355,17 +382,21 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
           if( pair.functionals.size() > 1 )
             eps_acc[i] += eps_pair[i];
 
-          if( se.is_uks ) {
-            se.vrho[2*i]   += vrho_pair[2*i];
-            se.vrho[2*i+1] += vrho_pair[2*i];
-          } else {
-            se.vrho[i] += vrho_pair[2*i];
+          if( build_vxc[pair.electron] ) {
+            if( se.is_uks ) {
+              se.vrho[2*i]   += vrho_pair[2*i];
+              se.vrho[2*i+1] += vrho_pair[2*i];
+            } else {
+              se.vrho[i] += vrho_pair[2*i];
+            }
           }
 
-          if( sp.is_uks ) {
-            sp.vrho[2*i] += vrho_pair[2*i+1];
-          } else {
-            sp.vrho[i] += vrho_pair[2*i+1];
+          if( build_vxc[pair.particle] ) {
+            if( sp.is_uks ) {
+              sp.vrho[2*i] += vrho_pair[2*i+1];
+            } else {
+              sp.vrho[i] += vrho_pair[2*i+1];
+            }
           }
         }
       }
@@ -378,14 +409,14 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
         // both packed densities.
         e_local += weights[i] * eps_energy[i] *
           (rho_pair[2*i] + rho_pair[2*i+1]);
-      inter_local += e_local;
+      inter_local[iPair] += e_local;
     }
     //----------------------End Inter-Particle XC Evaluation------------------------
 
     //----------------------Begin VXC Z-Matrix Assembly----------------------------
     for( size_t p = 0; p < np; ++p ) {
       auto& s = scratch[p];
-      if( not participates[p] ) continue;
+      if( not build_vxc[p] ) continue;
       if( not s.active ) continue;
 
       const size_t spin_dim = s.is_uks ? 2 : 1;
@@ -456,7 +487,8 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
   {
     for( size_t p = 0; p < np; ++p )
       intra_work[p] += intra_local[p];
-    inter_work += inter_local;
+    for( size_t i = 0; i < ninter; ++i )
+      inter_work[i] += inter_local[i];
   }
 
   }
@@ -464,6 +496,7 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
   // Symmetrize local VXC blocks before the global reduction.
   for( size_t p = 0; p < np; ++p ) {
     intra_exc[p] = intra_work[p];
+    if( not build_vxc[p] ) continue;
 
     for( int32_t j = 0; j < nbf[p]; ++j )
     for( int32_t i = j+1; i < nbf[p]; ++i )
@@ -475,13 +508,14 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
         vxc[p].VXCz[j + i*vxc[p].ldvxcz] = vxc[p].VXCz[i + j*vxc[p].ldvxcz];
     }
   }
-  *inter_exc = inter_work;
+  for( size_t i = 0; i < ninter; ++i ) inter_pair_exc[i] = inter_work[i];
 
   this->timer_.time_op("XCIntegrator.Allreduce", [&](){
     if( not this->reduction_driver_->takes_host_memory() )
       GAUXC_GENERIC_EXCEPTION("This Module Only Works With Host Reductions");
 
     for( size_t p = 0; p < np; ++p ) {
+      if( not build_vxc[p] ) continue;
       this->reduction_driver_->allreduce_inplace( vxc[p].VXCs,
         nbf[p] * nbf[p], ReductionOp::Sum );
       if( has_z[p] )
@@ -490,7 +524,9 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
     }
 
     this->reduction_driver_->allreduce_inplace( intra_exc, np, ReductionOp::Sum );
-    this->reduction_driver_->allreduce_inplace( inter_exc, 1, ReductionOp::Sum );
+    if( ninter )
+      this->reduction_driver_->allreduce_inplace( inter_pair_exc, ninter,
+        ReductionOp::Sum );
   });
 
 }
