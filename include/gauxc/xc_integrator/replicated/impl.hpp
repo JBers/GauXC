@@ -166,6 +166,7 @@ typename ReplicatedXCIntegrator<MatrixType>::multiparticle_exc_vxc_type
   ReplicatedXCIntegrator<MatrixType>::eval_exc_vxc_(
     const std::vector<multiparticle_density>& densities,
     const MultiParticleFunctionalSpec& functional_spec,
+    const MultiParticleXCPlan& plan,
     const IntegratorSettingsXC& ks_settings ) {
 
   if( not pimpl_ ) GAUXC_PIMPL_NOT_INITIALIZED();
@@ -177,8 +178,17 @@ typename ReplicatedXCIntegrator<MatrixType>::multiparticle_exc_vxc_type
   multiparticle_exc_vxc_type ret;
   ret.intra_exc.assign(np, value_type{0});
   ret.inter_exc = value_type{0};
+  ret.inter_pair_exc.assign(functional_spec.inter_functionals.size(), value_type{0});
   ret.VXCs.reserve(np);
   ret.VXCz.reserve(np);
+
+  // Determine indices of particles to build VXC for
+  std::vector<bool> build_vxc(np, false);
+  for( auto p : plan.vxc_targets ) {
+    if( p >= np )
+      GAUXC_GENERIC_EXCEPTION("Invalid MultiParticle VXC target index");
+    build_vxc[p] = true;
+  }
 
   std::vector<raw_density> raw_densities;
   std::vector<raw_vxc_type> raw_vxcs;
@@ -196,8 +206,11 @@ typename ReplicatedXCIntegrator<MatrixType>::multiparticle_exc_vxc_type
           density.Pz->cols() != density.Ps->cols() ) )
       GAUXC_GENERIC_EXCEPTION("MultiParticle Pz must match Ps dimensions");
 
-    ret.VXCs.emplace_back( density.Ps->rows(), density.Ps->cols() );
-    if( density.Pz )
+    if( build_vxc[i] )
+      ret.VXCs.emplace_back( density.Ps->rows(), density.Ps->cols() );
+    else
+      ret.VXCs.emplace_back();
+    if( build_vxc[i] and density.Pz )
       ret.VXCz.emplace_back( density.Pz->rows(), density.Pz->cols() );
     else
       ret.VXCz.emplace_back();
@@ -209,14 +222,18 @@ typename ReplicatedXCIntegrator<MatrixType>::multiparticle_exc_vxc_type
     } );
 
     raw_vxcs.push_back( raw_vxc_type{
-      ret.VXCs.back().data(), ret.VXCs.back().rows(),
-      density.Pz ? ret.VXCz.back().data() : nullptr,
-      density.Pz ? ret.VXCz.back().rows() : int64_t{0}
+      build_vxc[i] ? ret.VXCs.back().data() : nullptr,
+      build_vxc[i] ? ret.VXCs.back().rows() : int64_t{0},
+      build_vxc[i] and density.Pz ? ret.VXCz.back().data() : nullptr,
+      build_vxc[i] and density.Pz ? ret.VXCz.back().rows() : int64_t{0}
     } );
   }
 
-  pimpl_->eval_exc_vxc( raw_densities, functional_spec, raw_vxcs,
-                        ret.intra_exc.data(), &ret.inter_exc, ks_settings );
+  pimpl_->eval_exc_vxc( raw_densities, functional_spec, plan, raw_vxcs,
+                        ret.intra_exc.data(), ret.inter_pair_exc.data(),
+                        ks_settings );
+
+  for( const auto& energy : ret.inter_pair_exc ) ret.inter_exc += energy;
 
   return ret;
 

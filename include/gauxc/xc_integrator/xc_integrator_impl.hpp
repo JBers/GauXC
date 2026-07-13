@@ -12,6 +12,7 @@
 #pragma once
 
 #include <gauxc/xc_integrator.hpp>
+#include <numeric>
 
 namespace GauXC  {
 namespace detail {
@@ -50,6 +51,7 @@ protected:
                                             const IntegratorSettingsXC& ks_settings ) = 0;
   virtual multiparticle_exc_vxc_type eval_exc_vxc_( const std::vector<multiparticle_density>& densities,
                                                     const MultiParticleFunctionalSpec& functional_spec,
+                                                    const MultiParticleXCPlan& plan,
                                                     const IntegratorSettingsXC& ks_settings ) = 0;
   virtual exc_grad_type eval_exc_grad_( const MatrixType& P, const IntegratorSettingsXC& ks_settings ) = 0;
   virtual exc_grad_type eval_exc_grad_( const MatrixType& Ps, const MatrixType& Pz, const IntegratorSettingsXC& ks_settings ) = 0;
@@ -129,10 +131,26 @@ public:
     return eval_exc_vxc_(Ps, Pz, Py, Px, ks_settings);
   }
 
+  // Evaluate EXC / VXC for multiparticle densities, default to evaluate VXC for all particles
   multiparticle_exc_vxc_type eval_exc_vxc( const std::vector<multiparticle_density>& densities,
                                            const MultiParticleFunctionalSpec& functional_spec,
                                            const IntegratorSettingsXC& ks_settings ) {
-    return eval_exc_vxc_(densities, functional_spec, ks_settings);
+    MultiParticleXCPlan plan;
+    plan.active_intra.resize(functional_spec.intra_functionals.size());
+    std::iota(plan.active_intra.begin(), plan.active_intra.end(), size_t{0});
+    plan.active_inter.resize(functional_spec.inter_functionals.size());
+    std::iota(plan.active_inter.begin(), plan.active_inter.end(), size_t{0});
+    plan.vxc_targets.resize(densities.size());
+    std::iota(plan.vxc_targets.begin(), plan.vxc_targets.end(), size_t{0});
+    return eval_exc_vxc_(densities, functional_spec, plan, ks_settings);
+  }
+
+  // Evaluate EXC / VXC for multiparticle densities, with active particles specified in the plan
+  multiparticle_exc_vxc_type eval_exc_vxc( const std::vector<multiparticle_density>& densities,
+                                           const MultiParticleFunctionalSpec& functional_spec,
+                                           const MultiParticleXCPlan& plan,
+                                           const IntegratorSettingsXC& ks_settings ) {
+    return eval_exc_vxc_(densities, functional_spec, plan, ks_settings);
   }
 
   /** Integrate EXC gradient for RKS
