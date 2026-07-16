@@ -18,7 +18,6 @@
 #include <stdexcept>
 
 #include <gauxc/physcon.hpp>
-#include <fstream>
 
 namespace GauXC::detail {
 
@@ -179,18 +178,7 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
   const bool is_rks = not is_uks and not is_gks and not is_dks;
 
   std::cout<<"is rks uks gks dks "<<is_rks<<is_uks<<is_gks<<is_dks<<std::endl;
-  
-      // std::ofstream weights_out;
-      // std::ofstream coords_out;
-      // // std::ofstream mnorm_out;
-      // // std::ofstream den_out;
-      // std::ofstream dden_out;
 
-// weights_out.open("weights.txt");
-// coords_out.open("coords.txt");
-// // mnorm_out.open("mnorm.txt");
-// // den_out.open("dens.txt");
-// dden_out.open("dden.txt");
 
   if (not is_rks and not is_uks and not is_gks and not is_dks) {
     GAUXC_GENERIC_EXCEPTION("Must Be Either RKS, UKS, GKS, or DKS!");
@@ -536,17 +524,6 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
       }
     }
 
-// std::cout<<"npts = "<<npts<<std::endl;
-
-// coords_out<<std::setprecision(std::numeric_limits<double>::max_digits10);
-// for(int i =0; i<npts;++i){for(int j = 0;j<3;++j){coords_out<<points[3*i+j]<<" ";}coords_out<<std::endl;}
-
-
-
-// weights_out<<std::setprecision(std::numeric_limits<double>::max_digits10);
-// for(int i =0; i<npts;++i){weights_out<<weights[i]<<std::endl;}
-
-
     // Get the submatrix map for batch
     std::vector< std::array<int32_t, 3> > submat_map;
     std::tie(submat_map, std::ignore) =
@@ -729,16 +706,11 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
       func.eval_exc_vxc( npts, den_eval, gamma, eps, vrho, vgamma );
     else
       func.eval_exc_vxc( npts, den_eval, eps, vrho );
-    //  std::cout<<"eps eps*weight"<<std::endl;
-    // std::cout<<"vrho+ vrho-"<<std::endl;
     // Factor weights into XC results
     for( int32_t i = 0; i < npts; ++i ) {
-      // std::cout<<eps[i]<<" ";
       eps[i]  *= weights[i];
-      // std::cout<<eps[i]<<std::endl;
       vrho[sds*i] *= weights[i];
       if(not is_rks) vrho[sds*i+1] *= weights[i];
-      // std::cout<<vrho[sds*i]<<" "<<vrho[sds*i+1]<<std::endl;
     }
     if( func.is_gga() ){
       for( int32_t i = 0; i < npts; ++i ) {
@@ -781,28 +753,9 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
       NEL_local += weights[i] * den;
       spin_NEL_local += weights[i] * spin_den;
       EXC_local += eps[i]     * den;
-
-      // std::cout<<den_eval[2*i]<<" "<<den_eval[2*i+1]<<std::endl;
-
-      // std::cout<<"EXC_local += eps[i]     * den "<<EXC_local<<" += "<<eps[i]<<"     * "<<den<<std::endl;
-
-      // if( func.is_gga()){
-      //   dden_out<<std::setprecision(std::numeric_limits<double>::max_digits10);
-      //   // n dx dy dz
-      //   // mz
-      //   // my
-      //   // mx
-      //   dden_out<<dden_x_eval[4 * i]<<" "<<dden_y_eval[4 * i]<<" "<<dden_z_eval[4 * i]<<std::endl;
-      //   dden_out<<dden_x_eval[4 * i+1]<<" "<<dden_y_eval[4 * i+1]<<" "<<dden_z_eval[4 * i+1]<<std::endl;
-      //   dden_out<<dden_x_eval[4 * i+2]<<" "<<dden_y_eval[4 * i+2]<<" "<<dden_z_eval[4 * i+2]<<std::endl;
-      //   dden_out<<dden_x_eval[4 * i+3]<<" "<<dden_y_eval[4 * i+3]<<" "<<dden_z_eval[4 * i+3]<<std::endl;
-      //   // dden_out<<std::endl;
-      // }
-      //   den_out<<den<<std::endl;
-      //   mnorm_out<<spin_den<<std::endl;
     }
 
-    // std::cout<<"EXC_LOCAL "<<EXC_local<<std::endl;
+
     // Atomic updates
     #pragma omp atomic
     EXC_WORK += EXC_local;
@@ -1086,18 +1039,6 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
           VXCz_SS[ j + i*ldvxcz_ss ] = VXCz_SS[ i + j*ldvxcz_ss ];
           VXCy_SS[ j + i*ldvxcy_ss ] = VXCy_SS[ i + j*ldvxcy_ss ];
           VXCx_SS[ j + i*ldvxcx_ss ] = VXCx_SS[ i + j*ldvxcx_ss ];
-          
-          
-          
-          // std::cout<<"i j "<<i<<" "<<j<<std::endl;
-          // std::cout<<"VXCs_SS_im[ j + i*ldvxcs_ss ] "<<VXCs_SS_im[ j + i*ldvxcs_ss ]<<std::endl;
-          // std::cout<<"VXCz_SS_im[ j + i*ldvxcz_ss ] "<<VXCz_SS_im[ j + i*ldvxcz_ss ]<<std::endl;
-          // std::cout<<"VXCy_SS_im[ j + i*ldvxcy_ss ] "<<VXCy_SS_im[ j + i*ldvxcy_ss ]<<std::endl;
-          // std::cout<<"VXCx_SS_im[ j + i*ldvxcx_ss ] "<<VXCx_SS_im[ j + i*ldvxcx_ss ]<<std::endl;
-          // std::cout<<"VXCs_SS_im[ i + j*ldvxcs_ss ] "<<VXCs_SS_im[ i + j*ldvxcs_ss ]<<std::endl;
-          // std::cout<<"VXCz_SS_im[ i + j*ldvxcz_ss ] "<<VXCz_SS_im[ i + j*ldvxcz_ss ]<<std::endl;
-          // std::cout<<"VXCy_SS_im[ i + j*ldvxcy_ss ] "<<VXCy_SS_im[ i + j*ldvxcy_ss ]<<std::endl;
-          // std::cout<<"VXCx_SS_im[ i + j*ldvxcx_ss ] "<<VXCx_SS_im[ i + j*ldvxcx_ss ]<<std::endl;
 
           VXCs_SS_im[ j + i*ldvxcs_ss ] = -1. * VXCs_SS_im[ i + j*ldvxcs_ss ];
           VXCz_SS_im[ j + i*ldvxcz_ss ] = -1. * VXCz_SS_im[ i + j*ldvxcz_ss ];
@@ -1107,12 +1048,6 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
       }
     }
   }
-// weights_out.close();
-// coords_out.close();
-// // mnorm_out.close();
-// // den_out.close();
-// dden_out.close();
-
 } 
 
 
