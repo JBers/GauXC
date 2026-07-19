@@ -779,9 +779,6 @@ void ReferenceLocalHostWorkDriver::eval_uvvar_gga_dks( size_t npts, size_t nbe, 
 
    for( int32_t i = 0; i < (int32_t)npts; ++i ) {
 
-      // std::cout<<"i "<<i<<std::endl;
-      std::cout<<std::setprecision(std::numeric_limits<double>::max_digits10);
-
       const size_t ioffs = size_t(i) * ldxs;
       const size_t ioffz = size_t(i) * ldxz;
       const size_t ioffx = size_t(i) * ldxx;
@@ -1468,10 +1465,6 @@ void ReferenceLocalHostWorkDriver::eval_zmat_lda_vxc_dks(
       const double factm = 0.5 * vrho[2*i+1];
       const double factor = 0.5 * (factp - factm);
 
-      // std::cout<<"factp  "<<factp <<std::endl;
-      // std::cout<<"factm  "<<factm <<std::endl;
-      // std::cout<<"factor "<<factor<<std::endl;
-
       //eq. 56 https://doi.org/10.1140/epjb/e2018-90170-1
       GauXC::blas::scal( nbe, 0.5*(factp + factm), zs_col, 1 );
       GauXC::blas::scal( nbe, KZ[i] * factor, zz_col, 1 );
@@ -1837,8 +1830,6 @@ void ReferenceLocalHostWorkDriver::eval_zmat_gga_vxc_gks( size_t npts, size_t nb
       const double factm = 0.5 * vrho[2*i+1];
       const double factor = 0.5 * (factp - factm);
 
-      // std::cout<<"vrho "<<vrho[2*i]<<" "<<vrho[2*i+1]<<std::endl;
-
       GauXC::blas::scal( nbf, 0.5*(factp + factm), zs_col, 1 ); //additional 0.5 is from eq 56 in petrone 2018 eur phys journal b "an efficent implementation of .. "
       GauXC::blas::scal( nbf, KZ[i]*factor, zz_col, 1 );
       GauXC::blas::scal( nbf, KX[i]*factor, zx_col, 1 );
@@ -1902,9 +1893,6 @@ void ReferenceLocalHostWorkDriver::eval_zmat_gga_vxc_gks( size_t npts, size_t nb
       blas::axpy(nbf, x_fact_y, bf_x_col, 1, zy_col, 1);
       blas::axpy(nbf, y_fact_y, bf_y_col, 1, zy_col, 1);
       blas::axpy(nbf, z_fact_y, bf_z_col, 1, zy_col, 1);
-
-      // std::cout<<"H "<<HX[i]<<" "<<HY[i]<<" "<<HZ[i]<<std::endl;
-      // std::cout<<"K "<<KX[i]<<" "<<KY[i]<<" "<<KZ[i]<<std::endl;
 
     }
 
@@ -2003,61 +1991,15 @@ void ReferenceLocalHostWorkDriver::eval_zmat_gga_vxc_dks( size_t npts, size_t nb
       auto* bf_zx_col = d2basis_xz_eval + ioff;
       auto* bf_zy_col = d2basis_yz_eval + ioff;
       auto* bf_zz_col = d2basis_zz_eval + ioff;
-      // std::cout<<"bf col d2"<<std::endl;
-      // for(int i=0;i<nbf;i++){std::cout<<bf_xx_col[i]<<" ";}
-      // std::cout<<std::endl;
-      // for(int i=0;i<nbf;i++){std::cout<<bf_xy_col[i]<<" ";}
-      // std::cout<<std::endl;
-      // for(int i=0;i<nbf;i++){std::cout<<bf_xz_col[i]<<" ";}
-      // std::cout<<std::endl;
-      // for(int i=0;i<nbf;i++){std::cout<<bf_yx_col[i]<<" ";}
-      // std::cout<<std::endl;
-      // for(int i=0;i<nbf;i++){std::cout<<bf_yy_col[i]<<" ";}
-      // std::cout<<std::endl;
-      // for(int i=0;i<nbf;i++){std::cout<<bf_yz_col[i]<<" ";}
-      // std::cout<<std::endl;
-      // for(int i=0;i<nbf;i++){std::cout<<bf_xz_col[i]<<" ";}
-      // std::cout<<std::endl;
-      // for(int i=0;i<nbf;i++){std::cout<<bf_yz_col[i]<<" ";}
-      // std::cout<<std::endl;
-      // for(int i=0;i<nbf;i++){std::cout<<bf_zz_col[i]<<" ";}
-      // std::cout<<std::endl;
-      
-      // std::cout<<"zz_x_ss_col"<<std::endl;
-      // for(int i=0;i<nbf;i++){std::cout<<zz_x_ss_col[i]<<" ";}
-      // std::cout<<std::endl;
-
 
       const double factp = 0.5 * vrho[2*i];
       const double factm = 0.5 * vrho[2*i+1];
       const double factor = 0.5 * (factp - factm);
 
-      // std::cout<<"vrho "<<vrho[2*i]<<" "<<vrho[2*i+1]<<std::endl;
-      // std::cout<<"factp  "<<factp <<std::endl;
-      // std::cout<<"factm  "<<factm <<std::endl;
-      // std::cout<<"factor "<<factor<<std::endl;
-
-      // std::cout<<"KZ[i] "<<KZ[i]<<std::endl;
-      // std::cout<<"KX[i] "<<KX[i]<<std::endl;
-      // std::cout<<"KY[i] "<<KY[i]<<std::endl;
-
-
       GauXC::blas::scal( nbf, 0.5*(factp + factm), zs_col, 1 ); //additional 0.5 is from eq 56 in petrone 2018 eur phys journal b "an efficent implementation of .. "
       GauXC::blas::scal( nbf, KZ[i]*factor, zz_col, 1 );
       GauXC::blas::scal( nbf, KX[i]*factor, zx_col, 1 );
       GauXC::blas::scal( nbf, KY[i]*factor, zy_col, 1 );
-// std::cout<<"zs_col"<<std::endl;
-//       for(int i=0;i<nbf;i++){std::cout<<zs_col[i]<<" ";}
-//       std::cout<<std::endl;
-// std::cout<<"zz_col"<<std::endl;
-//       for(int i=0;i<nbf;i++){std::cout<<zz_col[i]<<" ";}
-//       std::cout<<std::endl;
-// std::cout<<"zx_col"<<std::endl;
-//       for(int i=0;i<nbf;i++){std::cout<<zx_col[i]<<" ";}
-//       std::cout<<std::endl;
-//       std::cout<<"zy_col"<<std::endl;
-//       for(int i=0;i<nbf;i++){std::cout<<zy_col[i]<<" ";}
-//       std::cout<<std::endl;
 
       // SS
       GauXC::blas::scal( nbf, 0.5*(factp + factm), zs_x_ss_col, 1 ); //additional 0.5 is from eq 56 in petrone 2018 eur phys journal b "an efficent implementation of .. "
@@ -2074,10 +2016,6 @@ void ReferenceLocalHostWorkDriver::eval_zmat_gga_vxc_dks( size_t npts, size_t nb
       GauXC::blas::scal( nbf, KZ[i]*factor, zz_z_ss_col, 1 );
       GauXC::blas::scal( nbf, KX[i]*factor, zx_z_ss_col, 1 );
       GauXC::blas::scal( nbf, KY[i]*factor, zy_z_ss_col, 1 );
-
-
-      // for(int i=0;i<nbf;i++){std::cout<<zz_x_ss_col[i]<<" ";}
-      // std::cout<<std::endl;
 
       const auto gga_fact_pp = vgamma[3 * i];
       const auto gga_fact_pm = vgamma[3 * i + 1];
@@ -2121,19 +2059,7 @@ void ReferenceLocalHostWorkDriver::eval_zmat_gga_vxc_dks( size_t npts, size_t nb
       const auto z_fact_y = gga_fact_3 * dden_z_eval[4 * i + 2] +
                             gga_fact_2 * HY[i] * dden_z_eval[4 * i];
 
-      // std::cout<<"x_fact_s"<<x_fact_s<<std::endl;;
-      // std::cout<<"y_fact_s"<<y_fact_s<<std::endl;;
-      // std::cout<<"z_fact_s"<<z_fact_s<<std::endl;;
-      // std::cout<<"x_fact_z"<<x_fact_z<<std::endl;;
-      // std::cout<<"y_fact_z"<<y_fact_z<<std::endl;;
-      // std::cout<<"z_fact_z"<<z_fact_z<<std::endl;;
-      // std::cout<<"x_fact_x"<<x_fact_x<<std::endl;;
-      // std::cout<<"y_fact_x"<<y_fact_x<<std::endl;;
-      // std::cout<<"z_fact_x"<<z_fact_x<<std::endl;;
-      // std::cout<<"x_fact_y"<<x_fact_y<<std::endl;;
-      // std::cout<<"y_fact_y"<<y_fact_y<<std::endl;;
-      // std::cout<<"z_fact_y"<<z_fact_y<<std::endl;;
-
+      // LL
       blas::axpy(nbf, x_fact_s, bf_x_col, 1, zs_col, 1);
       blas::axpy(nbf, y_fact_s, bf_y_col, 1, zs_col, 1);
       blas::axpy(nbf, z_fact_s, bf_z_col, 1, zs_col, 1);
@@ -2200,9 +2126,6 @@ void ReferenceLocalHostWorkDriver::eval_zmat_gga_vxc_dks( size_t npts, size_t nb
       blas::axpy(nbf, x_fact_y, bf_xz_col, 1, zy_z_ss_col, 1);
       blas::axpy(nbf, y_fact_y, bf_yz_col, 1, zy_z_ss_col, 1);
       blas::axpy(nbf, z_fact_y, bf_zz_col, 1, zy_z_ss_col, 1);
-
-      // std::cout<<"H "<<HX[i]<<" "<<HY[i]<<" "<<HZ[i]<<std::endl;
-      // std::cout<<"K "<<KX[i]<<" "<<KY[i]<<" "<<KZ[i]<<std::endl;
 
     }
 }
