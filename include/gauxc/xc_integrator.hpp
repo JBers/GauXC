@@ -91,7 +91,7 @@ public:
                                            const IntegratorSettingsXC& = IntegratorSettingsXC{} );
   multiparticle_exc_vxc_type eval_exc_vxc( const std::vector<multiparticle_density>&,
                                            const MultiParticleFunctionalSpec&,
-                                           const MultiParticleXCPlan&,
+                                           const MultiParticleXCTerms&,
                                            const IntegratorSettingsXC& = IntegratorSettingsXC{} );
 
   exc_grad_type eval_exc_grad( const MatrixType&, const IntegratorSettingsXC& = IntegratorSettingsXC{} );

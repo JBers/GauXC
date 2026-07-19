@@ -26,7 +26,7 @@ template <typename ValueType>
 void ReferenceReplicatedXCHostIntegrator<ValueType>::
   eval_exc_vxc_( const std::vector<multiparticle_density>& densities,
                  const MultiParticleFunctionalSpec& functional_spec,
-                 const MultiParticleXCPlan& plan,
+                 const MultiParticleXCTerms& terms,
                  std::vector<multiparticle_vxc>& vxc,
                  value_type* intra_exc,
                  value_type* inter_pair_exc,
@@ -53,17 +53,17 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
   std::vector<bool> active_inter(ninter, false);
   std::vector<bool> build_vxc(np, false);
 
-  for( auto p : plan.active_intra ) {
+  for( auto p : terms.active_intra ) {
     if( p >= functional_spec.intra_functionals.size() )
       GAUXC_GENERIC_EXCEPTION("Invalid MultiParticle active intra index");
     active_intra[p] = true;
   }
-  for( auto i : plan.active_inter ) {
+  for( auto i : terms.active_inter ) {
     if( i >= ninter )
       GAUXC_GENERIC_EXCEPTION("Invalid MultiParticle active inter index");
     active_inter[i] = true;
   }
-  for( auto p : plan.vxc_targets ) {
+  for( auto p : terms.vxc_targets ) {
     if( p >= np )
       GAUXC_GENERIC_EXCEPTION("Invalid MultiParticle VXC target index");
     build_vxc[p] = true;

@@ -91,10 +91,10 @@ template <typename MatrixType>
 typename XCIntegrator<MatrixType>::multiparticle_exc_vxc_type
   XCIntegrator<MatrixType>::eval_exc_vxc( const std::vector<multiparticle_density>& densities,
                                           const MultiParticleFunctionalSpec& functional_spec,
-                                          const MultiParticleXCPlan& plan,
+                                          const MultiParticleXCTerms& terms,
                                           const IntegratorSettingsXC& ks_settings ) {
   if( not pimpl_ ) GAUXC_PIMPL_NOT_INITIALIZED();
-  return pimpl_->eval_exc_vxc(densities, functional_spec, plan, ks_settings);
+  return pimpl_->eval_exc_vxc(densities, functional_spec, terms, ks_settings);
 };
 
 template <typename MatrixType>

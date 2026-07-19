@@ -93,7 +93,7 @@ protected:
                               value_type* EXC, const IntegratorSettingsXC& ks_settings ) = 0;
   virtual void eval_exc_vxc_( const std::vector<multiparticle_density>&,
                               const MultiParticleFunctionalSpec&,
-                              const MultiParticleXCPlan&,
+                              const MultiParticleXCTerms&,
                               std::vector<multiparticle_vxc>&,
                               value_type*, value_type*,
                               const IntegratorSettingsXC& ) {
@@ -176,7 +176,7 @@ public:
 
   void eval_exc_vxc( const std::vector<multiparticle_density>& densities,
                      const MultiParticleFunctionalSpec& functional_spec,
-                     const MultiParticleXCPlan& plan,
+                     const MultiParticleXCTerms& terms,
                      std::vector<multiparticle_vxc>& vxc,
                      value_type* intra_exc,
                      value_type* inter_pair_exc,
