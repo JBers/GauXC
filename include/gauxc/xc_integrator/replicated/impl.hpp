@@ -166,7 +166,7 @@ typename ReplicatedXCIntegrator<MatrixType>::multiparticle_exc_vxc_type
   ReplicatedXCIntegrator<MatrixType>::eval_exc_vxc_(
     const std::vector<multiparticle_density>& densities,
     const MultiParticleFunctionalSpec& functional_spec,
-    const MultiParticleXCPlan& plan,
+    const MultiParticleXCTerms& terms,
     const IntegratorSettingsXC& ks_settings ) {
 
   if( not pimpl_ ) GAUXC_PIMPL_NOT_INITIALIZED();
@@ -184,7 +184,7 @@ typename ReplicatedXCIntegrator<MatrixType>::multiparticle_exc_vxc_type
 
   // Determine indices of particles to build VXC for
   std::vector<bool> build_vxc(np, false);
-  for( auto p : plan.vxc_targets ) {
+  for( auto p : terms.vxc_targets ) {
     if( p >= np )
       GAUXC_GENERIC_EXCEPTION("Invalid MultiParticle VXC target index");
     build_vxc[p] = true;
@@ -229,7 +229,7 @@ typename ReplicatedXCIntegrator<MatrixType>::multiparticle_exc_vxc_type
     } );
   }
 
-  pimpl_->eval_exc_vxc( raw_densities, functional_spec, plan, raw_vxcs,
+  pimpl_->eval_exc_vxc( raw_densities, functional_spec, terms, raw_vxcs,
                         ret.intra_exc.data(), ret.inter_pair_exc.data(),
                         ks_settings );
 

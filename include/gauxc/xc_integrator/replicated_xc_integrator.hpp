@@ -58,7 +58,7 @@ private:
   exc_vxc_type_gks  eval_exc_vxc_ ( const MatrixType&, const MatrixType&, const MatrixType&, const MatrixType&, const IntegratorSettingsXC& ) override;
   multiparticle_exc_vxc_type eval_exc_vxc_( const std::vector<multiparticle_density>&,
                                             const MultiParticleFunctionalSpec&,
-                                            const MultiParticleXCPlan&,
+                                            const MultiParticleXCTerms&,
                                             const IntegratorSettingsXC& ) override;
   exc_grad_type eval_exc_grad_( const MatrixType&, const IntegratorSettingsXC& ) override;
   exc_grad_type eval_exc_grad_( const MatrixType&, const MatrixType&, const IntegratorSettingsXC& ) override;
