@@ -26,6 +26,8 @@ public:
   static constexpr bool is_device = false;
   using value_type = typename base_type::value_type;
   using basis_type = typename base_type::basis_type;
+  using multiparticle_density = typename base_type::multiparticle_density;
+  using multiparticle_vxc = typename base_type::multiparticle_vxc;
   using task_container = std::vector<XCTask>;
   using task_iterator  = typename task_container::iterator;
 
@@ -90,6 +92,15 @@ protected:
                       value_type* VXCx, int64_t ldvxcx,
                       value_type* EXC, const IntegratorSettingsXC& ks_settings ) override;
 
+  /// MultiParticle EXC/VXC
+  void eval_exc_vxc_( const std::vector<multiparticle_density>& densities,
+                      const MultiParticleFunctionalSpec& functional_spec,
+                      const MultiParticleXCPlan& plan,
+                      std::vector<multiparticle_vxc>& vxc,
+                      value_type* intra_exc,
+                      value_type* inter_pair_exc,
+                      const IntegratorSettingsXC& ks_settings ) override;
+
 
   /// DKS EXC/VXC - also serves as the generic implementation
   void eval_exc_vxc_( int64_t m, int64_t n, const value_type* Ps, int64_t ldps,
@@ -117,27 +128,6 @@ protected:
                       value_type* VXCy_SS_im, int64_t ldvxcy_ss_im,
                       value_type* VXCx_SS_im, int64_t ldvxcx_ss_im,
                       value_type* EXC, const IntegratorSettingsXC& ks_settings ) override;
-
-
-  void neo_eval_exc_vxc_( int64_t m1, int64_t n1, int64_t m2, int64_t n2, 
-                          const value_type* Ps, int64_t ldps,
-                          const value_type* prot_Ps, int64_t prot_ldps,
-                          const value_type* prot_Pz, int64_t prot_ldpz,
-                          value_type* VXCs, int64_t ldvxcs,
-                          value_type* prot_VXCs, int64_t prot_ldvxcs,
-                          value_type* prot_VXCz, int64_t prot_ldvxcz,
-                          value_type* EXC1, value_type* prot_EXC, const IntegratorSettingsXC& ks_settings ) override;
-
-  void neo_eval_exc_vxc_( int64_t m1, int64_t n1, int64_t m2, int64_t n2, 
-                          const value_type* Ps, int64_t ldps,
-                          const value_type* Pz, int64_t ldpz,
-                          const value_type* prot_Ps, int64_t prot_ldps,
-                          const value_type* prot_Pz, int64_t prot_ldpz,
-                          value_type* VXCs, int64_t ldvxcs,
-                          value_type* VXCz, int64_t ldvxcz,
-                          value_type* prot_VXCs, int64_t prot_ldvxcs,
-                          value_type* prot_VXCz, int64_t prot_ldvxcz,
-                          value_type* EXC1, value_type* prot_EXC, const IntegratorSettingsXC& ks_settings ) override;
 
   /// RKS EXC Gradient
   void eval_exc_grad_( int64_t m, int64_t n, const value_type* P, int64_t ldp, 
@@ -207,19 +197,6 @@ protected:
                             value_type* EXC, value_type *N_EL, value_type *spin_N_EL, 
                             const IntegratorSettingsXC& ks_settings,
                             task_iterator task_begin, task_iterator task_end );
-
-  void neo_exc_vxc_local_work_( const value_type* Ps, int64_t ldps,
-                                const value_type* Pz, int64_t ldpz,
-                                const value_type* prot_Ps, int64_t prot_ldps,
-                                const value_type* prot_Pz, int64_t prot_ldpz,
-                                value_type* VXCs, int64_t ldvxcs,
-                                value_type* VXCz, int64_t ldvxcz,
-                                value_type* prot_VXCs, int64_t prot_ldvxcs,
-                                value_type* prot_VXCz, int64_t prot_ldvxcz,
-                                value_type* EXC1, value_type* prot_EXC, 
-                                value_type *N_EL, value_type *N_PROT,
-                                const IntegratorSettingsXC& ks_settings,
-                                task_iterator task_begin, task_iterator task_end );
                             
   // Implemetation details of exc_grad
   void exc_grad_local_work_( const value_type* Ps, int64_t ldps, const value_type* Pz, int64_t ldpz,

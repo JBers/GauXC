@@ -229,55 +229,80 @@ typename ReplicatedXCIntegrator<MatrixType>::exc_vxc_type_dks
 }
 
 template <typename MatrixType>
-typename ReplicatedXCIntegrator<MatrixType>::exc_vxc_type_neo_rks
-  ReplicatedXCIntegrator<MatrixType>::neo_eval_exc_vxc_( const MatrixType& elec_Ps, const MatrixType& prot_Ps, const MatrixType& prot_Pz,
-                                                         const IntegratorSettingsXC& ks_settings ) {
+typename ReplicatedXCIntegrator<MatrixType>::multiparticle_exc_vxc_type
+  ReplicatedXCIntegrator<MatrixType>::eval_exc_vxc_(
+    const std::vector<multiparticle_density>& densities,
+    const MultiParticleFunctionalSpec& functional_spec,
+    const MultiParticleXCPlan& plan,
+    const IntegratorSettingsXC& ks_settings ) {
 
   if( not pimpl_ ) GAUXC_PIMPL_NOT_INITIALIZED();
-  matrix_type elec_VXCs( elec_Ps.rows(), elec_Ps.cols() );
-  matrix_type prot_VXCs( prot_Ps.rows(), prot_Ps.cols() );
-  matrix_type prot_VXCz( prot_Pz.rows(), prot_Pz.cols() );
-  value_type  elec_EXC;
-  value_type  prot_EXC;
 
-  pimpl_->neo_eval_exc_vxc( elec_Ps.rows(), elec_Ps.cols(), prot_Ps.rows(), prot_Ps.cols(),
-                            elec_Ps.data(), elec_Ps.rows(),
-                            prot_Ps.data(), prot_Ps.rows(),
-                            prot_Pz.data(), prot_Pz.rows(),
-                            elec_VXCs.data(), elec_VXCs.rows(),
-                            prot_VXCs.data(), prot_VXCs.rows(),
-                            prot_VXCz.data(), prot_VXCz.rows(),
-                            &elec_EXC, &prot_EXC, ks_settings );
+  using raw_density = typename pimpl_type::multiparticle_density;
+  using raw_vxc_type = typename pimpl_type::multiparticle_vxc;
 
-  return std::make_tuple( elec_EXC, prot_EXC, elec_VXCs, prot_VXCs, prot_VXCz );
+  const size_t np = densities.size();
+  multiparticle_exc_vxc_type ret;
+  ret.intra_exc.assign(np, value_type{0});
+  ret.inter_exc = value_type{0};
+  ret.inter_pair_exc.assign(functional_spec.inter_functionals.size(), value_type{0});
+  ret.VXCs.reserve(np);
+  ret.VXCz.reserve(np);
 
-}
+  // Determine indices of particles to build VXC for
+  std::vector<bool> build_vxc(np, false);
+  for( auto p : plan.vxc_targets ) {
+    if( p >= np )
+      GAUXC_GENERIC_EXCEPTION("Invalid MultiParticle VXC target index");
+    build_vxc[p] = true;
+  }
 
-template <typename MatrixType>
-typename ReplicatedXCIntegrator<MatrixType>::exc_vxc_type_neo_uks
-  ReplicatedXCIntegrator<MatrixType>::neo_eval_exc_vxc_( const MatrixType& elec_Ps, const MatrixType& elec_Pz, const MatrixType& prot_Ps, const MatrixType& prot_Pz,
-                                                         const IntegratorSettingsXC& ks_settings ) {
+  std::vector<raw_density> raw_densities;
+  std::vector<raw_vxc_type> raw_vxcs;
+  raw_densities.reserve(np);
+  raw_vxcs.reserve(np);
 
-  if( not pimpl_ ) GAUXC_PIMPL_NOT_INITIALIZED();
-  matrix_type elec_VXCs( elec_Ps.rows(), elec_Ps.cols() );
-  matrix_type elec_VXCz( elec_Pz.rows(), elec_Pz.cols() );
-  matrix_type prot_VXCs( prot_Ps.rows(), prot_Ps.cols() );
-  matrix_type prot_VXCz( prot_Pz.rows(), prot_Pz.cols() );
-  value_type  elec_EXC;
-  value_type  prot_EXC;
+  for( size_t i = 0; i < np; ++i ) {
+    const auto& density = densities[i];
+    if( density.Ps == nullptr )
+      GAUXC_GENERIC_EXCEPTION("MultiParticle density is missing Ps");
+    if( density.Ps->rows() != density.Ps->cols() )
+      GAUXC_GENERIC_EXCEPTION("MultiParticle Ps must be square");
+    if( density.Pz and
+        ( density.Pz->rows() != density.Ps->rows() or
+          density.Pz->cols() != density.Ps->cols() ) )
+      GAUXC_GENERIC_EXCEPTION("MultiParticle Pz must match Ps dimensions");
 
-  pimpl_->neo_eval_exc_vxc( elec_Ps.rows(), elec_Ps.cols(), prot_Ps.rows(), prot_Ps.cols(),
-                            elec_Ps.data(), elec_Ps.rows(),
-                            elec_Pz.data(), elec_Pz.rows(),
-                            prot_Ps.data(), prot_Ps.rows(),
-                            prot_Pz.data(), prot_Pz.rows(),
-                            elec_VXCs.data(), elec_VXCs.rows(),
-                            elec_VXCz.data(), elec_VXCz.rows(),
-                            prot_VXCs.data(), prot_VXCs.rows(),
-                            prot_VXCz.data(), prot_VXCz.rows(),
-                            &elec_EXC, &prot_EXC, ks_settings );
+    if( build_vxc[i] )
+      ret.VXCs.emplace_back( density.Ps->rows(), density.Ps->cols() );
+    else
+      ret.VXCs.emplace_back();
+    if( build_vxc[i] and density.Pz )
+      ret.VXCz.emplace_back( density.Pz->rows(), density.Pz->cols() );
+    else
+      ret.VXCz.emplace_back();
 
-  return std::make_tuple( elec_EXC, prot_EXC, elec_VXCs, elec_VXCz, prot_VXCs, prot_VXCz );
+    raw_densities.push_back( raw_density{
+      density.Ps->rows(), density.Ps->cols(), density.Ps->data(), density.Ps->rows(),
+      density.Pz ? density.Pz->data() : nullptr,
+      density.Pz ? density.Pz->rows() : int64_t{0}
+    } );
+
+    raw_vxcs.push_back( raw_vxc_type{
+      build_vxc[i] ? ret.VXCs.back().data() : nullptr,
+      build_vxc[i] ? ret.VXCs.back().rows() : int64_t{0},
+      build_vxc[i] and density.Pz ? ret.VXCz.back().data() : nullptr,
+      build_vxc[i] and density.Pz ? ret.VXCz.back().rows() : int64_t{0}
+    } );
+  }
+
+  pimpl_->eval_exc_vxc( raw_densities, functional_spec, plan, raw_vxcs,
+                        ret.intra_exc.data(), ret.inter_pair_exc.data(),
+                        ks_settings );
+
+  for( const auto& energy : ret.inter_pair_exc ) ret.inter_exc += energy;
+
+  return ret;
 
 }
 

@@ -99,21 +99,23 @@ typename XCIntegrator<MatrixType>::exc_vxc_type_dks
 };
 
 template <typename MatrixType>
-typename XCIntegrator<MatrixType>::exc_vxc_type_neo_rks
-  XCIntegrator<MatrixType>::neo_eval_exc_vxc( const MatrixType& elec_Ps, const MatrixType& prot_Ps, const MatrixType& prot_Pz,
-                                              const IntegratorSettingsXC& ks_settings ){
+typename XCIntegrator<MatrixType>::multiparticle_exc_vxc_type
+  XCIntegrator<MatrixType>::eval_exc_vxc( const std::vector<multiparticle_density>& densities,
+                                          const MultiParticleFunctionalSpec& functional_spec,
+                                          const IntegratorSettingsXC& ks_settings ) {
   if( not pimpl_ ) GAUXC_PIMPL_NOT_INITIALIZED();
-  return pimpl_->neo_eval_exc_vxc(elec_Ps, prot_Ps, prot_Pz, ks_settings);
+  return pimpl_->eval_exc_vxc(densities, functional_spec, ks_settings);
 };
 
 template <typename MatrixType>
-typename XCIntegrator<MatrixType>::exc_vxc_type_neo_uks
-  XCIntegrator<MatrixType>::neo_eval_exc_vxc( const MatrixType& elec_Ps, const MatrixType& elec_Pz, const MatrixType& prot_Ps, const MatrixType& prot_Pz,
-                                              const IntegratorSettingsXC& ks_settings ){
+typename XCIntegrator<MatrixType>::multiparticle_exc_vxc_type
+  XCIntegrator<MatrixType>::eval_exc_vxc( const std::vector<multiparticle_density>& densities,
+                                          const MultiParticleFunctionalSpec& functional_spec,
+                                          const MultiParticleXCPlan& plan,
+                                          const IntegratorSettingsXC& ks_settings ) {
   if( not pimpl_ ) GAUXC_PIMPL_NOT_INITIALIZED();
-  return pimpl_->neo_eval_exc_vxc(elec_Ps, elec_Pz, prot_Ps, prot_Pz, ks_settings);
+  return pimpl_->eval_exc_vxc(densities, functional_spec, plan, ks_settings);
 };
-
 
 template <typename MatrixType>
 typename XCIntegrator<MatrixType>::exc_grad_type

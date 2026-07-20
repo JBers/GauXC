@@ -87,9 +87,21 @@ const LoadBalancer::basis_type& LoadBalancer::basis() const {
   if( not pimpl_ ) GAUXC_PIMPL_NOT_INITIALIZED();
   return pimpl_->basis();
 }
+const LoadBalancer::basis_type& LoadBalancer::basis(size_t i) const {
+  if( not pimpl_ ) GAUXC_PIMPL_NOT_INITIALIZED();
+  return pimpl_->basis(i);
+}
+size_t LoadBalancer::basis_count() const {
+  if( not pimpl_ ) GAUXC_PIMPL_NOT_INITIALIZED();
+  return pimpl_->basis_count();
+}
 const LoadBalancer::basis_map_type& LoadBalancer::basis_map() const {
   if( not pimpl_ ) GAUXC_PIMPL_NOT_INITIALIZED();
   return pimpl_->basis_map();
+}
+const LoadBalancer::basis_map_type& LoadBalancer::basis_map(size_t i) const {
+  if( not pimpl_ ) GAUXC_PIMPL_NOT_INITIALIZED();
+  return pimpl_->basis_map(i);
 }
 const LoadBalancer::shell_pair_type& LoadBalancer::shell_pairs() const {
   if( not pimpl_ ) GAUXC_PIMPL_NOT_INITIALIZED();
@@ -99,15 +111,6 @@ const LoadBalancer::shell_pair_type& LoadBalancer::shell_pairs() const {
 const LoadBalancer::shell_pair_type& LoadBalancer::shell_pairs() {
   if( not pimpl_ ) GAUXC_PIMPL_NOT_INITIALIZED();
   return pimpl_->shell_pairs();
-}
-
-const LoadBalancer::basis_type& LoadBalancer::protonic_basis() const {
-  if( not pimpl_ ) GAUXC_PIMPL_NOT_INITIALIZED();
-  return pimpl_->protonic_basis();
-}
-const LoadBalancer::basis_map_type& LoadBalancer::protonic_basis_map() const {
-  if( not pimpl_ ) GAUXC_PIMPL_NOT_INITIALIZED();
-  return pimpl_->protonic_basis_map();
 }
 
 LoadBalancerState& LoadBalancer::state() {

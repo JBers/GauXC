@@ -13,6 +13,7 @@
 
 #include <gauxc/xc_integrator.hpp>
 #include <iostream>
+#include <numeric>
 
 namespace GauXC  {
 namespace detail {
@@ -28,11 +29,9 @@ public:
   using exc_vxc_type_rks   = typename XCIntegrator<MatrixType>::exc_vxc_type_rks;
   using exc_vxc_type_uks   = typename XCIntegrator<MatrixType>::exc_vxc_type_uks;
   using exc_vxc_type_gks   = typename XCIntegrator<MatrixType>::exc_vxc_type_gks;
-
   using exc_vxc_type_dks   = typename XCIntegrator<MatrixType>::exc_vxc_type_dks;
-
-  using exc_vxc_type_neo_rks   = typename XCIntegrator<MatrixType>::exc_vxc_type_neo_rks;
-  using exc_vxc_type_neo_uks   = typename XCIntegrator<MatrixType>::exc_vxc_type_neo_uks;
+  using multiparticle_density = typename XCIntegrator<MatrixType>::multiparticle_density;
+  using multiparticle_exc_vxc_type = typename XCIntegrator<MatrixType>::multiparticle_exc_vxc_type;
   using exc_grad_type  = typename XCIntegrator<MatrixType>::exc_grad_type;
   using exx_type       = typename XCIntegrator<MatrixType>::exx_type;
   using fxc_contraction_type_rks   = typename XCIntegrator<MatrixType>::fxc_contraction_type_rks;
@@ -57,17 +56,15 @@ protected:
   virtual exc_vxc_type_uks  eval_exc_vxc_ ( const MatrixType& Ps, const MatrixType& Pz, const IntegratorSettingsXC& ks_settings ) = 0;
   virtual exc_vxc_type_gks  eval_exc_vxc_ ( const MatrixType& Ps, const MatrixType& Pz, const MatrixType& Py, const MatrixType& Px, 
                                             const IntegratorSettingsXC& ks_settings ) = 0;
-
   virtual exc_vxc_type_dks  eval_exc_vxc_ ( const MatrixType& Ps, const MatrixType& Pz, const MatrixType& Py, const MatrixType& Px, 
                                             const MatrixType& Ps_SS, const MatrixType& Pz_SS, const MatrixType& Py_SS, const MatrixType& Px_SS,
                                             const MatrixType& Ps_SS_imag, const MatrixType& Pz_SS_imag, const MatrixType& Py_SS_imag, const MatrixType& Px_SS_imag, 
                                             const IntegratorSettingsXC& ks_settings) = 0;
 
-  virtual exc_vxc_type_neo_rks  neo_eval_exc_vxc_ ( const MatrixType& elec_Ps, const MatrixType& prot_Ps, const MatrixType& prot_Pz,
+  virtual multiparticle_exc_vxc_type eval_exc_vxc_( const std::vector<multiparticle_density>& densities,
+                                                    const MultiParticleFunctionalSpec& functional_spec,
+                                                    const MultiParticleXCPlan& plan,
                                                     const IntegratorSettingsXC& ks_settings ) = 0;
-  virtual exc_vxc_type_neo_uks  neo_eval_exc_vxc_ ( const MatrixType& elec_Ps, const MatrixType& elec_Pz, const MatrixType& prot_Ps, const MatrixType& prot_Pz,
-                                                    const IntegratorSettingsXC& ks_settings ) = 0;
-  // virtual exc_grad_type eval_exc_grad_( const MatrixType& P ) = 0;
   virtual exc_grad_type eval_exc_grad_( const MatrixType& P, const IntegratorSettingsXC& ks_settings ) = 0;
   virtual exc_grad_type eval_exc_grad_( const MatrixType& Ps, const MatrixType& Pz, const IntegratorSettingsXC& ks_settings ) = 0;
   virtual exx_type      eval_exx_     ( const MatrixType&     P, 
@@ -157,7 +154,6 @@ public:
   exc_vxc_type_gks eval_exc_vxc( const MatrixType& Ps, const MatrixType& Pz, const MatrixType& Py, const MatrixType& Px, const IntegratorSettingsXC& ks_settings ) {
     return eval_exc_vxc_(Ps, Pz, Py, Px, ks_settings);
   }
-
   exc_vxc_type_dks eval_exc_vxc( const MatrixType& Ps, const MatrixType& Pz, const MatrixType& Py, const MatrixType& Px, 
                                  const MatrixType& Ps_SS, const MatrixType& Pz_SS, const MatrixType& Py_SS, const MatrixType& Px_SS, 
                                  const MatrixType& Ps_SS_imag, const MatrixType& Pz_SS_imag, const MatrixType& Py_SS_imag, const MatrixType& Px_SS_imag,
@@ -165,14 +161,26 @@ public:
     return eval_exc_vxc_(Ps, Pz, Py, Px, Ps_SS, Pz_SS, Py_SS, Px_SS, Ps_SS_imag, Pz_SS_imag, Py_SS_imag, Px_SS_imag, ks_settings );
   }
   
-  exc_vxc_type_neo_rks neo_eval_exc_vxc( const MatrixType& elec_Ps, const MatrixType& prot_Ps, const MatrixType& prot_Pz, 
-                                         const IntegratorSettingsXC& ks_settings){
-    return neo_eval_exc_vxc_(elec_Ps, prot_Ps, prot_Pz, ks_settings);
+  // Evaluate EXC / VXC for multiparticle densities, default to evaluate VXC for all particles
+  multiparticle_exc_vxc_type eval_exc_vxc( const std::vector<multiparticle_density>& densities,
+                                           const MultiParticleFunctionalSpec& functional_spec,
+                                           const IntegratorSettingsXC& ks_settings ) {
+    MultiParticleXCPlan plan;
+    plan.active_intra.resize(functional_spec.intra_functionals.size());
+    std::iota(plan.active_intra.begin(), plan.active_intra.end(), size_t{0});
+    plan.active_inter.resize(functional_spec.inter_functionals.size());
+    std::iota(plan.active_inter.begin(), plan.active_inter.end(), size_t{0});
+    plan.vxc_targets.resize(densities.size());
+    std::iota(plan.vxc_targets.begin(), plan.vxc_targets.end(), size_t{0});
+    return eval_exc_vxc_(densities, functional_spec, plan, ks_settings);
   }
 
-  exc_vxc_type_neo_uks neo_eval_exc_vxc( const MatrixType& elec_Ps, const MatrixType& elec_Pz, const MatrixType& prot_Ps, const MatrixType& prot_Pz, 
-                                         const IntegratorSettingsXC& ks_settings){
-    return neo_eval_exc_vxc_(elec_Ps, elec_Pz, prot_Ps, prot_Pz, ks_settings);
+  // Evaluate EXC / VXC for multiparticle densities, with active particles specified in the plan
+  multiparticle_exc_vxc_type eval_exc_vxc( const std::vector<multiparticle_density>& densities,
+                                           const MultiParticleFunctionalSpec& functional_spec,
+                                           const MultiParticleXCPlan& plan,
+                                           const IntegratorSettingsXC& ks_settings ) {
+    return eval_exc_vxc_(densities, functional_spec, plan, ks_settings);
   }
 
   /** Integrate EXC gradient for RKS

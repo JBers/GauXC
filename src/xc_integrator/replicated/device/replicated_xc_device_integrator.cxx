@@ -64,7 +64,6 @@ typename ReplicatedXCDeviceIntegratorFactory<ValueType>::ptr_return_t
   ReplicatedXCDeviceIntegratorFactory<ValueType>::make_integrator_impl(
     std::string integrator_kernel,
     std::shared_ptr<functional_type> func,
-    std::shared_ptr<functional_type> epcfunc,
     std::shared_ptr<LoadBalancer> lb, 
     std::unique_ptr<LocalWorkDriver>&& lwd,
     std::shared_ptr<ReductionDriver>   rd
@@ -82,11 +81,11 @@ typename ReplicatedXCDeviceIntegratorFactory<ValueType>::ptr_return_t
 
   if( integrator_kernel == "INCORE" )
     return std::make_unique<IncoreReplicatedXCDeviceIntegrator<ValueType>>(
-      func, epcfunc, lb, std::move(lwd), rd
+      func, lb, std::move(lwd), rd
     );
   else if( integrator_kernel == "SHELLBATCHED" )
     return std::make_unique<ShellBatchedReplicatedXCDeviceIntegrator<ValueType>>(
-      func, epcfunc, lb, std::move(lwd), rd
+      func, lb, std::move(lwd), rd
     );
 
   else

@@ -10,6 +10,7 @@ include(CMakeFindDependencyMacro)
 find_dependency( ExchCXX )
 find_dependency( IntegratorXX )
 
+set( GAUXC_HAS_C          @GAUXC_HAS_C@         )
 set( GAUXC_HAS_HOST       @GAUXC_HAS_HOST@      )
 set( GAUXC_HAS_CUDA       @GAUXC_HAS_CUDA@      )
 set( GAUXC_HAS_HIP        @GAUXC_HAS_HIP@       )
@@ -28,6 +29,10 @@ enable_language(CXX)
 
 if(GAUXC_HAS_OPENMP)
   find_dependency( OpenMP )
+endif()
+
+if( GAUXC_HAS_GAU2GRID STREQUAL "External" )
+  find_dependency( gau2grid )
 endif()
 
 if( GAUXC_HAS_HOST )

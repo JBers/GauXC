@@ -20,39 +20,18 @@ std::shared_ptr<LoadBalancer> LoadBalancerHostFactory::get_shared_instance(
   std::string kernel_name, const RuntimeEnvironment& rt,
   const Molecule& mol, const MolGrid& mg, const BasisSet<double>& basis
 ) {
-
-  std::transform(kernel_name.begin(), kernel_name.end(), 
-    kernel_name.begin(), ::toupper );
-
-
-  if( kernel_name == "DEFAULT" or kernel_name == "REPLICATED" ) 
-    kernel_name = "REPLICATED-PETITE";
-
-  std::unique_ptr<detail::LoadBalancerImpl> ptr = nullptr;
-  if( kernel_name == "REPLICATED-PETITE" )
-    ptr = std::make_unique<detail::PetiteHostReplicatedLoadBalancer>(
-      rt, mol, mg, basis
-    );
-
-  if( kernel_name == "REPLICATED-FILLIN" )
-    ptr = std::make_unique<detail::FillInHostReplicatedLoadBalancer>(
-      rt, mol, mg, basis
-    );
-
-  if( ! ptr ) GAUXC_GENERIC_EXCEPTION("Load Balancer Kernel Not Recognized: " + kernel_name);
-
-  return std::make_shared<LoadBalancer>(std::move(ptr));
-
+  return get_shared_instance( std::move(kernel_name), rt, mol, mg,
+    std::vector<BasisSet<double>>{basis} );
 }
 
 std::shared_ptr<LoadBalancer> LoadBalancerHostFactory::get_shared_instance(
   std::string kernel_name, const RuntimeEnvironment& rt,
-  const Molecule& mol, const MolGrid& mg, const BasisSet<double>& basis,
-  const BasisSet<double>& protonic_basis
+  const Molecule& mol, const MolGrid& mg,
+  const std::vector<BasisSet<double>>& bases
 ) {
 
-  std::transform(kernel_name.begin(), kernel_name.end(), 
-    kernel_name.begin(), ::toupper );
+  std::transform(kernel_name.begin(), kernel_name.end(),
+    kernel_name.begin(), [](unsigned char c){ return static_cast<char>(std::toupper(c)); } );
 
 
   if( kernel_name == "DEFAULT" or kernel_name == "REPLICATED" ) 
@@ -61,19 +40,17 @@ std::shared_ptr<LoadBalancer> LoadBalancerHostFactory::get_shared_instance(
   std::unique_ptr<detail::LoadBalancerImpl> ptr = nullptr;
   if( kernel_name == "REPLICATED-PETITE" )
     ptr = std::make_unique<detail::PetiteHostReplicatedLoadBalancer>(
-      rt, mol, mg, basis, protonic_basis
+      rt, mol, mg, bases
     );
 
   if( kernel_name == "REPLICATED-FILLIN" )
     ptr = std::make_unique<detail::FillInHostReplicatedLoadBalancer>(
-      rt, mol, mg, basis, protonic_basis
+      rt, mol, mg, bases
     );
 
   if( ! ptr ) GAUXC_GENERIC_EXCEPTION("Load Balancer Kernel Not Recognized: " + kernel_name);
 
   return std::make_shared<LoadBalancer>(std::move(ptr));
 
-}
-
-}
-
+};
+} // namespace GauXC

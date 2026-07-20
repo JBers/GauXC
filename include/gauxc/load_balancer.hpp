@@ -104,19 +104,16 @@ public:
 
   /// Return the underlying BasisSet instance used to generate this LoadBalancer 
   const basis_type& basis()  const;
+  const basis_type& basis(size_t) const;
+  size_t basis_count() const;
 
   /// Return BasisSetMap instance corresponding to basis/molecule
   const basis_map_type& basis_map() const;
+  const basis_map_type& basis_map(size_t) const;
 
   /// Return the number of non-negligible local shell pairs for this LoadBalancer
   const shell_pair_type& shell_pairs() const;
   const shell_pair_type& shell_pairs();
-
-  /// Return the underlying protonic BasisSet instance used to generate this LoadBalancer 
-  const basis_type& protonic_basis()  const;
-
-  /// Return the protonic BasisSetMap instance corresponding to protonic basis/molecule
-  const basis_map_type& protonic_basis_map() const;
 
   /// Return the runtime handle used to construct this LoadBalancer
   const RuntimeEnvironment& runtime() const;
@@ -178,6 +175,9 @@ public:
    */
   LoadBalancer get_instance( const RuntimeEnvironment& rt, 
     const Molecule& mol, const MolGrid& mg, const BasisSet<double>& bs);
+  LoadBalancer get_instance( const RuntimeEnvironment& rt,
+    const Molecule& mol, const MolGrid& mg,
+    const std::vector<BasisSet<double>>& bs);
 
   LoadBalancer get_instance( const RuntimeEnvironment& rt, 
     const Molecule& mol, const MolGrid& mg, const BasisSet<double>& bs,
@@ -199,6 +199,10 @@ public:
   std::shared_ptr<LoadBalancer> get_shared_instance( 
     const RuntimeEnvironment& rt,
     const Molecule& mol, const MolGrid& mg, const BasisSet<double>&);
+  std::shared_ptr<LoadBalancer> get_shared_instance(
+    const RuntimeEnvironment& rt,
+    const Molecule& mol, const MolGrid& mg,
+    const std::vector<BasisSet<double>>&);
 
   std::shared_ptr<LoadBalancer> get_shared_instance( 
     const RuntimeEnvironment& rt,

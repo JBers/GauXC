@@ -35,11 +35,9 @@ public:
   using exc_vxc_type_rks   = typename XCIntegratorImpl<MatrixType>::exc_vxc_type_rks;
   using exc_vxc_type_uks   = typename XCIntegratorImpl<MatrixType>::exc_vxc_type_uks;
   using exc_vxc_type_gks   = typename XCIntegratorImpl<MatrixType>::exc_vxc_type_gks;
-
   using exc_vxc_type_dks   = typename XCIntegratorImpl<MatrixType>::exc_vxc_type_dks;
-
-  using exc_vxc_type_neo_rks   = typename XCIntegratorImpl<MatrixType>::exc_vxc_type_neo_rks;
-  using exc_vxc_type_neo_uks   = typename XCIntegratorImpl<MatrixType>::exc_vxc_type_neo_uks;
+  using multiparticle_density = typename XCIntegratorImpl<MatrixType>::multiparticle_density;
+  using multiparticle_exc_vxc_type = typename XCIntegratorImpl<MatrixType>::multiparticle_exc_vxc_type;
   using exc_grad_type  = typename XCIntegratorImpl<MatrixType>::exc_grad_type;
   using exx_type       = typename XCIntegratorImpl<MatrixType>::exx_type;
   using fxc_contraction_type_rks   = typename XCIntegratorImpl<MatrixType>::fxc_contraction_type_rks;
@@ -65,15 +63,15 @@ private:
   exc_vxc_type_rks  eval_exc_vxc_ ( const MatrixType&, const IntegratorSettingsXC& ) override;
   exc_vxc_type_uks  eval_exc_vxc_ ( const MatrixType&, const MatrixType&, const IntegratorSettingsXC&) override;
   exc_vxc_type_gks  eval_exc_vxc_ ( const MatrixType&, const MatrixType&, const MatrixType&, const MatrixType&, const IntegratorSettingsXC& ) override;
-
   exc_vxc_type_dks  eval_exc_vxc_ ( const MatrixType&, const MatrixType&, const MatrixType&, const MatrixType&, 
                                     const MatrixType&, const MatrixType&, const MatrixType&, const MatrixType&, 
                                     const MatrixType&, const MatrixType&, const MatrixType&, const MatrixType&,
                                     const IntegratorSettingsXC& ) override;
 
-  exc_vxc_type_neo_rks  neo_eval_exc_vxc_ ( const MatrixType&, const MatrixType&, const MatrixType&, const IntegratorSettingsXC& ) override;
-  exc_vxc_type_neo_uks  neo_eval_exc_vxc_ ( const MatrixType&, const MatrixType&, const MatrixType&, const MatrixType&, const IntegratorSettingsXC& ) override;
-  // exc_grad_type eval_exc_grad_( const MatrixType& ) override;
+  multiparticle_exc_vxc_type eval_exc_vxc_( const std::vector<multiparticle_density>&,
+                                            const MultiParticleFunctionalSpec&,
+                                            const MultiParticleXCPlan&,
+                                            const IntegratorSettingsXC& ) override;
   exc_grad_type eval_exc_grad_( const MatrixType&, const IntegratorSettingsXC& ) override;
   exc_grad_type eval_exc_grad_( const MatrixType&, const MatrixType&, const IntegratorSettingsXC& ) override;
   exx_type      eval_exx_     ( const MatrixType&, const IntegratorSettingsEXX& ) override;

@@ -17,6 +17,9 @@ message( STATUS "Building GauXC Tests" )
 add_library( gauxc_catch2 INTERFACE )
 
 find_package( Catch2 CONFIG QUIET )
+if( Catch2_FOUND AND Catch2_VERSION VERSION_GREATER_EQUAL 3 )
+  message(FATAL_ERROR "Catch2 v${Catch2_VERSION} found, but tests require Catch2 v2 (catch2/catch.hpp). Please install v2.")
+endif()
 if( NOT Catch2_FOUND )
 
   FetchContent_Declare(
@@ -66,11 +69,15 @@ add_executable( gauxc_test
   basis/parse_basis.cxx
   dd_psi_potential_test.cxx
   2nd_derivative_test.cxx
+  c_api_test.cxx
 )
 target_link_libraries( gauxc_test PUBLIC gauxc gauxc_catch2 Eigen3::Eigen )
 if(GAUXC_ENABLE_CUTLASS)
   include(gauxc-cutlass)
   target_link_libraries(gauxc_test PUBLIC gauxc_cutlass)
+endif()
+if(MSVC AND CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  target_compile_options( gauxc_test PRIVATE -Wno-unused-variable )
 endif()
 
 
@@ -84,6 +91,9 @@ add_executable( standalone_driver standalone_driver.cxx standards.cxx basis/pars
 target_link_libraries( standalone_driver PUBLIC gauxc gauxc_catch2 Eigen3::Eigen )
 target_include_directories( standalone_driver PRIVATE ${PROJECT_BINARY_DIR}/tests )
 target_include_directories( standalone_driver PRIVATE ${PROJECT_SOURCE_DIR}/tests )
+if(MSVC AND CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  target_compile_options( standalone_driver PRIVATE -Wno-unused-variable )
+endif()
 
 #add_executable( grid_opt grid_opt.cxx standards.cxx basis/parse_basis.cxx ini_input.cxx )
 #target_link_libraries( grid_opt PUBLIC gauxc gauxc_catch2 Eigen3::Eigen )

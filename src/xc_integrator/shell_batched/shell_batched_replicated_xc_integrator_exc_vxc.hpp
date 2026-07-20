@@ -193,45 +193,6 @@ void ShellBatchedReplicatedXCIntegrator<BaseIntegratorType, IncoreIntegratorType
 
 template <typename BaseIntegratorType, typename IncoreIntegratorType>
 void ShellBatchedReplicatedXCIntegrator<BaseIntegratorType, IncoreIntegratorType>::
-  neo_eval_exc_vxc_( int64_t elec_m, int64_t elec_n, int64_t prot_m, int64_t prot_n, 
-                     const value_type* elec_Ps, int64_t elec_ldps,
-                     const value_type* prot_Ps, int64_t prot_ldps,
-                     const value_type* prot_Pz, int64_t prot_ldpz,
-                     value_type* elec_VXCs,     int64_t elec_ldvxcs,
-                     value_type* prot_VXCs,     int64_t prot_ldvxcs,
-                     value_type* prot_VXCz,     int64_t prot_ldvxcz,
-                     value_type* elec_EXC,  value_type* prot_EXC, const IntegratorSettingsXC& settings  ) {
-
-
-    GauXC::util::unused(elec_m, elec_n, prot_m, prot_n, elec_Ps, elec_ldps,
-      prot_Ps, prot_ldps, prot_Pz, prot_ldpz, elec_VXCs, elec_ldvxcs,
-      prot_VXCs, prot_ldvxcs, prot_VXCz, prot_ldvxcz, elec_EXC, prot_EXC, settings);  
-    GAUXC_GENERIC_EXCEPTION("NEO-UKS ShellBatched Not Yet Implemented");
-
-}
-
-template <typename BaseIntegratorType, typename IncoreIntegratorType>
-void ShellBatchedReplicatedXCIntegrator<BaseIntegratorType, IncoreIntegratorType>::
-  neo_eval_exc_vxc_( int64_t elec_m, int64_t elec_n, int64_t prot_m, int64_t prot_n, 
-                     const value_type* elec_Ps, int64_t elec_ldps,
-                     const value_type* elec_Pz, int64_t elec_ldpz,
-                     const value_type* prot_Ps, int64_t prot_ldps,
-                     const value_type* prot_Pz, int64_t prot_ldpz,
-                     value_type* elec_VXCs,     int64_t elec_ldvxcs,
-                     value_type* elec_VXCz,     int64_t elec_ldvxcz,
-                     value_type* prot_VXCs,     int64_t prot_ldvxcs,
-                     value_type* prot_VXCz,     int64_t prot_ldvxcz,
-                     value_type* elec_EXC,  value_type* prot_EXC, const IntegratorSettingsXC& settings  ) {
-
-    GauXC::util::unused(elec_m, elec_n, prot_m, prot_n, elec_Ps, elec_ldps, elec_Pz, elec_ldpz,
-      prot_Ps, prot_ldps, prot_Pz, prot_ldpz, elec_VXCs, elec_ldvxcs, elec_VXCz, elec_ldvxcz,
-      prot_VXCs, prot_ldvxcs, prot_VXCz, prot_ldvxcz, elec_EXC, prot_EXC, settings);  
-    GAUXC_GENERIC_EXCEPTION("NEO-UKS ShellBatched Not Yet Implemented");
-
-}
-
-template <typename BaseIntegratorType, typename IncoreIntegratorType>
-void ShellBatchedReplicatedXCIntegrator<BaseIntegratorType, IncoreIntegratorType>::
   exc_vxc_local_work_( const basis_type& basis, 
                        const value_type* Ps, int64_t ldps,
                        const value_type* Pz, int64_t ldpz,
@@ -486,19 +447,19 @@ void ShellBatchedReplicatedXCIntegrator<BaseIntegratorType, IncoreIntegratorType
       basis.nbf(), basis.nbf() );
 
   this->timer_.time_op_accumulate("XCIntegrator.ExtractSubDensity",[&]() {
-    detail::submat_set( basis.nbf(), basis.nbf(), nbe, nbe, Ps, ldps, 
-                        Ps_submat, nbe, union_submat_cut );
+    detail::submat_set( static_cast<int32_t>(basis.nbf()), static_cast<int32_t>(basis.nbf()), static_cast<int32_t>(nbe), static_cast<int32_t>(nbe), Ps, static_cast<int32_t>(ldps),
+                        Ps_submat, static_cast<int32_t>(nbe), union_submat_cut );
     if(Pz)
-    detail::submat_set( basis.nbf(), basis.nbf(), nbe, nbe, Pz, ldpz, 
-                        Pz_submat, nbe, union_submat_cut );
+    detail::submat_set( static_cast<int32_t>(basis.nbf()), static_cast<int32_t>(basis.nbf()), static_cast<int32_t>(nbe), static_cast<int32_t>(nbe), Pz, static_cast<int32_t>(ldpz),
+                        Pz_submat, static_cast<int32_t>(nbe), union_submat_cut );
 
     if(Py)
-    detail::submat_set( basis.nbf(), basis.nbf(), nbe, nbe, Py, ldpy, 
-                        Py_submat, nbe, union_submat_cut );
+    detail::submat_set( static_cast<int32_t>(basis.nbf()), static_cast<int32_t>(basis.nbf()), static_cast<int32_t>(nbe), static_cast<int32_t>(nbe), Py, static_cast<int32_t>(ldpy),
+                        Py_submat, static_cast<int32_t>(nbe), union_submat_cut );
 
     if(Px)
-    detail::submat_set( basis.nbf(), basis.nbf(), nbe, nbe, Px, ldpx, 
-                        Px_submat, nbe, union_submat_cut );
+    detail::submat_set( static_cast<int32_t>(basis.nbf()), static_cast<int32_t>(basis.nbf()), static_cast<int32_t>(nbe), static_cast<int32_t>(nbe), Px, static_cast<int32_t>(ldpx),
+                        Px_submat, static_cast<int32_t>(nbe), union_submat_cut );
   } );
 
 
@@ -530,20 +491,20 @@ void ShellBatchedReplicatedXCIntegrator<BaseIntegratorType, IncoreIntegratorType
   *N_EL += NEL_tmp;
   this->timer_.time_op_accumulate("XCIntegrator.IncrementSubPotential",[&]() {
     if(VXCs)
-    detail::inc_by_submat( basis.nbf(), basis.nbf(), nbe, nbe, VXCs, ldvxcs, 
-                           VXCs_submat, nbe, union_submat_cut );
+    detail::inc_by_submat( static_cast<int32_t>(basis.nbf()), static_cast<int32_t>(basis.nbf()), static_cast<int32_t>(nbe), static_cast<int32_t>(nbe), VXCs, static_cast<int32_t>(ldvxcs),
+                           VXCs_submat, static_cast<int32_t>(nbe), union_submat_cut );
 
     if(VXCz)
-    detail::inc_by_submat( basis.nbf(), basis.nbf(), nbe, nbe, VXCz, ldvxcz, 
-                           VXCz_submat, nbe, union_submat_cut );
+    detail::inc_by_submat( static_cast<int32_t>(basis.nbf()), static_cast<int32_t>(basis.nbf()), static_cast<int32_t>(nbe), static_cast<int32_t>(nbe), VXCz, static_cast<int32_t>(ldvxcz),
+                           VXCz_submat, static_cast<int32_t>(nbe), union_submat_cut );
 
     if(VXCy)
-    detail::inc_by_submat( basis.nbf(), basis.nbf(), nbe, nbe, VXCy, ldvxcy, 
-                           VXCy_submat, nbe, union_submat_cut );
+    detail::inc_by_submat( static_cast<int32_t>(basis.nbf()), static_cast<int32_t>(basis.nbf()), static_cast<int32_t>(nbe), static_cast<int32_t>(nbe), VXCy, static_cast<int32_t>(ldvxcy),
+                           VXCy_submat, static_cast<int32_t>(nbe), union_submat_cut );
 
     if(VXCx)
-    detail::inc_by_submat( basis.nbf(), basis.nbf(), nbe, nbe, VXCx, ldvxcx, 
-                           VXCx_submat, nbe, union_submat_cut );
+    detail::inc_by_submat( static_cast<int32_t>(basis.nbf()), static_cast<int32_t>(basis.nbf()), static_cast<int32_t>(nbe), static_cast<int32_t>(nbe), VXCx, static_cast<int32_t>(ldvxcx),
+                           VXCx_submat, static_cast<int32_t>(nbe), union_submat_cut );
   });
 
 
