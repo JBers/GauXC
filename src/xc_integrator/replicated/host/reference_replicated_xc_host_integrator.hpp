@@ -93,6 +93,13 @@ protected:
   void eval_exc_grad_( int64_t m, int64_t n, const value_type* Ps, int64_t ldps, 
                        const value_type* Pz, int64_t lpdz, value_type* EXC_GRAD, const IntegratorSettingsXC& settings ) override;
 
+  /// MultiParticle EXC Gradient
+  void eval_exc_grad_( const std::vector<multiparticle_density>& densities,
+                       const MultiParticleFunctionalSpec& functional_spec,
+                       const MultiParticleXCTerms& terms,
+                       value_type* EXC_GRAD,
+                       const IntegratorSettingsXC& settings ) override;
+
   /// sn-LinK
   void eval_exx_( int64_t m, int64_t n, const value_type* P,
                   int64_t ldp, value_type* K, int64_t ldk,
@@ -138,9 +145,26 @@ protected:
                             value_type* EXC, value_type *N_EL, const IntegratorSettingsXC& ks_settings,
                             task_iterator task_begin, task_iterator task_end );
                             
+  // Implementation details of the MultiParticle exc_vxc (per-rank local work)
+  void multiparticle_exc_vxc_local_work_( const std::vector<multiparticle_density>& densities,
+                            const MultiParticleFunctionalSpec& functional_spec,
+                            const MultiParticleXCTerms& terms,
+                            std::vector<multiparticle_vxc>& vxc,
+                            value_type* intra_exc,
+                            value_type* inter_pair_exc,
+                            const IntegratorSettingsXC& ks_settings,
+                            task_iterator task_begin, task_iterator task_end );
+
   // Implemetation details of exc_grad
   void exc_grad_local_work_( const value_type* Ps, int64_t ldps, const value_type* Pz, int64_t ldpz,
                              value_type* EXC_GRAD, const IntegratorSettingsXC& ks_settings );
+
+  // Implementation details of the MultiParticle exc_grad (per-rank local work)
+  void multiparticle_exc_grad_local_work_( const std::vector<multiparticle_density>& densities,
+                             const MultiParticleFunctionalSpec& functional_spec,
+                             const MultiParticleXCTerms& terms,
+                             value_type* EXC_GRAD,
+                             const IntegratorSettingsXC& settings );
 
   // Implementation details of sn-LinK
   void exx_local_work_( const value_type* P, int64_t ldp, value_type* K, int64_t ldk,
