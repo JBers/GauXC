@@ -55,6 +55,10 @@ protected:
                                                     const IntegratorSettingsXC& ks_settings ) = 0;
   virtual exc_grad_type eval_exc_grad_( const MatrixType& P, const IntegratorSettingsXC& ks_settings ) = 0;
   virtual exc_grad_type eval_exc_grad_( const MatrixType& Ps, const MatrixType& Pz, const IntegratorSettingsXC& ks_settings ) = 0;
+  virtual exc_grad_type eval_exc_grad_( const std::vector<multiparticle_density>& densities,
+                                        const MultiParticleFunctionalSpec& functional_spec,
+                                        const MultiParticleXCTerms& terms,
+                                        const IntegratorSettingsXC& ks_settings ) = 0;
   virtual exx_type      eval_exx_     ( const MatrixType&     P, 
                                         const IntegratorSettingsEXX& settings ) = 0;
   virtual fxc_contraction_type_rks  eval_fxc_contraction_ ( const MatrixType& P,
@@ -131,7 +135,13 @@ public:
     return eval_exc_vxc_(Ps, Pz, Py, Px, ks_settings);
   }
 
-  // Evaluate EXC / VXC for multiparticle densities, default to evaluate VXC for all particles
+  /** Integrate EXC / VXC (mean-field terms) for multiparticle densities; defaults
+   *  to evaluating VXC for all particles
+   *
+   *  @param[in] densities       Per-particle density matrices
+   *  @param[in] functional_spec Intra/inter functional specification
+   *  @returns EXC / VXC in a combined structure
+   */
   multiparticle_exc_vxc_type eval_exc_vxc( const std::vector<multiparticle_density>& densities,
                                            const MultiParticleFunctionalSpec& functional_spec,
                                            const IntegratorSettingsXC& ks_settings ) {
@@ -145,7 +155,6 @@ public:
     return eval_exc_vxc_(densities, functional_spec, terms, ks_settings);
   }
 
-  // Evaluate EXC / VXC for multiparticle densities, with active particles specified in the terms
   multiparticle_exc_vxc_type eval_exc_vxc( const std::vector<multiparticle_density>& densities,
                                            const MultiParticleFunctionalSpec& functional_spec,
                                            const MultiParticleXCTerms& terms,
@@ -169,6 +178,39 @@ public:
    */
   exc_grad_type eval_exc_grad( const MatrixType& Ps, const MatrixType& Pz, const IntegratorSettingsXC& ks_settings ) {
     return eval_exc_grad_(Ps, Pz, ks_settings);
+  }
+
+  /** Integrate EXC gradient for multiparticle densities; defaults to all
+   *  functionals in the spec active
+   *
+   *  @param[in] densities       Per-particle density matrices
+   *  @param[in] functional_spec Intra/inter functional specification
+   *  @returns EXC gradient
+   */
+  exc_grad_type eval_exc_grad( const std::vector<multiparticle_density>& densities,
+                               const MultiParticleFunctionalSpec& functional_spec,
+                               const IntegratorSettingsXC& ks_settings ) {
+    MultiParticleXCTerms terms;
+    terms.active_intra.resize(functional_spec.intra_functionals.size());
+    std::iota(terms.active_intra.begin(), terms.active_intra.end(), size_t{0});
+    terms.active_inter.resize(functional_spec.inter_functionals.size());
+    std::iota(terms.active_inter.begin(), terms.active_inter.end(), size_t{0});
+    return eval_exc_grad_(densities, functional_spec, terms, ks_settings);
+  }
+
+  /** Integrate EXC gradient for multiparticle densities, with active
+   *  functionals specified in the terms (vxc_targets is ignored)
+   *
+   *  @param[in] densities       Per-particle density matrices
+   *  @param[in] functional_spec Intra/inter functional specification
+   *  @param[in] terms           Active functionals (vxc_targets ignored)
+   *  @returns EXC gradient
+   */
+  exc_grad_type eval_exc_grad( const std::vector<multiparticle_density>& densities,
+                               const MultiParticleFunctionalSpec& functional_spec,
+                               const MultiParticleXCTerms& terms,
+                               const IntegratorSettingsXC& ks_settings ) {
+    return eval_exc_grad_(densities, functional_spec, terms, ks_settings);
   }
 
   /** Integrate Exact Exchange for RHF

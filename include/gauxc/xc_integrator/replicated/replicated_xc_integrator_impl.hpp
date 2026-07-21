@@ -104,6 +104,13 @@ protected:
                                value_type* EXC_GRAD, const IntegratorSettingsXC& ks_settings ) = 0;
   virtual void eval_exc_grad_( int64_t m, int64_t n, const value_type* P, int64_t ldps, 
                                const value_type* Pz, int64_t lpdz, value_type* EXC_GRAD, const IntegratorSettingsXC& ks_settings ) = 0;
+  virtual void eval_exc_grad_( const std::vector<multiparticle_density>&,
+                               const MultiParticleFunctionalSpec&,
+                               const MultiParticleXCTerms&,
+                               value_type*,
+                               const IntegratorSettingsXC& ) {
+    GAUXC_GENERIC_EXCEPTION("MultiParticle EXC Gradient is not implemented for this integrator");
+  }
   virtual void eval_exx_( int64_t m, int64_t n, const value_type* P,
                           int64_t ldp, value_type* K, int64_t ldk,
                           const IntegratorSettingsEXX& settings ) = 0;
@@ -187,6 +194,11 @@ public:
                       value_type* EXC_GRAD, const IntegratorSettingsXC& ks_settings );
   void eval_exc_grad( int64_t m, int64_t n, const value_type* Ps, int64_t ldps, 
                       const value_type* Pz, int64_t ldpz, value_type* EXC_GRAD, const IntegratorSettingsXC& ks_settings );
+  void eval_exc_grad( const std::vector<multiparticle_density>& densities,
+                      const MultiParticleFunctionalSpec& functional_spec,
+                      const MultiParticleXCTerms& terms,
+                      value_type* EXC_GRAD,
+                      const IntegratorSettingsXC& ks_settings );
 
   void eval_exx( int64_t m, int64_t n, const value_type* P,
                  int64_t ldp, value_type* K, int64_t ldk,

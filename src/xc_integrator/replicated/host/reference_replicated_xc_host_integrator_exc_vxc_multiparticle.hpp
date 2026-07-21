@@ -19,9 +19,8 @@
 
 namespace GauXC::detail {
 
-/// Generic host EXC/VXC driver for multiple quantum-particle basis sets.
-/// Each particle density is evaluated once on the shared grid, then all intra-
-/// and inter-particle XC contributions are accumulated before forming VXC.
+/// MultiParticle EXC/VXC: per-rank local work followed by the global reduction,
+/// matching the single-particle exc_vxc convention.
 template <typename ValueType>
 void ReferenceReplicatedXCHostIntegrator<ValueType>::
   eval_exc_vxc_( const std::vector<multiparticle_density>& densities,
@@ -30,11 +29,12 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
                  std::vector<multiparticle_vxc>& vxc,
                  value_type* intra_exc,
                  value_type* inter_pair_exc,
-                 const IntegratorSettingsXC& settings ) {
+                 const IntegratorSettingsXC& ks_settings ) {
 
-  static_cast<void>(settings);
+  const size_t np     = densities.size();
+  const size_t ninter = functional_spec.inter_functionals.size();
 
-  const size_t np = densities.size();
+  // Check that densities / VXC are sane
   if( np == 0 )
     GAUXC_GENERIC_EXCEPTION("MultiParticle EXC/VXC requires at least one density");
   if( np != vxc.size() )
@@ -44,32 +44,109 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
   if( functional_spec.intra_functionals.size() > np )
     GAUXC_GENERIC_EXCEPTION("Too many MultiParticle intra functional entries");
 
+  for( auto p : terms.active_intra )
+    if( p >= functional_spec.intra_functionals.size() )
+      GAUXC_GENERIC_EXCEPTION("Invalid MultiParticle active intra index");
+  for( auto i : terms.active_inter )
+    if( i >= ninter )
+      GAUXC_GENERIC_EXCEPTION("Invalid MultiParticle active inter index");
+  for( auto p : terms.vxc_targets )
+    if( p >= np )
+      GAUXC_GENERIC_EXCEPTION("Invalid MultiParticle VXC target index");
+
+  std::vector<bool> build_vxc(np, false);
+  for( auto p : terms.vxc_targets ) build_vxc[p] = true;
+
+  for( size_t p = 0; p < np; ++p ) {
+    const int64_t nbf = this->load_balancer_->basis(p).nbf();
+    const auto& den   = densities[p];
+    const bool  has_z = den.Pz != nullptr;
+    if( den.m != den.n )
+      GAUXC_GENERIC_EXCEPTION("MultiParticle Ps must be square");
+    if( den.m != nbf )
+      GAUXC_GENERIC_EXCEPTION("MultiParticle Ps dimension must match its basis");
+    if( den.ldps < nbf )
+      GAUXC_GENERIC_EXCEPTION("Invalid MultiParticle LDPS");
+    if( den.Pz and den.ldpz < nbf )
+      GAUXC_GENERIC_EXCEPTION("Invalid MultiParticle LDPZ");
+    if( build_vxc[p] and (not vxc[p].VXCs or vxc[p].ldvxcs < nbf) )
+      GAUXC_GENERIC_EXCEPTION("Invalid MultiParticle LDVXCS");
+    if( build_vxc[p] and has_z and (not vxc[p].VXCz or vxc[p].ldvxcz < nbf) )
+      GAUXC_GENERIC_EXCEPTION("Invalid MultiParticle LDVXCZ");
+  }
+
+  for( size_t i = 0; i < ninter; ++i ) {
+    const auto& pair = functional_spec.inter_functionals[i];
+    if( pair.electron >= np or pair.particle >= np )
+      GAUXC_GENERIC_EXCEPTION("Invalid MultiParticle inter functional index");
+  }
+
+  // Get Tasks
+  auto& tasks = this->load_balancer_->get_tasks();
+
+  // Compute Local contributions to EXC / VXC
+  this->timer_.time_op("XCIntegrator.LocalWork", [&](){
+    multiparticle_exc_vxc_local_work_( densities, functional_spec, terms,
+                                       vxc, intra_exc, inter_pair_exc, ks_settings,
+                                       tasks.begin(), tasks.end() );
+  });
+
+  // Reduce Results
+  this->timer_.time_op("XCIntegrator.Allreduce", [&](){
+    if( not this->reduction_driver_->takes_host_memory() )
+      GAUXC_GENERIC_EXCEPTION("This Module Only Works With Host Reductions");
+
+    for( size_t p = 0; p < np; ++p ) {
+      if( not build_vxc[p] ) continue;
+      const int64_t nbf = this->load_balancer_->basis(p).nbf();
+      this->reduction_driver_->allreduce_inplace( vxc[p].VXCs, nbf * nbf, ReductionOp::Sum );
+      if( densities[p].Pz )
+        this->reduction_driver_->allreduce_inplace( vxc[p].VXCz, nbf * nbf, ReductionOp::Sum );
+    }
+
+    this->reduction_driver_->allreduce_inplace( intra_exc, np, ReductionOp::Sum );
+    if( ninter )
+      this->reduction_driver_->allreduce_inplace( inter_pair_exc, ninter, ReductionOp::Sum );
+  });
+
+}
+
+
+/// Generic host EXC/VXC driver for multiple quantum-particle basis sets.
+/// Each particle density is evaluated once on the shared grid, then all intra-
+/// and inter-particle XC contributions are accumulated before forming VXC.
+template <typename ValueType>
+void ReferenceReplicatedXCHostIntegrator<ValueType>::
+  multiparticle_exc_vxc_local_work_( const std::vector<multiparticle_density>& densities,
+                                     const MultiParticleFunctionalSpec& functional_spec,
+                                     const MultiParticleXCTerms& terms,
+                                     std::vector<multiparticle_vxc>& vxc,
+                                     value_type* intra_exc,
+                                     value_type* inter_pair_exc,
+                                     const IntegratorSettingsXC& settings,
+                                     task_iterator task_begin, task_iterator task_end ) {
+
+  // Misc KS settings
+  IntegratorSettingsKS ks_settings;
+  if( auto* tmp = dynamic_cast<const IntegratorSettingsKS*>(&settings) ) {
+    ks_settings = *tmp;
+  }
+
+  const size_t np     = densities.size();
+  const size_t ninter = functional_spec.inter_functionals.size();
+
   auto* lwd = dynamic_cast<LocalHostWorkDriver*>(this->local_work_driver_.get());
   if( not lwd )
     GAUXC_GENERIC_EXCEPTION("MultiParticle EXC/VXC requires a host local work driver");
 
-  const size_t ninter = functional_spec.inter_functionals.size();
   std::vector<bool> active_intra(np, false);
   std::vector<bool> active_inter(ninter, false);
   std::vector<bool> build_vxc(np, false);
+  for( auto p : terms.active_intra ) active_intra[p] = true;
+  for( auto i : terms.active_inter ) active_inter[i] = true;
+  for( auto p : terms.vxc_targets )  build_vxc[p]    = true;
 
-  for( auto p : terms.active_intra ) {
-    if( p >= functional_spec.intra_functionals.size() )
-      GAUXC_GENERIC_EXCEPTION("Invalid MultiParticle active intra index");
-    active_intra[p] = true;
-  }
-  for( auto i : terms.active_inter ) {
-    if( i >= ninter )
-      GAUXC_GENERIC_EXCEPTION("Invalid MultiParticle active inter index");
-    active_inter[i] = true;
-  }
-  for( auto p : terms.vxc_targets ) {
-    if( p >= np )
-      GAUXC_GENERIC_EXCEPTION("Invalid MultiParticle VXC target index");
-    build_vxc[p] = true;
-  }
-
-  // Validate particle blocks and decide which bases need density evaluation.
+  // Derive per-particle bases, spin, GGA needs, and zero the integrands.
   std::vector<int64_t> nbf(np);
   std::vector<bool> has_z(np, false);
   std::vector<bool> need_grad(np, false);
@@ -79,22 +156,7 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
     const auto& basis = this->load_balancer_->basis(p);
     nbf[p] = basis.nbf();
     const auto& den = densities[p];
-
-    if( den.m != den.n )
-      GAUXC_GENERIC_EXCEPTION("MultiParticle Ps must be square");
-    if( den.m != nbf[p] )
-      GAUXC_GENERIC_EXCEPTION("MultiParticle Ps dimension must match its basis");
-    if( den.ldps < nbf[p] )
-      GAUXC_GENERIC_EXCEPTION("Invalid MultiParticle LDPS");
-    if( den.Pz and den.ldpz < nbf[p] )
-      GAUXC_GENERIC_EXCEPTION("Invalid MultiParticle LDPZ");
-    if( build_vxc[p] and (not vxc[p].VXCs or vxc[p].ldvxcs < nbf[p]) )
-      GAUXC_GENERIC_EXCEPTION("Invalid MultiParticle LDVXCS");
-
     has_z[p] = den.Pz != nullptr;
-    if( build_vxc[p] and has_z[p] and
-        (not vxc[p].VXCz or vxc[p].ldvxcz < nbf[p]) )
-      GAUXC_GENERIC_EXCEPTION("Invalid MultiParticle LDVXCZ");
 
     const auto* funcs = p < functional_spec.intra_functionals.size() ?
       &functional_spec.intra_functionals[p] : nullptr;
@@ -116,8 +178,6 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
 
   for( size_t i = 0; i < ninter; ++i ) {
     const auto& pair = functional_spec.inter_functionals[i];
-    if( pair.electron >= np or pair.particle >= np )
-      GAUXC_GENERIC_EXCEPTION("Invalid MultiParticle inter functional index");
     if( active_inter[i] and not pair.functionals.empty() ) {
       participates[pair.electron] = true;
       participates[pair.particle] = true;
@@ -150,6 +210,8 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
   std::vector<value_type> intra_work(np, 0.0);
   std::vector<value_type> inter_work(ninter, 0.0);
 
+  const size_t ntasks = std::distance( task_begin, task_end );
+
   #pragma omp parallel
   {
 
@@ -164,7 +226,7 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
     const int32_t* shell_list = nullptr;
     std::vector<std::array<int32_t, 3>> submat_map;
     std::vector<value_type> basis_eval;
-    std::vector<value_type> den;
+    std::vector<value_type> den_scr;
     std::vector<value_type> gamma;
     std::vector<value_type> eps;
     std::vector<value_type> vrho;
@@ -185,8 +247,9 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
   std::vector<value_type> eps_acc;
 
   #pragma omp for schedule(dynamic)
-  for( size_t iT = 0; iT < tasks.size(); ++iT ) {
-    const auto& task = tasks[iT];
+  for( size_t iT = 0; iT < ntasks; ++iT ) {
+    // Alias current task
+    const auto& task = *( task_begin + iT );
     const int32_t npts = static_cast<int32_t>(task.points.size());
     const auto* points = task.points.data()->data();
     const auto* weights = task.weights.data();
@@ -223,23 +286,24 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
       }
 
       if( not s.active ) {
-        s.den.assign(spin_dim * npts, 0.0);
+        s.den_scr.assign(spin_dim * npts, 0.0);
         continue;
       }
 
       const auto& basis = this->load_balancer_->basis(p);
       const auto& basis_map = this->load_balancer_->basis_map(p);
 
+      // Get the submatrix map for batch
       std::tie(s.submat_map, std::ignore) =
         gen_compressed_submat_map(basis_map, screening.shell_list, nbf[p], nbf[p]);
 
       s.nbe_scr.resize(s.nbe * s.nbe);
       s.basis_eval.resize((s.gga ? 4 : 1) * npts * s.nbe);
-      s.den.resize(spin_dim * (s.gga ? 4 : 1) * npts);
+      s.den_scr.resize(spin_dim * (s.gga ? 4 : 1) * npts);
       s.zmat.resize(spin_dim * npts * s.nbe);
 
       auto* basis_eval = s.basis_eval.data();
-      auto* den_eval = s.den.data();
+      auto* den_eval = s.den_scr.data();
       auto* zmat = s.zmat.data();
       auto* zmat_z = s.is_uks ? zmat + s.nbe * npts : nullptr;
 
@@ -267,16 +331,19 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
         lwd->eval_collocation( npts, s.nshells, s.nbe, points, basis,
           s.shell_list, basis_eval );
 
+      // Evaluate X matrix (fac * P * B) -> store in Z
       const auto xmat_fac = s.is_uks ? 1.0 : 2.0;
       lwd->eval_xmat( npts, nbf[p], s.nbe, s.submat_map, xmat_fac,
         densities[p].Ps, densities[p].ldps, basis_eval, s.nbe, zmat, s.nbe,
         s.nbe_scr.data() );
 
       if( s.is_uks )
+      // X matrix for Pz
         lwd->eval_xmat( npts, nbf[p], s.nbe, s.submat_map, 1.0,
           densities[p].Pz, densities[p].ldpz, basis_eval, s.nbe, zmat_z,
           s.nbe, s.nbe_scr.data() );
 
+      // Evaluate U and V variables
       if( s.gga ) {
         if( s.is_uks )
           lwd->eval_uvvar_gga_uks( npts, s.nbe, basis_eval, dbasis_x_eval,
@@ -299,7 +366,7 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
 
     auto rho_total = [&]( size_t p, int32_t i ) -> value_type {
       const auto& s = scratch[p];
-      return s.is_uks ? s.den[2*i] + s.den[2*i+1] : s.den[i];
+      return s.is_uks ? s.den_scr[2*i] + s.den_scr[2*i+1] : s.den_scr[i];
     };
 
     //----------------------Start Intra-Particle XC Evaluation------------------------
@@ -313,13 +380,14 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
       const size_t spin_dim = s.is_uks ? 2 : 1;
       const size_t gga_dim = s.is_uks ? 3 : 1;
 
+      // Evaluate XC functional
       if( funcs->size() == 1 ) {
         const auto& func = funcs->front();
         if( func->is_gga() ) {
-          func->eval_exc_vxc( npts, s.den.data(), s.gamma.data(),
+          func->eval_exc_vxc( npts, s.den_scr.data(), s.gamma.data(),
             s.eps.data(), s.vrho.data(), s.vgamma.data() );
         } else {
-          func->eval_exc_vxc( npts, s.den.data(), s.eps.data(),
+          func->eval_exc_vxc( npts, s.den_scr.data(), s.eps.data(),
             s.vrho.data() );
         }
       } else {
@@ -330,10 +398,10 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
         for( const auto& func : *funcs ) {
           if( func->is_gga() ) {
             std::fill(vgamma_tmp.begin(), vgamma_tmp.end(), 0.0);
-            func->eval_exc_vxc( npts, s.den.data(), s.gamma.data(),
+            func->eval_exc_vxc( npts, s.den_scr.data(), s.gamma.data(),
               eps_tmp.data(), vrho_tmp.data(), vgamma_tmp.data() );
           } else {
-            func->eval_exc_vxc( npts, s.den.data(), eps_tmp.data(),
+            func->eval_exc_vxc( npts, s.den_scr.data(), eps_tmp.data(),
               vrho_tmp.data() );
           }
 
@@ -347,6 +415,7 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
         }
       }
 
+      // Scalar integrations
       value_type e_local = 0.0;
       for( int32_t i = 0; i < npts; ++i )
         e_local += weights[i] * s.eps[i] * rho_total(p, i);
@@ -423,6 +492,7 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
       const size_t gga_dim = s.is_uks ? 3 : 1;
 
       for( int32_t i = 0; i < npts; ++i ) {
+      // Factor weights into XC results
         for( size_t is = 0; is < spin_dim; ++is )
           s.vrho[spin_dim*i + is] *= weights[i];
       }
@@ -435,7 +505,7 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
       auto* basis_eval = s.basis_eval.data();
       auto* zmat = s.zmat.data();
       auto* zmat_z = s.is_uks ? zmat + s.nbe * npts : nullptr;
-      auto* den_eval = s.den.data();
+      auto* den_eval = s.den_scr.data();
       auto* gamma = s.gamma.data();
       auto* vrho = s.vrho.data();
       auto* vgamma = s.vgamma.data();
@@ -456,6 +526,7 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
         dden_y_eval = dden_x_eval + spin_dim * npts;
         dden_z_eval = dden_y_eval + spin_dim * npts;
 
+        // Evaluate Z matrix for VXC
         if( s.is_uks )
           lwd->eval_zmat_gga_vxc_uks( npts, s.nbe, vrho, vgamma,
             basis_eval, dbasis_x_eval, dbasis_y_eval, dbasis_z_eval,
@@ -474,6 +545,7 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
             s.nbe );
       }
 
+      // Increment VXC
       lwd->inc_vxc( npts, nbf[p], s.nbe, basis_eval, s.submat_map, zmat,
         s.nbe, vxc[p].VXCs, vxc[p].ldvxcs, s.nbe_scr.data() );
       if( s.is_uks )
@@ -509,25 +581,6 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
     }
   }
   for( size_t i = 0; i < ninter; ++i ) inter_pair_exc[i] = inter_work[i];
-
-  this->timer_.time_op("XCIntegrator.Allreduce", [&](){
-    if( not this->reduction_driver_->takes_host_memory() )
-      GAUXC_GENERIC_EXCEPTION("This Module Only Works With Host Reductions");
-
-    for( size_t p = 0; p < np; ++p ) {
-      if( not build_vxc[p] ) continue;
-      this->reduction_driver_->allreduce_inplace( vxc[p].VXCs,
-        nbf[p] * nbf[p], ReductionOp::Sum );
-      if( has_z[p] )
-        this->reduction_driver_->allreduce_inplace( vxc[p].VXCz,
-          nbf[p] * nbf[p], ReductionOp::Sum );
-    }
-
-    this->reduction_driver_->allreduce_inplace( intra_exc, np, ReductionOp::Sum );
-    if( ninter )
-      this->reduction_driver_->allreduce_inplace( inter_pair_exc, ninter,
-        ReductionOp::Sum );
-  });
 
 }
 
