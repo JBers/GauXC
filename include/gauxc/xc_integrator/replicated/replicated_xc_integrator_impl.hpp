@@ -279,14 +279,6 @@ public:
   
   void eval_exc_vxc( const std::vector<multiparticle_density>& densities,
                      const MultiParticleFunctionalSpec& functional_spec,
-                     const MultiParticleXCPlan& plan,
-                     std::vector<multiparticle_vxc>& vxc,
-                     value_type* intra_exc,
-                     value_type* inter_pair_exc,
-                     const IntegratorSettingsXC& ks_settings );
-
-  void eval_exc_vxc( const std::vector<multiparticle_density>& densities,
-                     const MultiParticleFunctionalSpec& functional_spec,
                      const MultiParticleXCTerms& terms,
                      std::vector<multiparticle_vxc>& vxc,
                      value_type* intra_exc,
