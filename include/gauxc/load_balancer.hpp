@@ -178,13 +178,6 @@ public:
   LoadBalancer get_instance( const RuntimeEnvironment& rt,
     const Molecule& mol, const MolGrid& mg,
     const std::vector<BasisSet<double>>& bs);
-<<<<<<< HEAD
-
-  LoadBalancer get_instance( const RuntimeEnvironment& rt, 
-    const Molecule& mol, const MolGrid& mg, const BasisSet<double>& bs,
-    const BasisSet<double>& bs2 );
-=======
->>>>>>> feature/multiparticle-host-dft
 
   /** 
    *  @brief Generate a shared pointer to a LoadBalancer instance per kernel and 
@@ -206,14 +199,6 @@ public:
     const RuntimeEnvironment& rt,
     const Molecule& mol, const MolGrid& mg,
     const std::vector<BasisSet<double>>&);
-<<<<<<< HEAD
-
-  std::shared_ptr<LoadBalancer> get_shared_instance( 
-    const RuntimeEnvironment& rt,
-    const Molecule& mol, const MolGrid& mg, const BasisSet<double>&,
-    const BasisSet<double>& );
-=======
->>>>>>> feature/multiparticle-host-dft
 
 private:
 

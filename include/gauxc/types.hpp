@@ -36,15 +36,9 @@ struct MultiParticleFunctionalSpec {
   std::vector<MultiParticlePairFunctional> inter_functionals;
 };
 
-<<<<<<< HEAD
-// Dynamic plan requested from a static multiparticle functional setup.
-// Indices refer to the corresponding entries in MultiParticleFunctionalSpec.
-struct MultiParticleXCPlan {
-=======
 // Dynamic terms requested from a static multiparticle functional setup.
 // Indices refer to the corresponding entries in MultiParticleFunctionalSpec.
 struct MultiParticleXCTerms {
->>>>>>> feature/multiparticle-host-dft
   std::vector<size_t> active_intra;
   std::vector<size_t> active_inter;
   std::vector<size_t> vxc_targets;
