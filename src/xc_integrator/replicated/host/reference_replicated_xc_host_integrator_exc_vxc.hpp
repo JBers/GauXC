@@ -177,9 +177,6 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
   const bool is_uks = (Pz != nullptr) and (Py == nullptr) and (Px == nullptr) and (Ps_SS == nullptr);
   const bool is_rks = not is_uks and not is_gks and not is_dks;
 
-  std::cout<<"is rks uks gks dks "<<is_rks<<is_uks<<is_gks<<is_dks<<std::endl;
-
-
   if (not is_rks and not is_uks and not is_gks and not is_dks) {
     GAUXC_GENERIC_EXCEPTION("Must Be Either RKS, UKS, GKS, or DKS!");
   }
@@ -274,7 +271,6 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
 
   // Loop over tasks
   const size_t ntasks = std::distance(task_begin, task_end);
-  std::cout<<"ntasks "<<ntasks<<std::endl;
 
   #pragma omp parallel
   {
