@@ -198,8 +198,6 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
   const auto& func  = *this->func_;
   const auto& mol   = this->load_balancer_->molecule();
 
-  std::cout<<"total npts "<<this->load_balancer_->total_npts()<<std::endl;
-
   const bool needs_laplacian = func.needs_laplacian(); 
   
   if (func.is_mgga() and is_gks) {
@@ -829,15 +827,15 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
     {
 
       // Increment VXC
-      lwd->inc_vxc( mgga_dim_scal * npts, nbf, nbe, basis_eval, submat_map, zmat, nbe, VXCs, ldvxcs, nbe_scr, 1. );
+      lwd->inc_vxc( mgga_dim_scal * npts, nbf, nbe, basis_eval, submat_map, zmat, nbe, VXCs, ldvxcs, nbe_scr );
       if(not is_rks) {
-        lwd->inc_vxc( mgga_dim_scal * npts, nbf, nbe, basis_eval, submat_map, zmat_z, nbe,VXCz, ldvxcz, nbe_scr, 1.);
+        lwd->inc_vxc( mgga_dim_scal * npts, nbf, nbe, basis_eval, submat_map, zmat_z, nbe,VXCz, ldvxcz, nbe_scr );
       }
       if(not is_uks and not is_rks) {
         lwd->inc_vxc( npts, nbf, nbe, basis_eval, submat_map, zmat_y, nbe, VXCy, ldvxcy,
-          nbe_scr, 1.);
+          nbe_scr );
         lwd->inc_vxc( npts, nbf, nbe, basis_eval, submat_map, zmat_x, nbe, VXCx, ldvxcx,
-          nbe_scr, 1.);
+          nbe_scr );
       }
       if(is_dks) {
         // VXC SS BEGIN

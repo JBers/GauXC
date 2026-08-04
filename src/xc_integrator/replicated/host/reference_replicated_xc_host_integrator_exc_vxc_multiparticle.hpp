@@ -547,10 +547,10 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
 
       // Increment VXC
       lwd->inc_vxc( npts, nbf[p], s.nbe, basis_eval, s.submat_map, zmat,
-        s.nbe, vxc[p].VXCs, vxc[p].ldvxcs, s.nbe_scr.data(), 1. );
+        s.nbe, vxc[p].VXCs, vxc[p].ldvxcs, s.nbe_scr.data() );
       if( s.is_uks )
         lwd->inc_vxc( npts, nbf[p], s.nbe, basis_eval, s.submat_map, zmat_z,
-          s.nbe, vxc[p].VXCz, vxc[p].ldvxcz, s.nbe_scr.data(), 1. );
+          s.nbe, vxc[p].VXCz, vxc[p].ldvxcz, s.nbe_scr.data() );
     }
     //----------------------End VXC Z-Matrix Assembly------------------------------
   }

@@ -60,7 +60,7 @@ struct ReplicatedXCHostIntegratorFactory {
     std::unique_ptr<LocalWorkDriver>&& lwd,
     std::shared_ptr<ReductionDriver>   rd
     );
-  
+
 };
 
 

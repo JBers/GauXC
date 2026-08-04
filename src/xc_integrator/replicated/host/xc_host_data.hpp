@@ -34,7 +34,7 @@ struct XCHostData {
   std::vector<F> nbe_scr;
   std::vector<F> den_scr;
   std::vector<F> basis_eval;
-  
+
   // Second order derivatives
   std::vector<F> v2rho2;
   std::vector<F> v2rhogamma;

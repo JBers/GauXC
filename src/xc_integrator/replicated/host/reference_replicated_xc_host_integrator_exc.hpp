@@ -38,9 +38,6 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
 
   const auto& basis = this->load_balancer_->basis();
 
-std::cout<<"Hello from eval_exc_"<<std::endl;
-
-
   // Check that P / VXC are sane
   const int64_t nbf = basis.nbf();
   if( m != n ) 

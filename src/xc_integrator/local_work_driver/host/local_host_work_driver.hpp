@@ -550,11 +550,11 @@ public:
    */
   void inc_vxc( size_t npts, size_t nbf, size_t nbe, const double* basis_eval,
     const submat_map_t& submat_map, const double* Z, size_t ldz, 
-    double* VXC, size_t ldvxc, double* scr, double factor );
+    double* VXC, size_t ldvxc, double* scr, double factor = 1. );
 
   void inc_vxc_anti( size_t npts, size_t nbf, size_t nbe, const double* basis_eval,
     const submat_map_t& submat_map, const double* Z, size_t ldz, 
-    double* VXC, size_t ldvxc, double* scr, double factor );
+    double* VXC, size_t ldvxc, double* scr, double factor = 1. );
 
   /** Evaluate the intermediate vector variables tmat for Fxc contraction of LDA 
    *
