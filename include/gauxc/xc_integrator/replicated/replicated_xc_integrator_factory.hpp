@@ -45,6 +45,8 @@ struct ReplicatedXCIntegratorFactory {
     std::shared_ptr<ReductionDriver>   rd
     ) {
 
+
+
     switch(ex) {
 
       using host_factory = 
@@ -75,6 +77,8 @@ struct ReplicatedXCIntegratorFactory {
 
   }
 
+ 
 };
 
-} // namespace GauXC
+
+}
