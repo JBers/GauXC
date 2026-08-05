@@ -73,6 +73,7 @@ protected:
                       value_type* VXCx, int64_t ldvxcx,
                       value_type* EXC, const IntegratorSettingsXC& settings ) override;
 
+
   void eval_exc_grad_( int64_t m, int64_t n, const value_type* P, int64_t ldp, 
                        value_type* EXC_GRAD, const IntegratorSettingsXC& settings ) override;
   void eval_exc_grad_( int64_t m, int64_t n, const value_type* Ps, int64_t ldps, 

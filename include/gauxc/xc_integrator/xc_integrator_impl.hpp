@@ -63,7 +63,6 @@ protected:
   virtual multiparticle_exc_vxc_type eval_exc_vxc_( const std::vector<multiparticle_density>& densities,
                                                     const MultiParticleFunctionalSpec& functional_spec,
                                                     const MultiParticleXCTerms& terms,
-
                                                     const IntegratorSettingsXC& ks_settings ) = 0;
   virtual exc_grad_type eval_exc_grad_( const MatrixType& P, const IntegratorSettingsXC& ks_settings ) = 0;
   virtual exc_grad_type eval_exc_grad_( const MatrixType& Ps, const MatrixType& Pz, const IntegratorSettingsXC& ks_settings ) = 0;

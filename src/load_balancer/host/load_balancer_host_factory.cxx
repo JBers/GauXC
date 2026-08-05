@@ -52,5 +52,6 @@ std::shared_ptr<LoadBalancer> LoadBalancerHostFactory::get_shared_instance(
 
   return std::make_shared<LoadBalancer>(std::move(ptr));
 
-};
-} // namespace GauXC
+}
+
+}

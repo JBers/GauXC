@@ -93,6 +93,7 @@ public:
     return get_shared_instance( std::make_shared<functional_type>(func), lb );
   }
 
+
   template <typename... Args>
   integrator_type get_instance( Args&&... args ) {
 

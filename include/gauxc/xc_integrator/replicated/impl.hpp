@@ -173,6 +173,7 @@ typename ReplicatedXCIntegrator<MatrixType>::exc_vxc_type_gks
                         VXCz.data(), VXCz.rows(),
                         VXCy.data(), VXCy.rows(),
                         VXCx.data(), VXCx.rows(), &EXC, ks_settings );
+
   return std::make_tuple( EXC, VXCs, VXCz, VXCy, VXCx);
 
 }

@@ -65,7 +65,6 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
 
   // Check that P / VXC are sane
   const int64_t nbf = basis.nbf();
-
   if( m != n ) 
     GAUXC_GENERIC_EXCEPTION("P/VXC Must Be Square");
   if( m != nbf ) 
