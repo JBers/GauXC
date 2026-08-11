@@ -12,7 +12,6 @@
 #pragma once
 
 #include <gauxc/xc_integrator/xc_integrator_impl.hpp>
-#include <iostream>
 
 // Implementations of XCIntegrator public API
 

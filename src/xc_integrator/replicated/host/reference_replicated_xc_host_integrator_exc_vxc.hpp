@@ -672,6 +672,7 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
 
      } else {
       if(is_rks) {
+        lwd->eval_uvvar_lda_rks( npts, nbe, basis_eval, zmat, nbe, den_eval );
       } else if(is_uks) {
         lwd->eval_uvvar_lda_uks( npts, nbe, basis_eval, zmat, nbe, zmat_z, nbe,
           den_eval );
@@ -738,7 +739,6 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
     double NEL_local = 0.0;
     double spin_NEL_local = 0.0;
     double EXC_local  = 0.0;
-    std::cout<< std::fixed << std::setprecision(10);
 
     for( int32_t i = 0; i < npts; ++i ) {
       const auto den = is_rks ? den_eval[i] : (den_eval[2*i] + den_eval[2*i+1]);

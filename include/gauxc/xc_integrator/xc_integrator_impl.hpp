@@ -12,7 +12,6 @@
 #pragma once
 
 #include <gauxc/xc_integrator.hpp>
-#include <iostream>
 #include <numeric>
 
 namespace GauXC  {
