@@ -567,7 +567,8 @@ void AoSScheme1Base::inc_exc( XCDeviceData* _data ){
   const bool is_RKS  = data->allocated_terms.ks_scheme == RKS;
   const bool is_UKS  = data->allocated_terms.ks_scheme == UKS;
   const bool is_GKS  = data->allocated_terms.ks_scheme == GKS;
-  const bool is_pol  = is_UKS or is_GKS;
+  const bool is_DKS  = data->allocated_terms.ks_scheme == DKS;
+  const bool is_pol  = is_UKS or is_GKS or is_DKS;
   
   gdot( data->device_backend_->master_blas_handle(), data->total_npts_task_batch,
     base_stack.eps_eval_device, 1, base_stack.den_s_eval_device, 1, 
@@ -594,7 +595,8 @@ void AoSScheme1Base::inc_nel( XCDeviceData* _data ){
   const bool is_RKS  = data->allocated_terms.ks_scheme == RKS;
   const bool is_UKS  = data->allocated_terms.ks_scheme == UKS;
   const bool is_GKS  = data->allocated_terms.ks_scheme == GKS;
-  const bool is_pol  = is_UKS or is_GKS;
+  const bool is_DKS  = data->allocated_terms.ks_scheme == DKS;
+  const bool is_pol  = is_UKS or is_GKS or is_DKS;
   
   gdot( data->device_backend_->master_blas_handle(), data->total_npts_task_batch,
     base_stack.weights_device, 1, base_stack.den_s_eval_device, 1, 
@@ -1370,7 +1372,8 @@ void AoSScheme1Base::eval_kern_exc_vxc_lda( const functional_type& func,
   const bool is_RKS = data->allocated_terms.ks_scheme == RKS;
   const bool is_UKS = data->allocated_terms.ks_scheme == UKS;
   const bool is_GKS = data->allocated_terms.ks_scheme == GKS;
-  const bool is_pol = is_UKS or is_GKS;
+  const bool is_DKS = data->allocated_terms.ks_scheme == DKS;
+  const bool is_pol = is_UKS or is_GKS or is_DKS;
   const bool is_excgrad = data->allocated_terms.exc_grad;
 
   const size_t npts = data->total_npts_task_batch ;
@@ -1409,7 +1412,8 @@ void AoSScheme1Base::eval_kern_exc_vxc_gga( const functional_type& func,
   const bool is_RKS = data->allocated_terms.ks_scheme == RKS;
   const bool is_UKS = data->allocated_terms.ks_scheme == UKS;
   const bool is_GKS = data->allocated_terms.ks_scheme == GKS;
-  const bool is_pol  = is_UKS or is_GKS;
+  const bool is_DKS = data->allocated_terms.ks_scheme == DKS;
+  const bool is_pol = is_UKS or is_GKS or is_DKS;
   const bool is_excgrad = data->allocated_terms.exc_grad;
 
   const size_t npts = data->total_npts_task_batch ;
@@ -1449,7 +1453,8 @@ void AoSScheme1Base::eval_kern_exc_vxc_mgga( const functional_type& func,
   const bool is_RKS = data->allocated_terms.ks_scheme == RKS;
   const bool is_UKS = data->allocated_terms.ks_scheme == UKS;
   const bool is_GKS = data->allocated_terms.ks_scheme == GKS;
-  const bool is_pol  = is_UKS or is_GKS;
+  const bool is_DKS = data->allocated_terms.ks_scheme == DKS;
+  const bool is_pol = is_UKS or is_GKS or is_DKS;
   const bool is_excgrad = data->allocated_terms.exc_grad;
 
   const size_t npts = data->total_npts_task_batch ;

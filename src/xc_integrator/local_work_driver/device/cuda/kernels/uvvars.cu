@@ -31,6 +31,9 @@ namespace GauXC {
     case GKS: \
       eval_uvars_##xc_approx##_gks_kernel<<< blocks, threads, 0, stream >>>( ntasks, device_tasks ); \
       break; \
+    case GKS: \
+      eval_uvars_##xc_approx##_dks_kernel<<< blocks, threads, 0, stream >>>( ntasks, device_tasks ); \
+      break; \
     default: \
       GAUXC_GENERIC_EXCEPTION( "Unexpected KS scheme when attempting to evaluate U vars" ); \
   } 
@@ -47,6 +50,9 @@ namespace GauXC {
       break; \
     case GKS: \
       GAUXC_GENERIC_EXCEPTION( "GKS + evaluate trial U vars NYI" ); \
+      break; \
+    case DKS: \
+      GAUXC_GENERIC_EXCEPTION( "DKS + evaluate trial U vars NYI" ); \
       break; \
     default: \
       GAUXC_GENERIC_EXCEPTION( "Unexpected KS scheme when attempting to evaluate U vars" ); \

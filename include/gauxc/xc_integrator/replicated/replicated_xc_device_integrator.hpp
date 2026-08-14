@@ -33,56 +33,6 @@ public:
 
   virtual ~ReplicatedXCDeviceIntegrator() noexcept;
 
-protected:
-
-  // DKS is host-only for now. These satisfy the pure virtuals in
-  // ReplicatedXCIntegratorImpl so device builds compile; any attempt to
-  // actually run DKS on device fails loudly rather than silently.
-
-  void eval_exc_( int64_t, int64_t, const value_type*, int64_t,
-                  const value_type*, int64_t,
-                  const value_type*, int64_t,
-                  const value_type*, int64_t,
-                  const value_type*, int64_t,
-                  const value_type*, int64_t,
-                  const value_type*, int64_t,
-                  const value_type*, int64_t,
-                  const value_type*,
-                  const value_type*,
-                  const value_type*,
-                  const value_type*,
-                  value_type*, const IntegratorSettingsXC& ) override {
-    GAUXC_GENERIC_EXCEPTION("Device DKS EXC NYI");
-  }
-
-  void eval_exc_vxc_( int64_t, int64_t, const value_type*, int64_t,
-                      const value_type*, int64_t,
-                      const value_type*, int64_t,
-                      const value_type*, int64_t,
-                      const value_type*, int64_t,
-                      const value_type*, int64_t,
-                      const value_type*, int64_t,
-                      const value_type*, int64_t,
-                      const value_type*,
-                      const value_type*,
-                      const value_type*,
-                      const value_type*,
-                      value_type*, int64_t,
-                      value_type*, int64_t,
-                      value_type*, int64_t,
-                      value_type*, int64_t,
-                      value_type*, int64_t,
-                      value_type*, int64_t,
-                      value_type*, int64_t,
-                      value_type*, int64_t,
-                      value_type*, int64_t,
-                      value_type*, int64_t,
-                      value_type*, int64_t,
-                      value_type*, int64_t,
-                      value_type*, const IntegratorSettingsXC& ) override {
-    GAUXC_GENERIC_EXCEPTION("Device DKS EXC/VXC NYI");
-  }
-
 };
 
 extern template class ReplicatedXCDeviceIntegrator<double>;

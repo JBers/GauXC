@@ -538,6 +538,7 @@ struct required_term_storage {
       const bool is_mgga = is_xc and (need_tau or need_lapl);
       const bool is_grad = tracker.exc_grad;
       const bool is_rks  = tracker.ks_scheme == RKS;
+      const bool is_dks  = tracker.ks_scheme == DKS;
 
       grid_den      = true;
       grid_den_grad = is_gga or is_mgga or is_grad;
@@ -685,9 +686,14 @@ struct XCDeviceData {
 
   // Send persistent data from host to device
   virtual void send_static_data_weights( const Molecule& mol, const MolMeta& meta ) = 0;
-  virtual void send_static_data_density_basis( const double* Ps, int32_t ldps, 
-    const double* Pz, int32_t ldpz, const double* Py, int32_t ldpy, 
-    const double* Px, int32_t ldpx, const BasisSet<double>& basis ) = 0;
+  virtual void send_static_data_density_basis(
+    const double* Ps, int32_t ldps, const double* Pz, int32_t ldpz,
+    const double* Py, int32_t ldpy, const double* Px, int32_t ldpx,
+    const double* Ps_SS, int32_t ldps_ss, const double* Pz_SS, int32_t ldpz_ss,
+    const double* Py_SS, int32_t ldpy_ss, const double* Px_SS, int32_t ldpx_ss,
+    const double* Ps_SS_imag, int32_t ldps_ss_im, const double* Pz_SS_imag, int32_t ldpz_ss_im,
+    const double* Py_SS_imag, int32_t ldpy_ss_im, const double* Px_SS_imag, int32_t ldpx_ss_im,
+    const BasisSet<double>& basis ) = 0;
   virtual void send_static_data_trial_density(
     const double* tPs, int32_t ldtps, const double* tPz, int32_t ldtpz,
     const double* tPy, int32_t ldtpy, const double* tPx, int32_t ldtpx ) = 0;
@@ -740,7 +746,13 @@ struct XCDeviceData {
    */
   virtual void retrieve_exc_vxc_integrands( double* EXC, double* N_EL,
     double* VXCs, int32_t ldvxcs, double* VXCz, int32_t ldvxcz,
-    double* VXCy, int32_t ldvxcy, double* VXCx, int32_t ldvxcx ) = 0;
+    double* VXCy, int32_t ldvxcy, double* VXCx, int32_t ldvxcx,
+
+    double* VXCs_ss, int32_t ldvxcs_ss, double* VXCz_ss, int32_t ldvxcz_ss,
+    double* VXCy_ss, int32_t ldvxcy_ss, double* VXCx_ss, int32_t ldvxcx_ss,
+
+    double* VXCs_ss_im, int32_t ldvxcs_ss_im, double* VXCz_ss_im, int32_t ldvxcz_ss_im,
+    double* VXCy_ss_im, int32_t ldvxcy_ss_im, double* VXCx_ss_im, int32_t ldvxcx_ss_im ) = 0;
 
   virtual void retrieve_fxc_contraction_integrands( double* N_EL,
     double* FXCs, int32_t ldfxcs, double* FXCz, int32_t ldfxcz,
@@ -772,6 +784,17 @@ struct XCDeviceData {
   virtual double* vxc_s_device_data() = 0;
   virtual double* vxc_y_device_data() = 0;
   virtual double* vxc_x_device_data() = 0;
+
+  virtual double* vxc_z_ss_device_data() = 0;
+  virtual double* vxc_s_ss_device_data() = 0;
+  virtual double* vxc_y_ss_device_data() = 0;
+  virtual double* vxc_x_ss_device_data() = 0;
+
+  virtual double* vxc_z_ss_im_device_data() = 0;
+  virtual double* vxc_s_ss_im_device_data() = 0;
+  virtual double* vxc_y_ss_im_device_data() = 0;
+  virtual double* vxc_x_ss_im_device_data() = 0;
+
   virtual double* exc_device_data() = 0;
   virtual double* nel_device_data() = 0;
   virtual double* exx_k_device_data() = 0;
