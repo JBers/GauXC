@@ -561,13 +561,14 @@ void AoSScheme1Base::inc_exc( XCDeviceData* _data ){
   if( !data ) GAUXC_BAD_LWD_DATA_CAST();
 
   if( not data->device_backend_ ) GAUXC_UNINITIALIZED_DEVICE_BACKEND();
-
+  std::cout<<"inc_exc"<<std::endl;
   auto base_stack    = data->base_stack;
   auto static_stack  = data->static_stack;
   const bool is_RKS  = data->allocated_terms.ks_scheme == RKS;
   const bool is_UKS  = data->allocated_terms.ks_scheme == UKS;
   const bool is_GKS  = data->allocated_terms.ks_scheme == GKS;
-  const bool is_pol  = is_UKS or is_GKS;
+  const bool is_DKS  = data->allocated_terms.ks_scheme == DKS;
+  const bool is_pol  = is_UKS or is_GKS or is_DKS;
   
   gdot( data->device_backend_->master_blas_handle(), data->total_npts_task_batch,
     base_stack.eps_eval_device, 1, base_stack.den_s_eval_device, 1, 
@@ -594,7 +595,8 @@ void AoSScheme1Base::inc_nel( XCDeviceData* _data ){
   const bool is_RKS  = data->allocated_terms.ks_scheme == RKS;
   const bool is_UKS  = data->allocated_terms.ks_scheme == UKS;
   const bool is_GKS  = data->allocated_terms.ks_scheme == GKS;
-  const bool is_pol  = is_UKS or is_GKS;
+  const bool is_DKS  = data->allocated_terms.ks_scheme == DKS;
+  const bool is_pol  = is_UKS or is_GKS or is_DKS;
   
   gdot( data->device_backend_->master_blas_handle(), data->total_npts_task_batch,
     base_stack.weights_device, 1, base_stack.den_s_eval_device, 1, 
@@ -683,12 +685,12 @@ void AoSScheme1Base::eval_uvars_mgga( XCDeviceData* _data, integrator_ks_scheme 
   data->device_backend_->check_error("uvvar mgga" __FILE__ ": " + std::to_string(__LINE__));
 }
 
-void AoSScheme1Base::eval_vvars_lda( XCDeviceData* _data, density_id den_select){
+void AoSScheme1Base::eval_vvars_lda( XCDeviceData* _data, integrator_ks_scheme ks_scheme, density_id den_select){
   auto* data = dynamic_cast<Data*>(_data);
   if ( !data ) GAUXC_BAD_LWD_DATA_CAST();
 
   if( not data->device_backend_ ) GAUXC_UNINITIALIZED_DEVICE_BACKEND();
-
+  std::cout<<"eval_vvars_lda begin"<<std::endl;
   auto& tasks = data->host_device_tasks;
   const auto ntasks = tasks.size();
   size_t nbe_max = 0, npts_max = 0;
@@ -703,30 +705,36 @@ void AoSScheme1Base::eval_vvars_lda( XCDeviceData* _data, density_id den_select)
   switch ( den_select ) {
     case DEN_S:
       den_eval_ptr = base_stack.den_s_eval_device;
+      std::cout<<"eval_vvars_lda case DEN_S"<<std::endl;
       break;
     case DEN_Z:
+      std::cout<<"eval_vvars_lda case DEN_Z"<<std::endl;
       den_eval_ptr = base_stack.den_z_eval_device;
       break;
     case DEN_Y:
+      std::cout<<"eval_vvars_lda case DEN_Y"<<std::endl;
       den_eval_ptr = base_stack.den_y_eval_device;
       break;
     case DEN_X:
+      std::cout<<"eval_vvars_lda case DEN_X"<<std::endl;
       den_eval_ptr = base_stack.den_x_eval_device;
       break;
     default:
       GAUXC_GENERIC_EXCEPTION( "eval_vvars_lda called with invalid density selected!" );
   }
 
+      std::cout<<"set_zero_async_master_queue berfore"<<std::endl;
   data->device_backend_->set_zero_async_master_queue( data->total_npts_task_batch, den_eval_ptr, "Den Zero" );
+      std::cout<<"set_zero_async_master_queue after"<<std::endl;
 
   // Evaluate V variable
   auto aos_stack     = data->aos_stack;
-  GauXC::eval_vvars_lda( ntasks, nbe_max, npts_max, den_select,
+  GauXC::eval_vvars_lda( ntasks, nbe_max, npts_max, den_select, ks_scheme, 
     aos_stack.device_tasks, data->device_backend_->queue() );
 
 }
 
-void AoSScheme1Base::eval_vvars_gga( XCDeviceData* _data, density_id den_select){
+void AoSScheme1Base::eval_vvars_gga( XCDeviceData* _data, integrator_ks_scheme ks_scheme, density_id den_select){
   auto* data = dynamic_cast<Data*>(_data);
   if ( !data ) GAUXC_BAD_LWD_DATA_CAST();
 
@@ -782,12 +790,12 @@ void AoSScheme1Base::eval_vvars_gga( XCDeviceData* _data, density_id den_select)
   
   // Evaluate V variable
   auto aos_stack = data->aos_stack;
-  GauXC::eval_vvars_gga( ntasks, nbe_max, npts_max, den_select,
+  GauXC::eval_vvars_gga( ntasks, nbe_max, npts_max, den_select, ks_scheme, 
     aos_stack.device_tasks, data->device_backend_->queue() );
 
 }
 
-void AoSScheme1Base::eval_vvars_mgga( XCDeviceData* _data, density_id den_select, bool need_lapl){
+void AoSScheme1Base::eval_vvars_mgga( XCDeviceData* _data, integrator_ks_scheme ks_scheme, density_id den_select, bool need_lapl){
   auto* data = dynamic_cast<Data*>(_data);
   if ( !data ) GAUXC_BAD_LWD_DATA_CAST();
 
@@ -853,7 +861,7 @@ void AoSScheme1Base::eval_vvars_mgga( XCDeviceData* _data, density_id den_select
   
   // Evaluate V variable
   auto aos_stack = data->aos_stack;
-  GauXC::eval_vvars_mgga( ntasks, nbe_max, npts_max, den_select, need_lapl,
+  GauXC::eval_vvars_mgga( ntasks, nbe_max, npts_max, den_select, ks_scheme, need_lapl, 
     aos_stack.device_tasks, data->device_backend_->queue() );
 
 }
@@ -932,7 +940,7 @@ void AoSScheme1Base::eval_tmat_mgga( XCDeviceData* _data, integrator_ks_scheme s
   data->device_backend_->check_error("uvvar mgga trial" __FILE__ ": " + std::to_string(__LINE__));
 }
 
-void AoSScheme1Base::eval_vvars_lda_trial( XCDeviceData* _data, density_id den_select){
+void AoSScheme1Base::eval_vvars_lda_trial( XCDeviceData* _data, integrator_ks_scheme ks_scheme, density_id den_select){
   auto* data = dynamic_cast<Data*>(_data);
   if ( !data ) GAUXC_BAD_LWD_DATA_CAST();
 
@@ -970,12 +978,12 @@ void AoSScheme1Base::eval_vvars_lda_trial( XCDeviceData* _data, density_id den_s
 
   // Evaluate V variable
   auto aos_stack     = data->aos_stack;
-  GauXC::eval_vvars_lda_trial( ntasks, nbe_max, npts_max, den_select,
+  GauXC::eval_vvars_lda_trial( ntasks, nbe_max, npts_max, den_select, ks_scheme, 
     aos_stack.device_tasks, data->device_backend_->queue() );
 
 }
 
-void AoSScheme1Base::eval_vvars_gga_trial( XCDeviceData* _data, density_id den_select){
+void AoSScheme1Base::eval_vvars_gga_trial( XCDeviceData* _data, integrator_ks_scheme ks_scheme, density_id den_select){
   auto* data = dynamic_cast<Data*>(_data);
   if ( !data ) GAUXC_BAD_LWD_DATA_CAST();
 
@@ -1031,12 +1039,12 @@ void AoSScheme1Base::eval_vvars_gga_trial( XCDeviceData* _data, density_id den_s
   
   // Evaluate V variable
   auto aos_stack = data->aos_stack;
-  GauXC::eval_vvars_gga_trial( ntasks, nbe_max, npts_max, den_select,
+  GauXC::eval_vvars_gga_trial( ntasks, nbe_max, npts_max, den_select, ks_scheme, 
     aos_stack.device_tasks, data->device_backend_->queue() );
 
 }
 
-void AoSScheme1Base::eval_vvars_mgga_trial( XCDeviceData* _data, density_id den_select, bool need_lapl){
+void AoSScheme1Base::eval_vvars_mgga_trial( XCDeviceData* _data, integrator_ks_scheme ks_scheme, density_id den_select, bool need_lapl){
   auto* data = dynamic_cast<Data*>(_data);
   if ( !data ) GAUXC_BAD_LWD_DATA_CAST();
 
@@ -1102,7 +1110,7 @@ void AoSScheme1Base::eval_vvars_mgga_trial( XCDeviceData* _data, density_id den_
   
   // Evaluate V variable
   auto aos_stack = data->aos_stack;
-  GauXC::eval_vvars_mgga_trial( ntasks, nbe_max, npts_max, den_select, need_lapl,
+  GauXC::eval_vvars_mgga_trial( ntasks, nbe_max, npts_max, den_select, ks_scheme, need_lapl,
     aos_stack.device_tasks, data->device_backend_->queue() );
 
 }
@@ -1357,7 +1365,7 @@ void scale_mgga_output(size_t npts, T& base_stack, DeviceBackend* backend, bool 
 
 void AoSScheme1Base::eval_kern_exc_vxc_lda( const functional_type& func, 
   XCDeviceData* _data ) {
-
+    std::cout<<"eval_kern_exc_vxc_lda"<<std::endl;
   auto* data = dynamic_cast<Data*>(_data);
   if( !data ) GAUXC_BAD_LWD_DATA_CAST();
 
@@ -1370,24 +1378,29 @@ void AoSScheme1Base::eval_kern_exc_vxc_lda( const functional_type& func,
   const bool is_RKS = data->allocated_terms.ks_scheme == RKS;
   const bool is_UKS = data->allocated_terms.ks_scheme == UKS;
   const bool is_GKS = data->allocated_terms.ks_scheme == GKS;
-  const bool is_pol = is_UKS or is_GKS;
+  const bool is_DKS = data->allocated_terms.ks_scheme == DKS;
+  const bool is_pol = is_UKS or is_GKS or is_DKS;
   const bool is_excgrad = data->allocated_terms.exc_grad;
 
   const size_t npts = data->total_npts_task_batch ;
   
   auto* den_eval_ptr = base_stack.den_s_eval_device;
-
+    std::cout<<"eval_kern_exc_vxc_lda 1"<<std::endl;
   if ( is_pol ) {
     den_eval_ptr = base_stack.den_interleaved_device;
     interleave_lda_input(npts, base_stack, data->device_backend_);
   }
+  std::cout<<"eval_kern_exc_vxc_lda 2"<<std::endl;
 
   GauXC::eval_kern_exc_vxc_lda( func, npts,
     den_eval_ptr, base_stack.eps_eval_device, 
     base_stack.vrho_eval_device, data->device_backend_->queue() );
 
+  std::cout<<"eval_kern_exc_vxc_lda 3"<<std::endl;
+
   if(is_pol) deinterleave_lda_output(npts, base_stack, data->device_backend_);
   scale_lda_output(npts, base_stack, data->device_backend_, is_pol);
+  std::cout<<"eval_kern_exc_vxc_lda 4"<<std::endl;
   
   data->device_backend_->check_error("exc_vxc lda" __FILE__ ": " + std::to_string(__LINE__));
 }
@@ -1409,7 +1422,8 @@ void AoSScheme1Base::eval_kern_exc_vxc_gga( const functional_type& func,
   const bool is_RKS = data->allocated_terms.ks_scheme == RKS;
   const bool is_UKS = data->allocated_terms.ks_scheme == UKS;
   const bool is_GKS = data->allocated_terms.ks_scheme == GKS;
-  const bool is_pol  = is_UKS or is_GKS;
+  const bool is_DKS = data->allocated_terms.ks_scheme == DKS;
+  const bool is_pol = is_UKS or is_GKS or is_DKS;
   const bool is_excgrad = data->allocated_terms.exc_grad;
 
   const size_t npts = data->total_npts_task_batch ;
@@ -1449,7 +1463,8 @@ void AoSScheme1Base::eval_kern_exc_vxc_mgga( const functional_type& func,
   const bool is_RKS = data->allocated_terms.ks_scheme == RKS;
   const bool is_UKS = data->allocated_terms.ks_scheme == UKS;
   const bool is_GKS = data->allocated_terms.ks_scheme == GKS;
-  const bool is_pol  = is_UKS or is_GKS;
+  const bool is_DKS = data->allocated_terms.ks_scheme == DKS;
+  const bool is_pol = is_UKS or is_GKS or is_DKS;
   const bool is_excgrad = data->allocated_terms.exc_grad;
 
   const size_t npts = data->total_npts_task_batch ;
@@ -1663,6 +1678,178 @@ void AoSScheme1Base::eval_xmat_impl( double fac, XCDeviceData* _data, bool do_gr
 
 }
 
+template<bool is_trial>
+void AoSScheme1Base::eval_xmat_dks_impl( double fac, XCDeviceData* _data, bool do_grad, density_id den_select ){
+
+  auto* data = dynamic_cast<Data*>(_data);
+  if( !data ) GAUXC_BAD_LWD_DATA_CAST();
+
+  if( not data->device_backend_ ) GAUXC_UNINITIALIZED_DEVICE_BACKEND();
+
+  auto tasks = data->host_device_tasks;
+  const auto ntasks = tasks.size();
+  std::cout<<"eval_xmat_dks_impl"<<std::endl;
+  // Set correct density matrix pointer on the stack
+  const auto nbf = data->global_dims.nbf;
+  const auto submat_block_size = data->get_submat_chunk_size( nbf, 0 );
+  auto static_stack  = data->static_stack;
+  auto aos_stack     = data->aos_stack;
+  double * dmat_ptr; 
+  double * dmat_ptr_SS_dot; 
+  double * dmat_ptr_SS_k; 
+  double * dmat_ptr_SS_j;
+  double * dmat_ptr_SS_i;
+  // double xx, yy ,zz, m;
+  if constexpr (is_trial) {
+    dmat_ptr = static_stack.tden_selector(den_select);
+    // now screened trial density matrix is stored in aos_stack.device_tasks[itask].nbe_scr
+  } else {
+    dmat_ptr = static_stack.den_selector(den_select);
+      std::cout<<"LL den dmat_ptr"<<std::endl;
+  }
+  if (den_select == DEN_S) {
+      dmat_ptr_SS_dot = static_stack.den_selector(DEN_S_SS);
+      dmat_ptr_SS_k   = static_stack.den_selector(DEN_Z_SS_IM);
+      dmat_ptr_SS_j   = static_stack.den_selector(DEN_Y_SS_IM);
+      dmat_ptr_SS_i   = static_stack.den_selector(DEN_X_SS_IM);
+    std::cout<<"den_select == DEN_S"<<std::endl;
+  }
+  if (den_select == DEN_Z) {
+      dmat_ptr_SS_dot = static_stack.den_selector(DEN_Z_SS);
+      dmat_ptr_SS_k   = static_stack.den_selector(DEN_S_SS_IM);
+      dmat_ptr_SS_j   = static_stack.den_selector(DEN_X_SS);
+      dmat_ptr_SS_i   = static_stack.den_selector(DEN_Y_SS);
+    std::cout<<"den_select == DEN_Z"<<std::endl;
+  }
+  if (den_select == DEN_Y) {
+      dmat_ptr_SS_dot = static_stack.den_selector(DEN_Y_SS);
+      dmat_ptr_SS_k   = static_stack.den_selector(DEN_X_SS);
+      dmat_ptr_SS_j   = static_stack.den_selector(DEN_S_SS_IM);
+      dmat_ptr_SS_i   = static_stack.den_selector(DEN_Z_SS);
+    std::cout<<"den_select == DEN_Y"<<std::endl;
+  }
+  if (den_select == DEN_X) {
+      dmat_ptr_SS_dot = static_stack.den_selector(DEN_X_SS);
+      dmat_ptr_SS_k   = static_stack.den_selector(DEN_Y_SS);
+      dmat_ptr_SS_j   = static_stack.den_selector(DEN_Z_SS);
+      dmat_ptr_SS_i   = static_stack.den_selector(DEN_S_SS_IM);
+    std::cout<<"den_select == DEN_X"<<std::endl;
+
+  }
+  // Pack density matrix 
+  sym_pack_submat( ntasks, aos_stack.device_tasks, dmat_ptr, 
+    nbf, submat_block_size, data->device_backend_->queue() );
+
+  // Sync blas streams with master stream
+  data->device_backend_->sync_blas_pool_with_master();
+
+  auto do_gemm = [&]( auto& handle, size_t npts, size_t nbe, auto* bf_ptr, auto* den_ptr, int ldden, auto* x_ptr ) {
+    gemm( handle, DeviceBlasOp::NoTrans, DeviceBlasOp::Trans, npts, nbe, nbe, fac, bf_ptr, npts,
+      den_ptr, ldden, 0., x_ptr, npts ); 
+  };
+
+  // Launch GEMM in round-robin
+  const auto n_blas_streams = data->device_backend_->blas_pool_size();
+  
+  std::cout<<"eval_xmat_dks_impl before do_gemm"<<std::endl;
+   
+  //size_t nsingle = 0;
+  for( size_t iT = 0; iT < ntasks; ++iT ) {
+    auto& task = tasks[iT];
+      auto den_ptr_LL = task.bfn_screening.ncut > 1 ? task.nbe_scr : dmat_ptr + task.bfn_screening.ibf_begin*(nbf+1);
+
+      int  ldden   = task.bfn_screening.ncut > 1 ? task.bfn_screening.nbe : nbf;
+      auto handle = data->device_backend_->blas_pool_handle( iT % n_blas_streams );
+      std::cout<<"eval_xmat_dks_impl do_gemm 0"<<std::endl;
+      do_gemm( handle, task.npts, task.bfn_screening.nbe, task.bf, den_ptr_LL, ldden, task.zmat );
+        std::cout<<"eval_xmat_dks_impl do_gemm 1"<<std::endl;
+  }
+  data->device_backend_->sync_master_with_blas_pool();
+
+  sym_pack_submat( ntasks, aos_stack.device_tasks, dmat_ptr_SS_dot, 
+    nbf, submat_block_size, data->device_backend_->queue() );
+    data->device_backend_->sync_blas_pool_with_master();
+
+  for( size_t iT = 0; iT < ntasks; ++iT ) {
+    auto& task = tasks[iT];
+      auto den_ptr_SS_dot = task.bfn_screening.ncut > 1 ? task.nbe_scr : dmat_ptr_SS_dot + task.bfn_screening.ibf_begin*(nbf+1);
+
+      int  ldden   = task.bfn_screening.ncut > 1 ? task.bfn_screening.nbe : nbf;
+      auto handle = data->device_backend_->blas_pool_handle( iT % n_blas_streams );
+        std::cout<<"eval_xmat_dks_impl do_gemm 1"<<std::endl;
+      do_gemm( handle, task.npts, task.bfn_screening.nbe, task.dbfx, den_ptr_SS_dot, ldden, task.xmat_x );
+        std::cout<<"eval_xmat_dks_impl do_gemm 2"<<std::endl;
+      do_gemm( handle, task.npts, task.bfn_screening.nbe, task.dbfy, den_ptr_SS_dot, ldden, task.xmat_y );
+        std::cout<<"eval_xmat_dks_impl do_gemm 3"<<std::endl;
+      do_gemm( handle, task.npts, task.bfn_screening.nbe, task.dbfz, den_ptr_SS_dot, ldden, task.xmat_z );
+        std::cout<<"eval_xmat_dks_impl do_gemm 4"<<std::endl;
+  }
+  data->device_backend_->sync_master_with_blas_pool();
+
+  sym_pack_submat( ntasks, aos_stack.device_tasks, dmat_ptr_SS_k,
+    nbf, submat_block_size, data->device_backend_->queue() );
+    data->device_backend_->sync_blas_pool_with_master();
+
+    //size_t nsingle = 0;
+  for( size_t iT = 0; iT < ntasks; ++iT ) {
+    auto& task = tasks[iT];
+      auto den_ptr_SS_cross_anti_k = task.bfn_screening.ncut > 1 ? task.nbe_scr : dmat_ptr_SS_k + task.bfn_screening.ibf_begin*(nbf+1);
+
+      int  ldden   = task.bfn_screening.ncut > 1 ? task.bfn_screening.nbe : nbf;
+      auto handle = data->device_backend_->blas_pool_handle( iT % n_blas_streams );
+
+      do_gemm( handle, task.npts, task.bfn_screening.nbe, task.dbfx, den_ptr_SS_cross_anti_k, ldden, task.xmat_k_ij );
+        std::cout<<"eval_xmat_dks_impl do_gemm 5"<<std::endl;
+      do_gemm( handle, task.npts, task.bfn_screening.nbe, task.dbfy, den_ptr_SS_cross_anti_k, ldden, task.xmat_k_ji );
+        std::cout<<"eval_xmat_dks_impl do_gemm 6"<<std::endl;
+  }
+  data->device_backend_->sync_master_with_blas_pool();
+
+
+  sym_pack_submat( ntasks, aos_stack.device_tasks, dmat_ptr_SS_j, 
+    nbf, submat_block_size, data->device_backend_->queue() );
+  data->device_backend_->sync_blas_pool_with_master();
+
+    //size_t nsingle = 0;
+  for( size_t iT = 0; iT < ntasks; ++iT ) {
+    auto& task = tasks[iT];
+      auto den_ptr_SS_cross_anti_j = task.bfn_screening.ncut > 1 ? task.nbe_scr : dmat_ptr_SS_j + task.bfn_screening.ibf_begin*(nbf+1);
+
+      int  ldden   = task.bfn_screening.ncut > 1 ? task.bfn_screening.nbe : nbf;
+      auto handle = data->device_backend_->blas_pool_handle( iT % n_blas_streams );
+
+      do_gemm( handle, task.npts, task.bfn_screening.nbe, task.dbfz, den_ptr_SS_cross_anti_j, ldden, task.xmat_j_ik );
+        std::cout<<"eval_xmat_dks_impl do_gemm 7"<<std::endl;
+      do_gemm( handle, task.npts, task.bfn_screening.nbe, task.dbfx, den_ptr_SS_cross_anti_j, ldden, task.xmat_j_ki );
+        std::cout<<"eval_xmat_dks_impl do_gemm 8"<<std::endl;
+  }
+  data->device_backend_->sync_master_with_blas_pool();
+
+  sym_pack_submat( ntasks, aos_stack.device_tasks, dmat_ptr_SS_i, 
+    nbf, submat_block_size, data->device_backend_->queue() );
+  data->device_backend_->sync_blas_pool_with_master();
+
+    //size_t nsingle = 0;
+  for( size_t iT = 0; iT < ntasks; ++iT ) {
+    auto& task = tasks[iT];
+      auto den_ptr_SS_cross_anti_i = task.bfn_screening.ncut > 1 ? task.nbe_scr : dmat_ptr_SS_i + task.bfn_screening.ibf_begin*(nbf+1);
+
+      int  ldden   = task.bfn_screening.ncut > 1 ? task.bfn_screening.nbe : nbf;
+      auto handle = data->device_backend_->blas_pool_handle( iT % n_blas_streams );
+
+      do_gemm( handle, task.npts, task.bfn_screening.nbe, task.dbfy, den_ptr_SS_cross_anti_i, ldden, task.xmat_i_jk );
+        std::cout<<"eval_xmat_dks_impl do_gemm 9"<<std::endl;
+      do_gemm( handle, task.npts, task.bfn_screening.nbe, task.dbfz, den_ptr_SS_cross_anti_i, ldden, task.xmat_i_kj );
+        std::cout<<"eval_xmat_dks_impl do_gemm 10"<<std::endl;
+  }
+
+  std::cout<<"eval_xmat_dks_impl after do_gemm"<<std::endl;
+  
+  data->device_backend_->check_error("xmat impl" __FILE__ ": " + std::to_string(__LINE__));
+  // Record completion of BLAS ops on master stream
+  data->device_backend_->sync_master_with_blas_pool();
+
+}
 
 void AoSScheme1Base::eval_xmat( double fac, XCDeviceData* _data, bool do_grad, density_id den_select ){
   eval_xmat_impl<false>(fac, _data, do_grad, den_select);
@@ -1670,7 +1857,9 @@ void AoSScheme1Base::eval_xmat( double fac, XCDeviceData* _data, bool do_grad, d
 void AoSScheme1Base::eval_xmat_trial( double fac, XCDeviceData* _data, bool do_grad, density_id den_select ){
   eval_xmat_impl<true>(fac, _data, do_grad, den_select);
 }
-
+void AoSScheme1Base::eval_xmat_dks( double fac, XCDeviceData* _data, bool do_grad, density_id den_select ){
+  eval_xmat_dks_impl<false>(fac, _data, do_grad, den_select);
+}
 void AoSScheme1Base::save_xmat( XCDeviceData* _data, bool do_grad, density_id den_select ){
 
   auto* data = dynamic_cast<Data*>(_data);
@@ -1777,8 +1966,130 @@ void AoSScheme1Base::inc_fxc( XCDeviceData* _data, density_id den_selector, bool
 
 
 
+template<bool is_fxc>
+void AoSScheme1Base::inc_potential_dks_impl( XCDeviceData* _data, density_id den_selector, bool do_m ){
 
+  auto* data = dynamic_cast<Data*>(_data);
+  if( !data ) GAUXC_BAD_LWD_DATA_CAST();
 
+  if( not data->device_backend_ ) GAUXC_UNINITIALIZED_DEVICE_BACKEND();
+
+  auto& tasks = data->host_device_tasks;
+  const auto ntasks = tasks.size();
+  double SpeedOfLight  = 137.03599917700001;
+  double RKB_factor = 1./(4.*SpeedOfLight*SpeedOfLight);
+  std::cout<<"inc_potential_dks_impl"<<std::endl;
+  // Sync blas streams with master stream
+  data->device_backend_->sync_blas_pool_with_master();
+
+  double xx, yy ,zz, mkxy, mkyx, mjxz, mjzx, mizy, miyz;
+  switch ( den_selector ) {
+    case DEN_S_SS:
+        xx = 1.;
+        yy = 1.;
+        zz = 1.;
+        mkxy=0.;
+        mkyx=0.;
+        mjxz=0.;
+        mjzx=0.;
+        mizy=0.;
+        miyz=0.;
+      break;
+    case DEN_Z_SS:
+        xx = -1.;
+        yy = -1.;
+        zz = 1.;
+        mkxy=0.;
+        mkyx=0.;
+        mjxz=1.;
+        mjzx=1.;
+        mizy=1.;
+        miyz=1.;
+      break;
+    case DEN_Y_SS:
+        xx = -1.;
+        yy = 1.;
+        zz = -1.;
+        mkyx=1.;
+        mkxy=1.;
+        mjxz=0.;
+        mjzx=0.;
+        mizy=1.;
+        miyz=1.;
+      break;
+    case DEN_X_SS:
+        xx = 1.;
+        yy = -1.;
+        zz = -1.;
+        mkyx=1.;
+        mkxy=1.;
+        mjxz=1.;
+        mjzx=1.;
+        mizy=0.;
+        miyz=0.; 
+      break;
+    default:
+      GAUXC_GENERIC_EXCEPTION( "inc_potential_dks_impl: invalid density selected" );
+  }
+  auto do_syr2k = [&]( auto& handle, size_t npts, size_t nbe, auto* bf_ptr, auto* zptr, double fac, auto* v_ptr, double SS_fac ) {
+    syr2k( handle, DeviceBlasUplo::Lower, DeviceBlasOp::Trans, nbe, npts, SS_fac, bf_ptr, npts,
+      zptr, npts, fac, v_ptr, nbe ); 
+  };
+
+  // Launch SYR2K in round robin
+  const auto n_blas_streams = data->device_backend_->blas_pool_size();
+  for( size_t iT = 0; iT < ntasks; ++iT ) {
+    auto& task = tasks[iT];
+    auto handle = data->device_backend_->blas_pool_handle( iT % n_blas_streams );
+    do_syr2k(handle, task.npts, task.bfn_screening.nbe, task.dbfx, task.xmat_x, 0.0, task.nbe_scr, xx * RKB_factor);
+    do_syr2k(handle, task.npts, task.bfn_screening.nbe, task.dbfy, task.xmat_y, 1.0, task.nbe_scr, yy * RKB_factor);
+    do_syr2k(handle, task.npts, task.bfn_screening.nbe, task.dbfz, task.xmat_z, 1.0, task.nbe_scr, zz * RKB_factor);
+    if (mkxy != 0.){
+    do_syr2k(handle, task.npts, task.bfn_screening.nbe, task.dbfy, task.xmat_k_ij, 1.0, task.nbe_scr, mkxy * RKB_factor);
+    do_syr2k(handle, task.npts, task.bfn_screening.nbe, task.dbfx, task.xmat_k_ji, 1.0, task.nbe_scr, mkyx * RKB_factor);
+    }
+    if (mjxz != 0.){
+    do_syr2k(handle, task.npts, task.bfn_screening.nbe, task.dbfx, task.xmat_j_ik, 1.0, task.nbe_scr, mjxz * RKB_factor);
+    do_syr2k(handle, task.npts, task.bfn_screening.nbe, task.dbfz, task.xmat_j_ki, 1.0, task.nbe_scr, mjzx * RKB_factor);
+    }
+    if (mizy != 0.){
+    do_syr2k(handle, task.npts, task.bfn_screening.nbe, task.dbfz, task.xmat_i_jk, 1.0, task.nbe_scr, mizy * RKB_factor);
+    do_syr2k(handle, task.npts, task.bfn_screening.nbe, task.dbfy, task.xmat_i_kj, 1.0, task.nbe_scr, miyz * RKB_factor);
+    }
+  }
+
+  // Record completion of BLAS ops on master stream
+  data->device_backend_->sync_master_with_blas_pool();
+
+  // Increment global VXC
+  const auto nbf = data->global_dims.nbf;
+  const auto submat_block_size = data->get_submat_chunk_size( nbf, 0 );
+  auto static_stack  = data->static_stack;
+  auto aos_stack     = data->aos_stack;
+  
+  double* potential_ptr;
+  if constexpr (is_fxc) {
+    potential_ptr = static_stack.fxc_selector(den_selector);
+    // cutlass_stack.vmat_array_device points to aos_stack.device_tasks[itask].nbe_scr
+  } else {
+    potential_ptr = static_stack.vxc_selector(den_selector);
+  }
+
+  auto vxc_ptr = static_stack.vxc_selector(den_selector);
+  sym_task_inc_potential( ntasks, aos_stack.device_tasks,
+    potential_ptr, nbf, submat_block_size,
+    data->device_backend_->queue() );
+  
+  data->device_backend_->check_error("inc_potential_ptr" __FILE__ ": " + std::to_string(__LINE__));
+}
+
+void AoSScheme1Base::inc_vxc_dks( XCDeviceData* _data, density_id den_selector, bool do_m ){
+  inc_potential_dks_impl<false>(_data, den_selector, do_m);
+}
+
+void AoSScheme1Base::inc_fxc_dks( XCDeviceData* _data, density_id den_selector, bool do_m ){
+  inc_potential_dks_impl<true>(_data, den_selector, do_m);
+}
 
 
 
@@ -1790,7 +2101,7 @@ void AoSScheme1Base::symmetrize_vxc( XCDeviceData* _data, density_id den_selecto
   if( !data ) GAUXC_BAD_LWD_DATA_CAST();
 
   if( not data->device_backend_ ) GAUXC_UNINITIALIZED_DEVICE_BACKEND();
-
+  std::cout<<"symmetrize_vxc"<<std::endl;
   const auto nbf = data->global_dims.nbf;
   auto static_stack  = data->static_stack;
   switch ( den_selector ) {
@@ -1808,6 +2119,22 @@ void AoSScheme1Base::symmetrize_vxc( XCDeviceData* _data, density_id den_selecto
       break;
     case DEN_X:
       symmetrize_matrix( nbf, static_stack.vxc_x_device, nbf, 
+            data->device_backend_->queue() ); 
+      break;
+    case DEN_S_SS:
+      symmetrize_matrix( nbf, static_stack.vxc_s_ss_device, nbf, 
+            data->device_backend_->queue() ); 
+      break;
+    case DEN_Z_SS:
+      symmetrize_matrix( nbf, static_stack.vxc_z_ss_device, nbf, 
+            data->device_backend_->queue() ); 
+      break;
+    case DEN_Y_SS:
+      symmetrize_matrix( nbf, static_stack.vxc_y_ss_device, nbf, 
+            data->device_backend_->queue() ); 
+      break;
+    case DEN_X_SS:
+      symmetrize_matrix( nbf, static_stack.vxc_x_ss_device, nbf, 
             data->device_backend_->queue() ); 
       break;
     default:

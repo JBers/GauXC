@@ -73,10 +73,31 @@ struct XCDeviceStackData : public XCDeviceData {
     double* dmat_z_device   = nullptr;  /// Ditto for Z,Y,X densities
     double* dmat_y_device   = nullptr;
     double* dmat_x_device   = nullptr;
+
+    double* dmat_s_ss_device   = nullptr;  ///< Static density matrix storage (nbf,nbf)
+    double* dmat_z_ss_device   = nullptr;  /// SS Block for DKS (Real part)
+    double* dmat_y_ss_device   = nullptr;  /// Ditto for Z,Y,X densities
+    double* dmat_x_ss_device   = nullptr;
+
+    double* dmat_s_ss_im_device   = nullptr;  ///< Static density matrix storage (nbf,nbf)
+    double* dmat_z_ss_im_device   = nullptr;  /// SS Block for DKS (Imaginary part)
+    double* dmat_y_ss_im_device   = nullptr;  /// Ditto for Z,Y,X densities
+    double* dmat_x_ss_im_device   = nullptr;
+
     double* vxc_s_device    = nullptr;  ///< VXC storage (nbf, nbf)
     double* vxc_z_device    = nullptr;  /// Ditto for Z,Y,X densities
     double* vxc_y_device    = nullptr;
     double* vxc_x_device    = nullptr;
+
+    double* vxc_s_ss_device    = nullptr;  ///< VXC SS storage (nbf, nbf)
+    double* vxc_z_ss_device    = nullptr;  /// Ditto for Z,Y,X densities
+    double* vxc_y_ss_device    = nullptr;
+    double* vxc_x_ss_device    = nullptr;
+
+    double* vxc_s_ss_im_device    = nullptr;  ///< VXC SS imag storage (nbf, nbf) (not in paper)
+    double* vxc_z_ss_im_device    = nullptr;  /// Ditto for Z,Y,X densities
+    double* vxc_y_ss_im_device    = nullptr;
+    double* vxc_x_ss_im_device    = nullptr;
     
     // Second derivatives
     double* tdmat_s_device  = nullptr;  ///< Static trial density matrix storage (nbf,nbf)
@@ -96,6 +117,14 @@ struct XCDeviceStackData : public XCDeviceData {
         case DEN_Z: return dmat_z_device;
         case DEN_Y: return dmat_y_device;
         case DEN_X: return dmat_x_device;
+        case DEN_S_SS: return dmat_s_ss_device;
+        case DEN_Z_SS: return dmat_z_ss_device;
+        case DEN_Y_SS: return dmat_y_ss_device;
+        case DEN_X_SS: return dmat_x_ss_device;
+        case DEN_S_SS_IM: return dmat_s_ss_im_device;
+        case DEN_Z_SS_IM: return dmat_z_ss_im_device;
+        case DEN_Y_SS_IM: return dmat_y_ss_im_device;
+        case DEN_X_SS_IM: return dmat_x_ss_im_device;
         default: GAUXC_GENERIC_EXCEPTION("den_selector: density_id not recognized");
       } 
       return nullptr;
@@ -107,6 +136,14 @@ struct XCDeviceStackData : public XCDeviceData {
         case DEN_Z: return vxc_z_device;
         case DEN_Y: return vxc_y_device;
         case DEN_X: return vxc_x_device;
+        case DEN_S_SS: return vxc_s_ss_device;
+        case DEN_Z_SS: return vxc_z_ss_device;
+        case DEN_Y_SS: return vxc_y_ss_device;
+        case DEN_X_SS: return vxc_x_ss_device;
+        case DEN_S_SS_IM: return vxc_s_ss_im_device;
+        case DEN_Z_SS_IM: return vxc_z_ss_im_device;
+        case DEN_Y_SS_IM: return vxc_y_ss_im_device;
+        case DEN_X_SS_IM: return vxc_x_ss_im_device;
         default: GAUXC_GENERIC_EXCEPTION("vxc_selector: density_id not recognized");
       } 
       return nullptr;
@@ -331,7 +368,11 @@ struct XCDeviceStackData : public XCDeviceData {
   void allocate_static_data_exx_ek_screening( size_t ntasks, int32_t nbf, int32_t nshells, int nshell_pairs, int32_t max_l ) override final;
   void send_static_data_weights( const Molecule& mol, const MolMeta& meta ) override final;
   void send_static_data_density_basis( const double* Ps, int32_t ldps, const double* Pz, int32_t ldpz,
-                                        const double* Py, int32_t ldpy, const double* Px, int32_t ldpx,
+    const double* Py, int32_t ldpy, const double* Px, int32_t ldpx,
+    const double* Ps_SS, int32_t ldps_ss, const double* Pz_SS, int32_t ldpz_ss,
+    const double* Py_SS, int32_t ldpy_ss, const double* Px_SS, int32_t ldpx_ss,
+    const double* Ps_SS_imag, int32_t ldps_ss_im, const double* Pz_SS_imag, int32_t ldpz_ss_im,
+    const double* Py_SS_imag, int32_t ldpy_ss_im, const double* Px_SS_imag, int32_t ldpx_ss_im,
     const BasisSet<double>& basis ) override final;
   void send_static_data_trial_density(
     const double* tPs, int32_t ldtps, const double* tPz, int32_t ldtpz,
@@ -347,7 +388,13 @@ struct XCDeviceStackData : public XCDeviceData {
   void zero_exx_ek_screening_intermediates() override final;
   void retrieve_exc_vxc_integrands( double* EXC, double* N_EL,
     double* VXCscalar, int32_t ldvxcscalar, double* VXCz, int32_t ldvxcz,
-    double* VXCy     , int32_t ldvxcy     , double* VXCx, int32_t ldvxcx ) override final;
+    double* VXCy     , int32_t ldvxcy     , double* VXCx, int32_t ldvxcx,
+
+    double* VXCs_ss, int32_t ldvxcs_ss, double* VXCz_ss, int32_t ldvxcz_ss,
+    double* VXCy_ss, int32_t ldvxcy_ss, double* VXCx_ss, int32_t ldvxcx_ss,
+
+    double* VXCs_ss_im, int32_t ldvxcs_ss_im, double* VXCz_ss_im, int32_t ldvxcz_ss_im,
+    double* VXCy_ss_im, int32_t ldvxcy_ss_im, double* VXCx_ss_im, int32_t ldvxcx_ss_im  ) override final;
   void retrieve_fxc_contraction_integrands( double* N_EL,
     double* FXCs, int32_t ldfxcs, double* FXCz, int32_t ldfxcz,
     double* FXCy, int32_t ldfxcy, double* FXCx, int32_t ldfxcx ) override final;
@@ -361,6 +408,17 @@ struct XCDeviceStackData : public XCDeviceData {
   double* vxc_z_device_data() override;
   double* vxc_y_device_data() override;
   double* vxc_x_device_data() override;
+
+  double* vxc_s_ss_device_data() override;
+  double* vxc_z_ss_device_data() override;
+  double* vxc_y_ss_device_data() override;
+  double* vxc_x_ss_device_data() override;
+
+  double* vxc_s_ss_im_device_data() override;
+  double* vxc_z_ss_im_device_data() override;
+  double* vxc_y_ss_im_device_data() override;
+  double* vxc_x_ss_im_device_data() override;
+
   double* exc_device_data() override;
   double* nel_device_data() override;
   double* exx_k_device_data() override;

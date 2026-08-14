@@ -41,6 +41,7 @@ struct LocalDeviceWorkDriverPIMPL {
   virtual void eval_collocation_laplacian( XCDeviceData* ) = 0;
   virtual void eval_collocation_lapgrad( XCDeviceData* ) = 0;
   virtual void eval_xmat( double fac, XCDeviceData*, bool do_grad, density_id den ) = 0;
+  virtual void eval_xmat_dks( double fac, XCDeviceData*, bool do_grad, density_id den ) = 0;
   virtual void save_xmat( XCDeviceData*, bool do_grad, density_id den ) = 0;
   virtual void eval_exx_fmat( XCDeviceData* ) = 0;
   //virtual void eval_exx_gmat( XCDeviceData* ) = 0;
@@ -48,9 +49,9 @@ struct LocalDeviceWorkDriverPIMPL {
   virtual void eval_uvars_lda( XCDeviceData*, integrator_ks_scheme ) = 0;
   virtual void eval_uvars_gga( XCDeviceData*, integrator_ks_scheme ) = 0;
   virtual void eval_uvars_mgga( XCDeviceData*, integrator_ks_scheme, bool ) = 0;
-  virtual void eval_vvars_lda ( XCDeviceData*, density_id ) = 0;
-  virtual void eval_vvars_gga ( XCDeviceData*, density_id ) = 0;
-  virtual void eval_vvars_mgga( XCDeviceData*, density_id, bool ) = 0;
+  virtual void eval_vvars_lda ( XCDeviceData*, integrator_ks_scheme, density_id ) = 0;
+  virtual void eval_vvars_gga ( XCDeviceData*, integrator_ks_scheme, density_id ) = 0;
+  virtual void eval_vvars_mgga( XCDeviceData*, integrator_ks_scheme, density_id, bool ) = 0;
   virtual void eval_kern_exc_vxc_lda( const functional_type&, XCDeviceData* ) = 0;
   virtual void eval_kern_exc_vxc_gga( const functional_type&, XCDeviceData* ) = 0;
   virtual void eval_kern_exc_vxc_mgga( const functional_type&, XCDeviceData* ) = 0;
@@ -68,7 +69,9 @@ struct LocalDeviceWorkDriverPIMPL {
   virtual void inc_exc( XCDeviceData* ) = 0;
   virtual void inc_nel( XCDeviceData* ) = 0;
   virtual void inc_vxc( XCDeviceData* , density_id, bool) = 0;
+  virtual void inc_vxc_dks( XCDeviceData* , density_id, bool) = 0;
   virtual void inc_fxc( XCDeviceData* , density_id, bool) = 0;  
+  virtual void inc_fxc_dks( XCDeviceData* , density_id, bool) = 0; 
   virtual void inc_exc_grad_lda( XCDeviceData*, integrator_ks_scheme, bool  ) = 0;
   virtual void inc_exc_grad_gga( XCDeviceData*, integrator_ks_scheme, bool  ) = 0;
   virtual void inc_exc_grad_mgga( XCDeviceData*, integrator_ks_scheme , bool, bool ) = 0;
@@ -82,9 +85,9 @@ struct LocalDeviceWorkDriverPIMPL {
   virtual void eval_tmat_lda( XCDeviceData*, integrator_ks_scheme ) = 0;
   virtual void eval_tmat_gga( XCDeviceData*, integrator_ks_scheme ) = 0;
   virtual void eval_tmat_mgga( XCDeviceData*, integrator_ks_scheme, bool ) = 0;
-  virtual void eval_vvars_lda_trial ( XCDeviceData*, density_id ) = 0;
-  virtual void eval_vvars_gga_trial ( XCDeviceData*, density_id ) = 0;
-  virtual void eval_vvars_mgga_trial( XCDeviceData*, density_id, bool ) = 0;
+  virtual void eval_vvars_lda_trial ( XCDeviceData*, integrator_ks_scheme, density_id ) = 0;
+  virtual void eval_vvars_gga_trial ( XCDeviceData*, integrator_ks_scheme, density_id ) = 0;
+  virtual void eval_vvars_mgga_trial( XCDeviceData*, integrator_ks_scheme, density_id, bool ) = 0;
 
   virtual void eval_exx_ek_screening_bfn_stats( XCDeviceData* ) = 0;
   virtual void exx_ek_shellpair_collision( double eps_E, double eps_K, 

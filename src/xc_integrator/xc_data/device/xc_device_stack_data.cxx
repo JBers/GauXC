@@ -42,6 +42,17 @@ double* XCDeviceStackData::vxc_s_device_data() { return static_stack.vxc_s_devic
 double* XCDeviceStackData::vxc_z_device_data() { return static_stack.vxc_z_device; }
 double* XCDeviceStackData::vxc_y_device_data() { return static_stack.vxc_y_device; }
 double* XCDeviceStackData::vxc_x_device_data() { return static_stack.vxc_x_device; }
+
+double* XCDeviceStackData::vxc_s_ss_device_data() { return static_stack.vxc_s_ss_device; }
+double* XCDeviceStackData::vxc_z_ss_device_data() { return static_stack.vxc_z_ss_device; }
+double* XCDeviceStackData::vxc_y_ss_device_data() { return static_stack.vxc_y_ss_device; }
+double* XCDeviceStackData::vxc_x_ss_device_data() { return static_stack.vxc_x_ss_device; }
+
+double* XCDeviceStackData::vxc_s_ss_im_device_data() { return static_stack.vxc_s_ss_im_device; }
+double* XCDeviceStackData::vxc_z_ss_im_device_data() { return static_stack.vxc_z_ss_im_device; }
+double* XCDeviceStackData::vxc_y_ss_im_device_data() { return static_stack.vxc_y_ss_im_device; }
+double* XCDeviceStackData::vxc_x_ss_im_device_data() { return static_stack.vxc_x_ss_im_device; }
+
 double* XCDeviceStackData::exc_device_data() { return static_stack.exc_device; }
 double* XCDeviceStackData::nel_device_data() { return static_stack.nel_device; }
 double* XCDeviceStackData::exx_k_device_data() { return static_stack.exx_k_device; }
@@ -97,7 +108,7 @@ void XCDeviceStackData::allocate_static_data_exc_vxc( int32_t nbf, int32_t nshel
     GAUXC_GENERIC_EXCEPTION("Attempting to reallocate Stack EXC VXC");
   if( enabled_terms.ks_scheme == _UNDEF_SCHEME )
     GAUXC_GENERIC_EXCEPTION("Must have a KS Scheme set to allocate Stack EXC VXC");
-
+  std::cout<<"allocate_static_data_exc_vxc"<<std::endl;
   // Save state
   global_dims.nshells = nshells;
   global_dims.nbf     = nbf; 
@@ -114,20 +125,42 @@ void XCDeviceStackData::allocate_static_data_exc_vxc( int32_t nbf, int32_t nshel
   static_stack.dmat_s_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
   if( not (allocated_terms.ks_scheme == RKS) ) {
       static_stack.dmat_z_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
-      if( allocated_terms.ks_scheme == GKS ) {
+      if( not (allocated_terms.ks_scheme == UKS) ) {
         static_stack.dmat_y_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
         static_stack.dmat_x_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
+        if( allocated_terms.ks_scheme == DKS ) {
+          std::cout<<"dmat allocated_terms.ks_scheme == DKS"<<std::endl;
+          static_stack.dmat_s_ss_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
+          static_stack.dmat_z_ss_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
+          static_stack.dmat_y_ss_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
+          static_stack.dmat_x_ss_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
+          static_stack.dmat_s_ss_im_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
+          static_stack.dmat_z_ss_im_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
+          static_stack.dmat_y_ss_im_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
+          static_stack.dmat_x_ss_im_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
       }
+    }
   }
 
   if( do_vxc ) {
     static_stack.vxc_s_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
     if( not (allocated_terms.ks_scheme == RKS) ) {
         static_stack.vxc_z_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
-        if( allocated_terms.ks_scheme == GKS ) {
-          static_stack.vxc_y_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
-          static_stack.vxc_x_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
+      if( not (allocated_terms.ks_scheme == UKS) ) {
+        static_stack.vxc_y_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
+        static_stack.vxc_x_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
+        if( allocated_terms.ks_scheme == DKS ) {
+          std::cout<<"do_vxc allocated_terms.ks_scheme == DKS"<<std::endl;
+          static_stack.vxc_s_ss_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
+          static_stack.vxc_z_ss_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
+          static_stack.vxc_y_ss_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
+          static_stack.vxc_x_ss_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
+          static_stack.vxc_s_ss_im_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
+          static_stack.vxc_z_ss_im_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
+          static_stack.vxc_y_ss_im_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
+          static_stack.vxc_x_ss_im_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
         }
+      }
     }
   }
 
@@ -348,11 +381,16 @@ void XCDeviceStackData::send_static_data_weights( const Molecule& mol, const Mol
 }
 
 void XCDeviceStackData::send_static_data_density_basis( const double* Ps, int32_t ldps, const double* Pz, int32_t ldpz, const double* Py, int32_t ldpy, const double* Px, int32_t ldpx,
+  const double* Ps_SS, int32_t ldps_ss, const double* Pz_SS, int32_t ldpz_ss,
+  const double* Py_SS, int32_t ldpy_ss, const double* Px_SS, int32_t ldpx_ss,
+  const double* Ps_SS_imag, int32_t ldps_ss_im, const double* Pz_SS_imag, int32_t ldpz_ss_im,
+  const double* Py_SS_imag, int32_t ldpy_ss_im, const double* Px_SS_imag, int32_t ldpx_ss_im,
   const BasisSet<double>& basis ) {
-  const bool is_gks = (Pz != nullptr) and (Py != nullptr) and (Px != nullptr);
-  const bool is_uks = (Pz != nullptr) and (Py == nullptr) and (Px == nullptr);
-  const bool is_rks = (Ps != nullptr) and (not is_uks and not is_gks);
-  if( not is_rks and not is_uks and not is_gks )
+  const bool is_dks = (Pz != nullptr) and (Py != nullptr) and (Px != nullptr) and (Ps_SS != nullptr);
+  const bool is_gks = (Pz != nullptr) and (Py != nullptr) and (Px != nullptr) and (Ps_SS == nullptr);
+  const bool is_uks = (Pz != nullptr) and (Py == nullptr) and (Px == nullptr) and (Ps_SS == nullptr);
+  const bool is_rks = (Ps != nullptr) and (not is_uks and not is_gks and not is_dks);
+  if( not is_rks and not is_uks and not is_gks and not is_dks)
     GAUXC_GENERIC_EXCEPTION("Densities do not match RKS, UKS, or GKS schemes");
 
   if( not (allocated_terms.exx or allocated_terms.exc_vxc or allocated_terms.exc_grad or allocated_terms.den or allocated_terms.exx_ek_screening or allocated_terms.fxc_contraction ) ) 
@@ -360,6 +398,7 @@ void XCDeviceStackData::send_static_data_density_basis( const double* Ps, int32_
 
   if( not device_backend_ ) GAUXC_GENERIC_EXCEPTION("Invalid Device Backend");
 
+  std::cout<<"send_static_data_density_basis"<<std::endl;
 
   const auto nbf    = global_dims.nbf;
   // Check dimensions and copy density
@@ -368,11 +407,30 @@ void XCDeviceStackData::send_static_data_density_basis( const double* Ps, int32_
   if( not is_rks ) {
     if( ldpz != (int)nbf ) GAUXC_GENERIC_EXCEPTION("LDPz must bf NBF");
     device_backend_->copy_async( nbf*nbf, Pz, static_stack.dmat_z_device, "P_z H2D" );
-    if( is_gks ) {
+    if( not is_uks ) {
       if( ldpy != (int)nbf ) GAUXC_GENERIC_EXCEPTION("LDPy must bf NBF");
       if( ldpx != (int)nbf ) GAUXC_GENERIC_EXCEPTION("LDPx must bf NBF");
       device_backend_->copy_async( nbf*nbf, Py, static_stack.dmat_y_device, "P_y H2D" );
       device_backend_->copy_async( nbf*nbf, Px, static_stack.dmat_x_device, "P_x H2D" );
+      if( not is_gks ) {
+        std::cout<<"send_static_data_density_basis dks"<<std::endl;
+        if( ldps_ss != (int)nbf ) GAUXC_GENERIC_EXCEPTION("LDPy SS must bf NBF");
+        if( ldpz_ss != (int)nbf ) GAUXC_GENERIC_EXCEPTION("LDPx SS must bf NBF");
+        if( ldpy_ss != (int)nbf ) GAUXC_GENERIC_EXCEPTION("LDPy SS must bf NBF");
+        if( ldpx_ss != (int)nbf ) GAUXC_GENERIC_EXCEPTION("LDPx SS must bf NBF");
+        device_backend_->copy_async( nbf*nbf, Ps_SS, static_stack.dmat_s_ss_device, "P_s SS H2D" );
+        device_backend_->copy_async( nbf*nbf, Pz_SS, static_stack.dmat_z_ss_device, "P_z SS H2D" );
+        device_backend_->copy_async( nbf*nbf, Py_SS, static_stack.dmat_y_ss_device, "P_y SS H2D" );
+        device_backend_->copy_async( nbf*nbf, Px_SS, static_stack.dmat_x_ss_device, "P_x SS H2D" );
+        if( ldps_ss_im != (int)nbf ) GAUXC_GENERIC_EXCEPTION("LDPy SS im must bf NBF");
+        if( ldpz_ss_im != (int)nbf ) GAUXC_GENERIC_EXCEPTION("LDPx SS im must bf NBF");
+        if( ldpy_ss_im != (int)nbf ) GAUXC_GENERIC_EXCEPTION("LDPy SS im must bf NBF");
+        if( ldpx_ss_im != (int)nbf ) GAUXC_GENERIC_EXCEPTION("LDPx SS im must bf NBF");
+        device_backend_->copy_async( nbf*nbf, Ps_SS_imag, static_stack.dmat_s_ss_im_device, "P_s SS im H2D" );
+        device_backend_->copy_async( nbf*nbf, Pz_SS_imag, static_stack.dmat_z_ss_im_device, "P_z SS im H2D" );
+        device_backend_->copy_async( nbf*nbf, Py_SS_imag, static_stack.dmat_y_ss_im_device, "P_y SS im H2D" );
+        device_backend_->copy_async( nbf*nbf, Px_SS_imag, static_stack.dmat_x_ss_im_device, "P_x SS im H2D" );
+    }
     }
   }
 
@@ -559,12 +617,20 @@ void XCDeviceStackData::zero_den_integrands() {
 void XCDeviceStackData::zero_exc_vxc_integrands(integrator_term_tracker enabled_terms) {
 
   if( not device_backend_ ) GAUXC_GENERIC_EXCEPTION("Invalid Device Backend");
-
+  std::cout<<"zero_exc_vxc_integrands"<<std::endl;
   const auto nbf = global_dims.nbf;
   if(static_stack.vxc_s_device) device_backend_->set_zero( nbf*nbf, static_stack.vxc_s_device, "VXCs Zero" );
   if(static_stack.vxc_z_device) device_backend_->set_zero( nbf*nbf, static_stack.vxc_z_device, "VXCz Zero" );
   if(static_stack.vxc_y_device) device_backend_->set_zero( nbf*nbf, static_stack.vxc_y_device, "VXCy Zero" );
   if(static_stack.vxc_x_device) device_backend_->set_zero( nbf*nbf, static_stack.vxc_x_device, "VXCx Zero" );
+  if(static_stack.vxc_s_ss_device) device_backend_->set_zero( nbf*nbf, static_stack.vxc_s_ss_device, "VXCs SS Zero" );
+  if(static_stack.vxc_z_ss_device) device_backend_->set_zero( nbf*nbf, static_stack.vxc_z_ss_device, "VXCz SS Zero" );
+  if(static_stack.vxc_y_ss_device) device_backend_->set_zero( nbf*nbf, static_stack.vxc_y_ss_device, "VXCy SS Zero" );
+  if(static_stack.vxc_x_ss_device) device_backend_->set_zero( nbf*nbf, static_stack.vxc_x_ss_device, "VXCx SS Zero" );
+  if(static_stack.vxc_s_ss_im_device) device_backend_->set_zero( nbf*nbf, static_stack.vxc_s_ss_im_device, "VXCs SS Im Zero" );
+  if(static_stack.vxc_z_ss_im_device) device_backend_->set_zero( nbf*nbf, static_stack.vxc_z_ss_im_device, "VXCz SS Im Zero" );
+  if(static_stack.vxc_y_ss_im_device) device_backend_->set_zero( nbf*nbf, static_stack.vxc_y_ss_im_device, "VXCy SS Im Zero" );
+  if(static_stack.vxc_x_ss_im_device) device_backend_->set_zero( nbf*nbf, static_stack.vxc_x_ss_im_device, "VXCx SS Im Zero" );
   device_backend_->set_zero( 1,       static_stack.exc_device, "EXC Zero" );
   device_backend_->set_zero( 1,       static_stack.nel_device, "NEL Zero" );
 
@@ -616,12 +682,20 @@ void XCDeviceStackData::zero_exx_ek_screening_intermediates() {
 
 void XCDeviceStackData::retrieve_exc_vxc_integrands( double* EXC, double* N_EL,
   double* VXCs, int32_t ldvxcs, double* VXCz, int32_t ldvxcz,
-  double* VXCy, int32_t ldvxcy, double* VXCx, int32_t ldvxcx ) {
+  double* VXCy, int32_t ldvxcy, double* VXCx, int32_t ldvxcx,
+
+  double* VXCs_ss, int32_t ldvxcs_ss, double* VXCz_ss, int32_t ldvxcz_ss,
+  double* VXCy_ss, int32_t ldvxcy_ss, double* VXCx_ss, int32_t ldvxcx_ss,
+
+  double* VXCs_ss_im, int32_t ldvxcs_ss_im, double* VXCz_ss_im, int32_t ldvxcz_ss_im,
+  double* VXCy_ss_im, int32_t ldvxcy_ss_im, double* VXCx_ss_im, int32_t ldvxcx_ss_im  ) {
 
   const auto nbf = global_dims.nbf;
-
+  std::cout<<"retrieve_exc_vxc_integrands"<<std::endl;
   device_backend_->copy_async( 1,       static_stack.nel_device, N_EL, "NEL D2H" );
   device_backend_->copy_async( 1,       static_stack.exc_device, EXC,  "EXC D2H" );
+  std::cout<<"N_EL "<<*N_EL<<std::endl;
+  std::cout<<"EXC "<<*EXC<<std::endl;
 
   if( ldvxcs and (ldvxcs != (int)nbf) ) GAUXC_GENERIC_EXCEPTION("LDVXCs must be NBF");
   if( VXCs )
@@ -638,6 +712,40 @@ void XCDeviceStackData::retrieve_exc_vxc_integrands( double* EXC, double* N_EL,
   if( ldvxcx and (ldvxcx != (int)nbf) ) GAUXC_GENERIC_EXCEPTION("LDVXCx must be NBF");
   if( VXCx )
     device_backend_->copy_async( nbf*nbf, static_stack.vxc_x_device, VXCx,  "VXCx D2H" );
+
+  /// DKS SS
+  if( ldvxcs_ss and (ldvxcs_ss != (int)nbf) ) GAUXC_GENERIC_EXCEPTION("LDVXCs_ss must be NBF");
+  if( VXCs_ss )
+    device_backend_->copy_async( nbf*nbf, static_stack.vxc_s_ss_device, VXCs_ss,  "VXCs_ss D2H" );
+
+  if( ldvxcz_ss and (ldvxcz_ss != (int)nbf) ) GAUXC_GENERIC_EXCEPTION("LDVXCz_ss must be NBF");
+  if( VXCz_ss )
+    device_backend_->copy_async( nbf*nbf, static_stack.vxc_z_ss_device, VXCz_ss,  "VXCz_ss D2H" );
+
+  if( ldvxcy_ss and (ldvxcy_ss != (int)nbf) ) GAUXC_GENERIC_EXCEPTION("LDVXCy_ss must be NBF");
+  if( VXCy_ss )
+    device_backend_->copy_async( nbf*nbf, static_stack.vxc_y_ss_device, VXCy_ss,  "VXCy_ss D2H" );
+
+  if( ldvxcx_ss and (ldvxcx_ss != (int)nbf) ) GAUXC_GENERIC_EXCEPTION("LDVXCx_ss must be NBF");
+  if( VXCx_ss )
+    device_backend_->copy_async( nbf*nbf, static_stack.vxc_x_ss_device, VXCx_ss,  "VXCx_ss D2H" );
+
+  /// DKS SS_im
+  if( ldvxcs_ss_im and (ldvxcs_ss_im != (int)nbf) ) GAUXC_GENERIC_EXCEPTION("LDVXCs_ss_im must be NBF");
+  if( VXCs_ss_im )
+    device_backend_->copy_async( nbf*nbf, static_stack.vxc_s_ss_im_device, VXCs_ss_im,  "VXCs_ss_im D2H" );
+
+  if( ldvxcz_ss_im and (ldvxcz_ss_im != (int)nbf) ) GAUXC_GENERIC_EXCEPTION("LDVXCz_ss_im must be NBF");
+  if( VXCz_ss_im )
+    device_backend_->copy_async( nbf*nbf, static_stack.vxc_z_ss_im_device, VXCz_ss_im,  "VXCz_ss_im D2H" );
+
+  if( ldvxcy_ss_im and (ldvxcy_ss_im != (int)nbf) ) GAUXC_GENERIC_EXCEPTION("LDVXCy_ss_im must be NBF");
+  if( VXCy_ss_im )
+    device_backend_->copy_async( nbf*nbf, static_stack.vxc_y_ss_im_device, VXCy_ss_im ,  "VXCy_ss_im D2H" );
+
+  if( ldvxcx_ss_im and (ldvxcx_ss_im != (int)nbf) ) GAUXC_GENERIC_EXCEPTION("LDVXCx_ss_im must be NBF");
+  if( VXCx_ss_im )
+    device_backend_->copy_async( nbf*nbf, static_stack.vxc_x_ss_im_device, VXCx_ss_im,  "VXCx_ss_im D2H" );
 
 }
 
@@ -844,7 +952,8 @@ XCDeviceStackData::device_buffer_t XCDeviceStackData::allocate_dynamic_stack(
   const bool is_rks = terms.ks_scheme == RKS;
   const bool is_uks = terms.ks_scheme == UKS;
   const bool is_gks = terms.ks_scheme == GKS;
-  const bool is_pol = is_uks or is_gks;
+  const bool is_dks = terms.ks_scheme == DKS;
+  const bool is_pol = is_uks or is_gks or is_dks;
   const bool is_gga = terms.xc_approx == GGA;
 
   const bool is_den = terms.den;
@@ -871,7 +980,7 @@ XCDeviceStackData::device_buffer_t XCDeviceStackData::allocate_dynamic_stack(
       base_stack.den_z_eval_device      = mem.aligned_alloc<double>(msz, aln, csl);
     }
 
-    if(is_gks){   
+    if( is_gks or is_dks ){   
       base_stack.den_y_eval_device = mem.aligned_alloc<double>(msz, aln, csl); 
       base_stack.den_x_eval_device = mem.aligned_alloc<double>(msz, aln, csl); 
     }
@@ -882,12 +991,12 @@ XCDeviceStackData::device_buffer_t XCDeviceStackData::allocate_dynamic_stack(
     base_stack.dden_sy_eval_device = mem.aligned_alloc<double>(msz, aln, csl);
     base_stack.dden_sz_eval_device = mem.aligned_alloc<double>(msz, aln, csl); 
 
-    if(is_pol) { 
+    if( is_pol ) { 
       base_stack.dden_zx_eval_device = mem.aligned_alloc<double>(msz, aln, csl);
       base_stack.dden_zy_eval_device = mem.aligned_alloc<double>(msz, aln, csl); 
       base_stack.dden_zz_eval_device = mem.aligned_alloc<double>(msz, aln, csl); 
     }
-    if( is_gks ) { 
+    if( is_gks or is_dks ) { 
       base_stack.dden_yx_eval_device = mem.aligned_alloc<double>(msz, aln, csl);
       base_stack.dden_yy_eval_device = mem.aligned_alloc<double>(msz, aln, csl); 
       base_stack.dden_yz_eval_device = mem.aligned_alloc<double>(msz, aln, csl); 
@@ -945,7 +1054,7 @@ XCDeviceStackData::device_buffer_t XCDeviceStackData::allocate_dynamic_stack(
     }
   }
 
-  if( is_gks ) {       // H, K matrices
+  if( is_gks or is_dks ) {       // H, K matrices
     base_stack.K_x_eval_device   = mem.aligned_alloc<double>(msz, aln, csl);
     base_stack.K_y_eval_device   = mem.aligned_alloc<double>(msz, aln, csl);
     base_stack.K_z_eval_device   = mem.aligned_alloc<double>(msz, aln, csl);
@@ -987,7 +1096,7 @@ XCDeviceStackData::device_buffer_t XCDeviceStackData::allocate_dynamic_stack(
       if(is_pol) {
         base_stack.tden_z_eval_device      = mem.aligned_alloc<double>(msz, aln, csl);
       }
-      if(is_gks){
+      if(is_gks or is_dks){
         base_stack.tden_y_eval_device = mem.aligned_alloc<double>(msz, aln, csl); 
         base_stack.tden_x_eval_device = mem.aligned_alloc<double>(msz, aln, csl); 
       }
@@ -1004,7 +1113,7 @@ XCDeviceStackData::device_buffer_t XCDeviceStackData::allocate_dynamic_stack(
         base_stack.tdden_zy_eval_device = mem.aligned_alloc<double>(msz, aln, csl); 
         base_stack.tdden_zz_eval_device = mem.aligned_alloc<double>(msz, aln, csl); 
       }
-      if( is_gks ) { 
+      if( is_gks or is_dks ) { 
         base_stack.tdden_yx_eval_device = mem.aligned_alloc<double>(msz, aln, csl);
         base_stack.tdden_yy_eval_device = mem.aligned_alloc<double>(msz, aln, csl); 
         base_stack.tdden_yz_eval_device = mem.aligned_alloc<double>(msz, aln, csl); 

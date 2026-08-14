@@ -468,8 +468,12 @@ void ShellBatchedReplicatedXCIntegrator<BaseIntegratorType, IncoreIntegratorType
   if constexpr (IncoreIntegratorType::is_device) {
 
     incore_integrator.exc_vxc_local_work( basis_subset, Ps_submat, nbe, 
-      Pz_submat, nbe, Py_submat, nbe, Px_submat, nbe, VXCs_submat, nbe,
-      VXCz_submat, nbe, VXCy_submat, nbe, VXCx_submat, nbe,
+      Pz_submat, nbe, Py_submat, nbe, Px_submat, nbe, 
+      nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, 
+      nullptr, nullptr, nullptr, nullptr, 
+      VXCs_submat, nbe, VXCz_submat, nbe, VXCy_submat, nbe, VXCx_submat, nbe,
+      nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0,
+      nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0,
       &EXC_tmp, &NEL_tmp, task_begin, task_end, *device_data_ptr_ );
   } else if constexpr (not IncoreIntegratorType::is_device) {
 #endif
