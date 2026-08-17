@@ -331,7 +331,11 @@ struct XCDeviceStackData : public XCDeviceData {
   void allocate_static_data_exx_ek_screening( size_t ntasks, int32_t nbf, int32_t nshells, int nshell_pairs, int32_t max_l ) override final;
   void send_static_data_weights( const Molecule& mol, const MolMeta& meta ) override final;
   void send_static_data_density_basis( const double* Ps, int32_t ldps, const double* Pz, int32_t ldpz,
-                                        const double* Py, int32_t ldpy, const double* Px, int32_t ldpx,
+    const double* Py, int32_t ldpy, const double* Px, int32_t ldpx,
+    const double* Ps_SS, int32_t ldps_ss, const double* Pz_SS, int32_t ldpz_ss,
+    const double* Py_SS, int32_t ldpy_ss, const double* Px_SS, int32_t ldpx_ss,
+    const double* Ps_SS_imag, int32_t ldps_ss_im, const double* Pz_SS_imag, int32_t ldpz_ss_im,
+    const double* Py_SS_imag, int32_t ldpy_ss_im, const double* Px_SS_imag, int32_t ldpx_ss_im,
     const BasisSet<double>& basis ) override final;
   void send_static_data_trial_density(
     const double* tPs, int32_t ldtps, const double* tPz, int32_t ldtpz,

@@ -197,7 +197,9 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
   const auto natoms  = mol.size();
   device_data.reset_allocations();
   device_data.allocate_static_data_exc_grad( nbf, nshells, natoms, enabled_terms );
-  device_data.send_static_data_density_basis( Ps, ldps, Pz, ldpz, nullptr, 0, nullptr, 0, basis );
+  device_data.send_static_data_density_basis( Ps, ldps, Pz, ldpz, nullptr, 0, nullptr, 0,
+    nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0,
+    nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, basis );
   // for weight contribution
   device_data.allocate_static_data_weights( natoms );
   device_data.send_static_data_weights( mol, meta );

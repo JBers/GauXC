@@ -348,6 +348,10 @@ void XCDeviceStackData::send_static_data_weights( const Molecule& mol, const Mol
 }
 
 void XCDeviceStackData::send_static_data_density_basis( const double* Ps, int32_t ldps, const double* Pz, int32_t ldpz, const double* Py, int32_t ldpy, const double* Px, int32_t ldpx,
+  const double* Ps_SS, int32_t ldps_ss, const double* Pz_SS, int32_t ldpz_ss,
+  const double* Py_SS, int32_t ldpy_ss, const double* Px_SS, int32_t ldpx_ss,
+  const double* Ps_SS_imag, int32_t ldps_ss_im, const double* Pz_SS_imag, int32_t ldpz_ss_im,
+  const double* Py_SS_imag, int32_t ldpy_ss_im, const double* Px_SS_imag, int32_t ldpx_ss_im,
   const BasisSet<double>& basis ) {
   const bool is_gks = (Pz != nullptr) and (Py != nullptr) and (Px != nullptr);
   const bool is_uks = (Pz != nullptr) and (Py == nullptr) and (Px == nullptr);

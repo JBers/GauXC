@@ -217,7 +217,9 @@ namespace GauXC::detail {
     device_data.reset_allocations();
     device_data.allocate_static_data_fxc_contraction( nbf, nshells, enabled_terms);
     
-    device_data.send_static_data_density_basis( Ps, ldps, Pz, ldpz, nullptr, 0, nullptr, 0, basis );
+    device_data.send_static_data_density_basis( Ps, ldps, Pz, ldpz, nullptr, 0, nullptr, 0,
+      nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0,
+      nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, basis );
     device_data.send_static_data_trial_density( tPs, ldtps, tPz, ldtpz, nullptr, 0, nullptr, 0 );
 
 
