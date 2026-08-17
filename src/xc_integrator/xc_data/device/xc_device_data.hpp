@@ -553,8 +553,8 @@ struct required_term_storage {
       grid_vlapl    = need_lapl;
 
       task_bfn          = true;
-      task_bfn_grad     = is_gga or  is_mgga or is_grad;
-      task_bfn_hess     = (is_gga or is_mgga) and is_grad;
+      task_bfn_grad     = is_gga or  is_mgga or is_grad or is_dks;
+      task_bfn_hess     = ((is_gga or is_mgga) and is_grad) or (is_dks and is_gga);
       task_bfn_lapl     = need_lapl;
       task_bfn_lapgrad  = need_lapl and is_grad;
       task_zmat         = true;
