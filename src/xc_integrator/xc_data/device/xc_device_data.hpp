@@ -35,7 +35,8 @@ enum integrator_ks_scheme : uint32_t {
   _UNDEF_SCHEME             = 0,
   RKS                       = 1,
   UKS                       = 2,
-  GKS                       = 3
+  GKS                       = 3,
+  DKS                       = 4
 };
 
 enum density_id : uint32_t {

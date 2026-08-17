@@ -552,4 +552,126 @@ __global__ void eval_uvars_gga_gks_kernel( size_t ntasks, XCDeviceTask* tasks_de
 
 }
 
+__global__ void eval_uvars_gga_dks_kernel( size_t ntasks, XCDeviceTask* tasks_device) {
+
+  const int batch_idx = blockIdx.z;
+  if( batch_idx >= ntasks ) return;
+
+  const auto& task = tasks_device[ batch_idx ];
+  const auto npts            = task.npts;
+
+        auto*     den_s_eval_device   = task.den_s;
+  const auto*     dden_sx_eval_device = task.dden_sx;
+  const auto*     dden_sy_eval_device = task.dden_sy;
+  const auto*     dden_sz_eval_device = task.dden_sz;
+
+        auto*     den_z_eval_device   = task.den_z;
+  const auto*     dden_zx_eval_device = task.dden_zx;
+  const auto*     dden_zy_eval_device = task.dden_zy;
+  const auto*     dden_zz_eval_device = task.dden_zz;
+
+  const auto*     den_y_eval_device   = task.den_y;
+  const auto*     dden_yx_eval_device = task.dden_yx;
+  const auto*     dden_yy_eval_device = task.dden_yy;
+  const auto*     dden_yz_eval_device = task.dden_yz;
+
+  const auto*     den_x_eval_device   = task.den_x;
+  const auto*     dden_xx_eval_device = task.dden_xx;
+  const auto*     dden_xy_eval_device = task.dden_xy;
+  const auto*     dden_xz_eval_device = task.dden_xz;
+
+  auto*     gamma_pp_eval_device  = task.gamma_pp;
+  auto*     gamma_pm_eval_device  = task.gamma_pm;
+  auto*     gamma_mm_eval_device  = task.gamma_mm;
+
+  auto*     H_z_eval_device = task.H_z;
+  auto*     H_y_eval_device = task.H_y;
+  auto*     H_x_eval_device = task.H_x;
+  auto*     K_z_eval_device = task.K_z;
+  auto*     K_y_eval_device = task.K_y;
+  auto*     K_x_eval_device = task.K_x;
+
+  const double dtolsq = 1e-24;  // TODO: make variable
+
+  const int tid = blockIdx.x * blockDim.x + threadIdx.x;
+
+  if( tid < npts ) {
+    const double dndz = dden_sz_eval_device[ tid ];
+    const double dndy = dden_sy_eval_device[ tid ];
+    const double dndx = dden_sx_eval_device[ tid ];
+
+    const double dMzdz = dden_zz_eval_device[ tid ];
+    const double dMzdy = dden_zy_eval_device[ tid ];
+    const double dMzdx = dden_zx_eval_device[ tid ];
+
+    const double dMydz = dden_yz_eval_device[ tid ];
+    const double dMydy = dden_yy_eval_device[ tid ];
+    const double dMydx = dden_yx_eval_device[ tid ];
+
+    const double dMxdz = dden_xz_eval_device[ tid ];
+    const double dMxdy = dden_xy_eval_device[ tid ];
+    const double dMxdx = dden_xx_eval_device[ tid ];
+
+    const auto ps = den_s_eval_device[ tid ];
+    const auto pz = den_z_eval_device[ tid ];
+    const auto py = den_y_eval_device[ tid ];
+    const auto px = den_x_eval_device[ tid ];
+
+    const auto mtemp = pz*pz + px*px + py*py;
+    double mnorm = 0.;
+
+    const auto dels_dot_dels = dndx * dndx + dndy * dndy + dndz * dndz;
+    const auto delz_dot_delz = dMzdx * dMzdx + dMzdy * dMzdy + dMzdz * dMzdz;
+    const auto delx_dot_delx = dMxdx * dMxdx + dMxdy * dMxdy + dMxdz * dMxdz;
+    const auto dely_dot_dely = dMydx * dMydx + dMydy * dMydy + dMydz * dMydz;
+
+    const auto dels_dot_delz = dndx * dMzdx + dndy * dMzdy + dndz * dMzdz;
+    const auto dels_dot_delx = dndx * dMxdx + dndy * dMxdy + dndz * dMxdz;
+    const auto dels_dot_dely = dndx * dMydx + dndy * dMydy + dndz * dMydz;
+
+    const auto sum = delz_dot_delz + delx_dot_delx + dely_dot_dely;
+    const auto s_sum =
+               dels_dot_delz * pz + dels_dot_delx * px + dels_dot_dely * py;
+
+    const auto inv_sqsum2 =
+        rsqrt(dels_dot_delz * dels_dot_delz + dels_dot_delx * dels_dot_delx +
+             dels_dot_dely * dels_dot_dely);
+    const auto sqsum2 = 1./inv_sqsum2;
+
+    double sign = 1.;
+    if( signbit(s_sum)) 
+      sign = -1.;
+
+
+    if (mtemp > dtolsq) {
+      const double inv_mnorm = rsqrt(mtemp);
+      mnorm = 1./inv_mnorm;
+      K_z_eval_device[ tid ] = pz * inv_mnorm;
+      K_y_eval_device[ tid ] = py * inv_mnorm;
+      K_x_eval_device[ tid ] = px * inv_mnorm;
+      H_z_eval_device[ tid ] = sign * dels_dot_delz * inv_sqsum2;
+      H_y_eval_device[ tid ] = sign * dels_dot_dely * inv_sqsum2;
+      H_x_eval_device[ tid ] = sign * dels_dot_delx * inv_sqsum2;
+    }
+    else {
+      mnorm = (1. / 3.) * (px + py + pz);
+      K_z_eval_device[ tid ] = 1. / 3.;
+      K_y_eval_device[ tid ] = 1. / 3.;
+      K_x_eval_device[ tid ] = 1. / 3.;
+
+      H_z_eval_device[ tid ] = sign / 3.;
+      H_y_eval_device[ tid ] = sign / 3.;
+      H_x_eval_device[ tid ] = sign / 3.;
+    }
+
+    gamma_pp_eval_device[ tid ] = 0.25*(dels_dot_dels + sum) + 0.5*sign*sqsum2;
+    gamma_pm_eval_device[ tid ] = 0.25*(dels_dot_dels - sum);
+    gamma_mm_eval_device[ tid ] = 0.25*(dels_dot_dels + sum) - 0.5*sign*sqsum2;
+
+    den_s_eval_device[ tid ] = 0.5*(ps + mnorm);
+    den_z_eval_device[ tid ] = 0.5*(ps - mnorm);
+
+  }
+
+}
 } // namespace GauXC

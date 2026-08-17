@@ -31,7 +31,7 @@ namespace GauXC {
     case GKS: \
       eval_uvars_##xc_approx##_gks_kernel<<< blocks, threads, 0, stream >>>( ntasks, device_tasks ); \
       break; \
-    case GKS: \
+    case DKS: \
       eval_uvars_##xc_approx##_dks_kernel<<< blocks, threads, 0, stream >>>( ntasks, device_tasks ); \
       break; \
     default: \
