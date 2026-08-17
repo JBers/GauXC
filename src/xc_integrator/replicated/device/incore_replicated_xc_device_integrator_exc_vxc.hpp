@@ -551,7 +551,11 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
 
   // Receive XC terms from host
   this->timer_.time_op("XCIntegrator.DeviceToHostCopy_EXC_VXC",[&](){
-    device_data.retrieve_exc_vxc_integrands( EXC, N_EL, VXCs, ldvxcs, VXCz, ldvxcz, VXCy, ldvxcy, VXCx, ldvxcx ); 
+    device_data.retrieve_exc_vxc_integrands( EXC, N_EL, VXCs, ldvxcs, VXCz, ldvxcz, VXCy, ldvxcy, VXCx, ldvxcx,
+                                                                VXCs_ss, ldvxcs_ss, VXCz_ss, ldvxcz_ss,
+                                                                VXCy_ss, ldvxcy_ss, VXCx_ss, ldvxcx_ss,
+                                                                VXCs_ss_im, ldvxcs_ss_im, VXCz_ss_im, ldvxcz_ss_im,
+                                                                VXCy_ss_im, ldvxcy_ss_im, VXCx_ss_im, ldvxcx_ss_im   ); 
   });
 
 }

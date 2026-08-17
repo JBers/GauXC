@@ -351,7 +351,13 @@ struct XCDeviceStackData : public XCDeviceData {
   void zero_exx_ek_screening_intermediates() override final;
   void retrieve_exc_vxc_integrands( double* EXC, double* N_EL,
     double* VXCscalar, int32_t ldvxcscalar, double* VXCz, int32_t ldvxcz,
-    double* VXCy     , int32_t ldvxcy     , double* VXCx, int32_t ldvxcx ) override final;
+    double* VXCy     , int32_t ldvxcy     , double* VXCx, int32_t ldvxcx,
+
+    double* VXCs_ss, int32_t ldvxcs_ss, double* VXCz_ss, int32_t ldvxcz_ss,
+    double* VXCy_ss, int32_t ldvxcy_ss, double* VXCx_ss, int32_t ldvxcx_ss,
+
+    double* VXCs_ss_im, int32_t ldvxcs_ss_im, double* VXCz_ss_im, int32_t ldvxcz_ss_im,
+    double* VXCy_ss_im, int32_t ldvxcy_ss_im, double* VXCx_ss_im, int32_t ldvxcx_ss_im  ) override final;
   void retrieve_fxc_contraction_integrands( double* N_EL,
     double* FXCs, int32_t ldfxcs, double* FXCz, int32_t ldfxcz,
     double* FXCy, int32_t ldfxcy, double* FXCx, int32_t ldfxcx ) override final;

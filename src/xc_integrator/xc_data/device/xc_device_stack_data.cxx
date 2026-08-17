@@ -620,7 +620,13 @@ void XCDeviceStackData::zero_exx_ek_screening_intermediates() {
 
 void XCDeviceStackData::retrieve_exc_vxc_integrands( double* EXC, double* N_EL,
   double* VXCs, int32_t ldvxcs, double* VXCz, int32_t ldvxcz,
-  double* VXCy, int32_t ldvxcy, double* VXCx, int32_t ldvxcx ) {
+  double* VXCy, int32_t ldvxcy, double* VXCx, int32_t ldvxcx,
+
+  double* VXCs_ss, int32_t ldvxcs_ss, double* VXCz_ss, int32_t ldvxcz_ss,
+  double* VXCy_ss, int32_t ldvxcy_ss, double* VXCx_ss, int32_t ldvxcx_ss,
+
+  double* VXCs_ss_im, int32_t ldvxcs_ss_im, double* VXCz_ss_im, int32_t ldvxcz_ss_im,
+  double* VXCy_ss_im, int32_t ldvxcy_ss_im, double* VXCx_ss_im, int32_t ldvxcx_ss_im  ) {
 
   const auto nbf = global_dims.nbf;
 
@@ -642,6 +648,40 @@ void XCDeviceStackData::retrieve_exc_vxc_integrands( double* EXC, double* N_EL,
   if( ldvxcx and (ldvxcx != (int)nbf) ) GAUXC_GENERIC_EXCEPTION("LDVXCx must be NBF");
   if( VXCx )
     device_backend_->copy_async( nbf*nbf, static_stack.vxc_x_device, VXCx,  "VXCx D2H" );
+
+  /// DKS SS
+  if( ldvxcs_ss and (ldvxcs_ss != (int)nbf) ) GAUXC_GENERIC_EXCEPTION("LDVXCs_ss must be NBF");
+  if( VXCs_ss )
+    device_backend_->copy_async( nbf*nbf, static_stack.vxc_s_device, VXCs_ss,  "VXCs_ss D2H" );
+
+  if( ldvxcz_ss and (ldvxcz_ss != (int)nbf) ) GAUXC_GENERIC_EXCEPTION("LDVXCz_ss must be NBF");
+  if( VXCz_ss )
+    device_backend_->copy_async( nbf*nbf, static_stack.vxc_z_device, VXCz_ss,  "VXCz_ss D2H" );
+
+  if( ldvxcy_ss and (ldvxcy_ss != (int)nbf) ) GAUXC_GENERIC_EXCEPTION("LDVXCy_ss must be NBF");
+  if( VXCy_ss )
+    device_backend_->copy_async( nbf*nbf, static_stack.vxc_y_device, VXCy_ss,  "VXCy_ss D2H" );
+
+  if( ldvxcx_ss and (ldvxcx_ss != (int)nbf) ) GAUXC_GENERIC_EXCEPTION("LDVXCx_ss must be NBF");
+  if( VXCx_ss )
+    device_backend_->copy_async( nbf*nbf, static_stack.vxc_x_device, VXCx_ss,  "VXCx_ss D2H" );
+
+  /// DKS SS_im
+  if( ldvxcs_ss_im and (ldvxcs_ss_im != (int)nbf) ) GAUXC_GENERIC_EXCEPTION("LDVXCs_ss_im must be NBF");
+  if( VXCs_ss_im )
+    device_backend_->copy_async( nbf*nbf, static_stack.vxc_s_device, VXCs_ss_im,  "VXCs_ss_im D2H" );
+
+  if( ldvxcz_ss_im and (ldvxcz_ss_im != (int)nbf) ) GAUXC_GENERIC_EXCEPTION("LDVXCz_ss_im must be NBF");
+  if( VXCz_ss_im )
+    device_backend_->copy_async( nbf*nbf, static_stack.vxc_z_device, VXCz_ss_im,  "VXCz_ss_im D2H" );
+
+  if( ldvxcy_ss_im and (ldvxcy_ss_im != (int)nbf) ) GAUXC_GENERIC_EXCEPTION("LDVXCy_ss_im must be NBF");
+  if( VXCy_ss_im )
+    device_backend_->copy_async( nbf*nbf, static_stack.vxc_y_device, VXCy_ss_im ,  "VXCy_ss_im D2H" );
+
+  if( ldvxcx_ss_im and (ldvxcx_ss_im != (int)nbf) ) GAUXC_GENERIC_EXCEPTION("LDVXCx_ss_im must be NBF");
+  if( VXCx_ss_im )
+    device_backend_->copy_async( nbf*nbf, static_stack.vxc_x_device, VXCx_ss_im,  "VXCx_ss_im D2H" );
 
 }
 
