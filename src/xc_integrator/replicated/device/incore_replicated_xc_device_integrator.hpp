@@ -203,7 +203,7 @@ protected:
                             value_type* VXCy_SS_im, int64_t ldvxcy_ss_im,
                             value_type* VXCx_SS_im, int64_t ldvxcx_ss_im,
                             value_type* EXC, value_type *N_EL,
-                            task_iterator task_begin, task_iterator task_end,
+                            host_task_iterator task_begin, host_task_iterator task_end,
                             XCDeviceData& device_data );
 
   void fxc_contraction_local_work_( const basis_type& basis, const value_type* Ps, int64_t ldps,
