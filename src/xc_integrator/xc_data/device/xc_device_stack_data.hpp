@@ -77,6 +77,16 @@ struct XCDeviceStackData : public XCDeviceData {
     double* vxc_z_device    = nullptr;  /// Ditto for Z,Y,X densities
     double* vxc_y_device    = nullptr;
     double* vxc_x_device    = nullptr;
+
+    double* vxc_s_ss_device    = nullptr;  ///< VXC SS storage (nbf, nbf)
+    double* vxc_z_ss_device    = nullptr;  /// Ditto for Z,Y,X densities
+    double* vxc_y_ss_device    = nullptr;
+    double* vxc_x_ss_device    = nullptr;
+
+    double* vxc_s_ss_im_device    = nullptr;  ///< VXC SS imag storage (nbf, nbf) (not it paper)
+    double* vxc_z_ss_im_device    = nullptr;  /// Ditto for Z,Y,X densities
+    double* vxc_y_ss_im_device    = nullptr;
+    double* vxc_x_ss_im_device    = nullptr;
     
     // Second derivatives
     double* tdmat_s_device  = nullptr;  ///< Static trial density matrix storage (nbf,nbf)
@@ -371,6 +381,17 @@ struct XCDeviceStackData : public XCDeviceData {
   double* vxc_z_device_data() override;
   double* vxc_y_device_data() override;
   double* vxc_x_device_data() override;
+
+  double* vxc_s_ss_device_data() override;
+  double* vxc_z_ss_device_data() override;
+  double* vxc_y_ss_device_data() override;
+  double* vxc_x_ss_device_data() override;
+
+  double* vxc_s_ss_im_device_data() override;
+  double* vxc_z_ss_im_device_data() override;
+  double* vxc_y_ss_im_device_data() override;
+  double* vxc_x_ss_im_device_data() override;
+
   double* exc_device_data() override;
   double* nel_device_data() override;
   double* exx_k_device_data() override;

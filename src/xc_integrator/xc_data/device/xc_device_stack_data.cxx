@@ -42,6 +42,17 @@ double* XCDeviceStackData::vxc_s_device_data() { return static_stack.vxc_s_devic
 double* XCDeviceStackData::vxc_z_device_data() { return static_stack.vxc_z_device; }
 double* XCDeviceStackData::vxc_y_device_data() { return static_stack.vxc_y_device; }
 double* XCDeviceStackData::vxc_x_device_data() { return static_stack.vxc_x_device; }
+
+double* XCDeviceStackData::vxc_s_ss_device_data() { return static_stack.vxc_s_ss_device; }
+double* XCDeviceStackData::vxc_z_ss_device_data() { return static_stack.vxc_z_ss_device; }
+double* XCDeviceStackData::vxc_y_ss_device_data() { return static_stack.vxc_y_ss_device; }
+double* XCDeviceStackData::vxc_x_ss_device_data() { return static_stack.vxc_x_ss_device; }
+
+double* XCDeviceStackData::vxc_s_ss_im_device_data() { return static_stack.vxc_s_ss_im_device; }
+double* XCDeviceStackData::vxc_z_ss_im_device_data() { return static_stack.vxc_z_ss_im_device; }
+double* XCDeviceStackData::vxc_y_ss_im_device_data() { return static_stack.vxc_y_ss_im_device; }
+double* XCDeviceStackData::vxc_x_ss_im_device_data() { return static_stack.vxc_x_ss_im_device; }
+
 double* XCDeviceStackData::exc_device_data() { return static_stack.exc_device; }
 double* XCDeviceStackData::nel_device_data() { return static_stack.nel_device; }
 double* XCDeviceStackData::exx_k_device_data() { return static_stack.exx_k_device; }
