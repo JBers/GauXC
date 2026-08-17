@@ -98,14 +98,14 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
                       value_type* VXCz, int64_t ldvxcz,
                       value_type* VXCy, int64_t ldvxcy,
                       value_type* VXCx, int64_t ldvxcx,
-                      value_type* VXCs_ss, int64_t ldvxcs_ss,
-                      value_type* VXCz_ss, int64_t ldvxcz_ss,
-                      value_type* VXCy_ss, int64_t ldvxcy_ss,
-                      value_type* VXCx_ss, int64_t ldvxcx_ss,
-                      value_type* VXCs_ss_im, int64_t ldvxcs_ss_im,
-                      value_type* VXCz_ss_im, int64_t ldvxcz_ss_im,
-                      value_type* VXCy_ss_im, int64_t ldvxcy_ss_im,
-                      value_type* VXCx_ss_im, int64_t ldvxcx_ss_im,
+                      value_type* VXCs_SS, int64_t ldvxcs_ss,
+                      value_type* VXCz_SS, int64_t ldvxcz_ss,
+                      value_type* VXCy_SS, int64_t ldvxcy_ss,
+                      value_type* VXCx_SS, int64_t ldvxcx_ss,
+                      value_type* VXCs_SS_im, int64_t ldvxcs_ss_im,
+                      value_type* VXCz_SS_im, int64_t ldvxcz_ss_im,
+                      value_type* VXCy_SS_im, int64_t ldvxcy_ss_im,
+                      value_type* VXCx_SS_im, int64_t ldvxcx_ss_im,
                       value_type* EXC, const IntegratorSettingsXC& settings ) {
 
   const bool is_dks = (Pz != nullptr) and (Py != nullptr) and (Px != nullptr) and (Ps_SS != nullptr);
@@ -267,10 +267,10 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
     this->timer_.time_op("XCIntegrator.DeviceToHostCopy_EXC_VXC",[&](){
       device_data_ptr->retrieve_exc_vxc_integrands( EXC, &N_EL, VXCs, ldvxcs, VXCz, ldvxcz,
                                                                 VXCy, ldvxcy, VXCx, ldvxcx,
-                                                                VXCs_ss, ldvxcs_ss, VXCz_ss, ldvxcz_ss,
-                                                                VXCy_ss, ldvxcy_ss, VXCx_ss, ldvxcx_ss,
-                                                                VXCs_ss_im, ldvxcs_ss_im, VXCz_ss_im, ldvxcz_ss_im,
-                                                                VXCy_ss_im, ldvxcy_ss_im, VXCx_ss_im, ldvxcx_ss_im   );
+                                                                VXCs_SS, ldvxcs_ss, VXCz_SS, ldvxcz_ss,
+                                                                VXCy_SS, ldvxcy_ss, VXCx_SS, ldvxcx_ss,
+                                                                VXCs_SS_im, ldvxcs_ss_im, VXCz_SS_im, ldvxcz_ss_im,
+                                                                VXCy_SS_im, ldvxcy_ss_im, VXCx_SS_im, ldvxcx_ss_im   );
     });
 
 
@@ -317,15 +317,15 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
           this->reduction_driver_->allreduce_inplace( VXCy, nbf*nbf, ReductionOp::Sum );
           this->reduction_driver_->allreduce_inplace( VXCx, nbf*nbf, ReductionOp::Sum );
 
-          this->reduction_driver_->allreduce_inplace( VXCs_ss, nbf*nbf, ReductionOp::Sum );
-          this->reduction_driver_->allreduce_inplace( VXCz_ss, nbf*nbf, ReductionOp::Sum );
-          this->reduction_driver_->allreduce_inplace( VXCy_ss, nbf*nbf, ReductionOp::Sum );
-          this->reduction_driver_->allreduce_inplace( VXCx_ss, nbf*nbf, ReductionOp::Sum );
+          this->reduction_driver_->allreduce_inplace( VXCs_SS, nbf*nbf, ReductionOp::Sum );
+          this->reduction_driver_->allreduce_inplace( VXCz_SS, nbf*nbf, ReductionOp::Sum );
+          this->reduction_driver_->allreduce_inplace( VXCy_SS, nbf*nbf, ReductionOp::Sum );
+          this->reduction_driver_->allreduce_inplace( VXCx_SS, nbf*nbf, ReductionOp::Sum );
 
-          this->reduction_driver_->allreduce_inplace( VXCs_ss_im, nbf*nbf, ReductionOp::Sum );
-          this->reduction_driver_->allreduce_inplace( VXCz_ss_im, nbf*nbf, ReductionOp::Sum );
-          this->reduction_driver_->allreduce_inplace( VXCy_ss_im, nbf*nbf, ReductionOp::Sum );
-          this->reduction_driver_->allreduce_inplace( VXCx_ss_im, nbf*nbf, ReductionOp::Sum );
+          this->reduction_driver_->allreduce_inplace( VXCs_SS_im, nbf*nbf, ReductionOp::Sum );
+          this->reduction_driver_->allreduce_inplace( VXCz_SS_im, nbf*nbf, ReductionOp::Sum );
+          this->reduction_driver_->allreduce_inplace( VXCy_SS_im, nbf*nbf, ReductionOp::Sum );
+          this->reduction_driver_->allreduce_inplace( VXCx_SS_im, nbf*nbf, ReductionOp::Sum );
 
           this->reduction_driver_->allreduce_inplace( EXC, 1,       ReductionOp::Sum );
           this->reduction_driver_->allreduce_inplace( &N_EL, 1,       ReductionOp::Sum );
@@ -587,10 +587,10 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
   // Receive XC terms from host
   this->timer_.time_op("XCIntegrator.DeviceToHostCopy_EXC_VXC",[&](){
     device_data.retrieve_exc_vxc_integrands( EXC, N_EL, VXCs, ldvxcs, VXCz, ldvxcz, VXCy, ldvxcy, VXCx, ldvxcx,
-                                                                VXCs_ss, ldvxcs_ss, VXCz_ss, ldvxcz_ss,
-                                                                VXCy_ss, ldvxcy_ss, VXCx_ss, ldvxcx_ss,
-                                                                VXCs_ss_im, ldvxcs_ss_im, VXCz_ss_im, ldvxcz_ss_im,
-                                                                VXCy_ss_im, ldvxcy_ss_im, VXCx_ss_im, ldvxcx_ss_im   ); 
+                                                                VXCs_SS, ldvxcs_ss, VXCz_SS, ldvxcz_ss,
+                                                                VXCy_SS, ldvxcy_ss, VXCx_SS, ldvxcx_ss,
+                                                                VXCs_SS_im, ldvxcs_ss_im, VXCz_SS_im, ldvxcz_ss_im,
+                                                                VXCy_SS_im, ldvxcy_ss_im, VXCx_SS_im, ldvxcx_ss_im   ); 
   });
 
 }
