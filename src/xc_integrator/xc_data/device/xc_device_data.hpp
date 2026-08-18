@@ -45,18 +45,14 @@ enum density_id : uint32_t {
   DEN_Z           = 2,    // UKS, GKS, DKS
   DEN_Y           = 3,    // GKS, DKS
   DEN_X           = 4,    // GKS, DKS
-  DEN_S_SS_dX     = 5,    // DKS
-  DEN_Z_SS_dX     = 6,    // DKS
-  DEN_Y_SS_dX     = 7,    // DKS
-  DEN_X_SS_dX     = 8,    // DKS
-  DEN_S_SS_dY     = 9,    // DKS
-  DEN_Z_SS_dY     = 10,   // DKS
-  DEN_Y_SS_dY     = 11,   // DKS
-  DEN_X_SS_dY     = 12,   // DKS
-  DEN_S_SS_dZ     = 13,   // DKS
-  DEN_Z_SS_dZ     = 14,   // DKS
-  DEN_Y_SS_dZ     = 15,   // DKS
-  DEN_X_SS_dZ     = 16    // DKS
+  DEN_S_SS        = 5,    // DKS
+  DEN_Z_SS        = 6,    // DKS
+  DEN_Y_SS        = 7,    // DKS
+  DEN_X_SS        = 8,    // DKS
+  DEN_S_SS_IM     = 9,    // DKS
+  DEN_Z_SS_IM     = 10,   // DKS
+  DEN_Y_SS_IM     = 11,   // DKS
+  DEN_X_SS_IM     = 12,   // DKS
 };
 
 struct integrator_term_tracker {

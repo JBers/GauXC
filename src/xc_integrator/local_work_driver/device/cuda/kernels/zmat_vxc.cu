@@ -439,10 +439,10 @@ template<density_id den_selector>
 __global__ void zmat_gga_vxc_dks_kernel( size_t        ntasks,
                                      XCDeviceTask* tasks_device ) {
 
-  bool is_S = (den_selector == DEN_S or den_selector == DEN_S_SS_dX or den_selector == DEN_S_SS_dY or den_selector == DEN_S_SS_dZ);
-  bool is_X = (den_selector == DEN_X or den_selector == DEN_X_SS_dX or den_selector == DEN_X_SS_dY or den_selector == DEN_X_SS_dZ);
-  bool is_Y = (den_selector == DEN_Y or den_selector == DEN_Y_SS_dX or den_selector == DEN_Y_SS_dY or den_selector == DEN_Y_SS_dZ);
-  bool is_Z = (den_selector == DEN_Z or den_selector == DEN_Z_SS_dX or den_selector == DEN_Z_SS_dY or den_selector == DEN_Z_SS_dZ);
+  bool is_S = (den_selector == DEN_S);
+  bool is_X = (den_selector == DEN_X);
+  bool is_Y = (den_selector == DEN_Y);
+  bool is_Z = (den_selector == DEN_Z);
   bool is_LL = (den_selector == DEN_S or den_selector == DEN_Z or den_selector == DEN_Y or den_selector == DEN_X);
 
   const int batch_idx = blockIdx.z;
@@ -565,158 +565,158 @@ __global__ void zmat_gga_vxc_dks_kernel( size_t        ntasks,
              +  gga_fact_2 * H_device[ tid_x ] * dden_sz_eval_device[ tid_x ];
     }
 
-    if constexpr ( den_selector == DEN_S_SS_dX ) {
-      const double* Hz_device          = task.H_z;
-      const double* Hy_device          = task.H_y;
-      const double* Hx_device          = task.H_x;
+    // if constexpr ( den_selector == DEN_S_SS_dX ) {
+    //   const double* Hz_device          = task.H_z;
+    //   const double* Hy_device          = task.H_y;
+    //   const double* Hx_device          = task.H_x;
       
-      s_fact = 0.5 * (fact_p + fact_m);
+    //   s_fact = 0.5 * (fact_p + fact_m);
 
-      x_fact = gga_fact_1 * dden_sx_eval_device[ tid_x ]
-             + gga_fact_2 * (Hz_device[ tid_x ] * dden_zx_eval_device[ tid_x ]
-                          +  Hy_device[ tid_x ] * dden_yx_eval_device[ tid_x ]
-                          +  Hx_device[ tid_x ] * dden_xx_eval_device[ tid_x ] );
-      y_fact = gga_fact_1 * dden_sy_eval_device[ tid_x ]
-             + gga_fact_2 * (Hz_device[ tid_x ] * dden_zy_eval_device[ tid_x ]
-                          +  Hy_device[ tid_x ] * dden_yy_eval_device[ tid_x ]
-                          +  Hx_device[ tid_x ] * dden_xy_eval_device[ tid_x ] );
-      z_fact = gga_fact_1 * dden_sz_eval_device[ tid_x ]
-                        + gga_fact_2 * (Hz_device[ tid_x ] * dden_zz_eval_device[ tid_x ]
-                                     +  Hy_device[ tid_x ] * dden_yz_eval_device[ tid_x ]
-                                     +  Hx_device[ tid_x ] * dden_xz_eval_device[ tid_x ] );
-    }
+    //   x_fact = gga_fact_1 * dden_sx_eval_device[ tid_x ]
+    //          + gga_fact_2 * (Hz_device[ tid_x ] * dden_zx_eval_device[ tid_x ]
+    //                       +  Hy_device[ tid_x ] * dden_yx_eval_device[ tid_x ]
+    //                       +  Hx_device[ tid_x ] * dden_xx_eval_device[ tid_x ] );
+    //   y_fact = gga_fact_1 * dden_sy_eval_device[ tid_x ]
+    //          + gga_fact_2 * (Hz_device[ tid_x ] * dden_zy_eval_device[ tid_x ]
+    //                       +  Hy_device[ tid_x ] * dden_yy_eval_device[ tid_x ]
+    //                       +  Hx_device[ tid_x ] * dden_xy_eval_device[ tid_x ] );
+    //   z_fact = gga_fact_1 * dden_sz_eval_device[ tid_x ]
+    //                     + gga_fact_2 * (Hz_device[ tid_x ] * dden_zz_eval_device[ tid_x ]
+    //                                  +  Hy_device[ tid_x ] * dden_yz_eval_device[ tid_x ]
+    //                                  +  Hx_device[ tid_x ] * dden_xz_eval_device[ tid_x ] );
+    // }
 
-    if constexpr ( den_selector == DEN_Z_SS_dX ) {
-      s_fact  = K_device[ tid_x ] * 0.5 * (fact_p - fact_m);
-      x_fact  = gga_fact_3 * dden_zx_eval_device[ tid_x ]
-             +  gga_fact_2 * H_device[ tid_x ] * dden_sx_eval_device[ tid_x ];
-      y_fact  = gga_fact_3 * dden_zy_eval_device[ tid_x ]
-             +  gga_fact_2 * H_device[ tid_x ] * dden_sy_eval_device[ tid_x ];
-      z_fact  = gga_fact_3 * dden_zz_eval_device[ tid_x ]
-             +  gga_fact_2 * H_device[ tid_x ] * dden_sz_eval_device[ tid_x ];
-    }
+    // if constexpr ( den_selector == DEN_Z_SS_dX ) {
+    //   s_fact  = K_device[ tid_x ] * 0.5 * (fact_p - fact_m);
+    //   x_fact  = gga_fact_3 * dden_zx_eval_device[ tid_x ]
+    //          +  gga_fact_2 * H_device[ tid_x ] * dden_sx_eval_device[ tid_x ];
+    //   y_fact  = gga_fact_3 * dden_zy_eval_device[ tid_x ]
+    //          +  gga_fact_2 * H_device[ tid_x ] * dden_sy_eval_device[ tid_x ];
+    //   z_fact  = gga_fact_3 * dden_zz_eval_device[ tid_x ]
+    //          +  gga_fact_2 * H_device[ tid_x ] * dden_sz_eval_device[ tid_x ];
+    // }
 
-    if constexpr ( den_selector == DEN_Y_SS_dX ) {
-      s_fact  = K_device[ tid_x ] * 0.5 * (fact_p - fact_m);
-      x_fact  = gga_fact_3 * dden_yx_eval_device[ tid_x ]
-             +  gga_fact_2 * H_device[ tid_x ] * dden_sx_eval_device[ tid_x ];
-      y_fact  = gga_fact_3 * dden_yy_eval_device[ tid_x ]
-             +  gga_fact_2 * H_device[ tid_x ] * dden_sy_eval_device[ tid_x ];
-      z_fact  = gga_fact_3 * dden_yz_eval_device[ tid_x ]
-             +  gga_fact_2 * H_device[ tid_x ] * dden_sz_eval_device[ tid_x ];
-    }
+    // if constexpr ( den_selector == DEN_Y_SS_dX ) {
+    //   s_fact  = K_device[ tid_x ] * 0.5 * (fact_p - fact_m);
+    //   x_fact  = gga_fact_3 * dden_yx_eval_device[ tid_x ]
+    //          +  gga_fact_2 * H_device[ tid_x ] * dden_sx_eval_device[ tid_x ];
+    //   y_fact  = gga_fact_3 * dden_yy_eval_device[ tid_x ]
+    //          +  gga_fact_2 * H_device[ tid_x ] * dden_sy_eval_device[ tid_x ];
+    //   z_fact  = gga_fact_3 * dden_yz_eval_device[ tid_x ]
+    //          +  gga_fact_2 * H_device[ tid_x ] * dden_sz_eval_device[ tid_x ];
+    // }
 
-    if constexpr ( den_selector == DEN_X_SS_dX ) {
-      s_fact  = K_device[ tid_x ] * 0.5 * (fact_p - fact_m);
-      x_fact  = gga_fact_3 * dden_xx_eval_device[ tid_x ]
-             +  gga_fact_2 * H_device[ tid_x ] * dden_sx_eval_device[ tid_x ];
-      y_fact  = gga_fact_3 * dden_xy_eval_device[ tid_x ]
-             +  gga_fact_2 * H_device[ tid_x ] * dden_sy_eval_device[ tid_x ];
-      z_fact  = gga_fact_3 * dden_xz_eval_device[ tid_x ]
-             +  gga_fact_2 * H_device[ tid_x ] * dden_sz_eval_device[ tid_x ];
-    }
+    // if constexpr ( den_selector == DEN_X_SS_dX ) {
+    //   s_fact  = K_device[ tid_x ] * 0.5 * (fact_p - fact_m);
+    //   x_fact  = gga_fact_3 * dden_xx_eval_device[ tid_x ]
+    //          +  gga_fact_2 * H_device[ tid_x ] * dden_sx_eval_device[ tid_x ];
+    //   y_fact  = gga_fact_3 * dden_xy_eval_device[ tid_x ]
+    //          +  gga_fact_2 * H_device[ tid_x ] * dden_sy_eval_device[ tid_x ];
+    //   z_fact  = gga_fact_3 * dden_xz_eval_device[ tid_x ]
+    //          +  gga_fact_2 * H_device[ tid_x ] * dden_sz_eval_device[ tid_x ];
+    // }
 
-    if constexpr ( den_selector == DEN_S_SS_dY ) {
-      const double* Hz_device          = task.H_z;
-      const double* Hy_device          = task.H_y;
-      const double* Hx_device          = task.H_x;
+    // if constexpr ( den_selector == DEN_S_SS_dY ) {
+    //   const double* Hz_device          = task.H_z;
+    //   const double* Hy_device          = task.H_y;
+    //   const double* Hx_device          = task.H_x;
       
-      s_fact = 0.5 * (fact_p + fact_m);
+    //   s_fact = 0.5 * (fact_p + fact_m);
 
-      x_fact = gga_fact_1 * dden_sx_eval_device[ tid_x ]
-             + gga_fact_2 * (Hz_device[ tid_x ] * dden_zx_eval_device[ tid_x ]
-                          +  Hy_device[ tid_x ] * dden_yx_eval_device[ tid_x ]
-                          +  Hx_device[ tid_x ] * dden_xx_eval_device[ tid_x ] );
-      y_fact = gga_fact_1 * dden_sy_eval_device[ tid_x ]
-             + gga_fact_2 * (Hz_device[ tid_x ] * dden_zy_eval_device[ tid_x ]
-                          +  Hy_device[ tid_x ] * dden_yy_eval_device[ tid_x ]
-                          +  Hx_device[ tid_x ] * dden_xy_eval_device[ tid_x ] );
-      z_fact = gga_fact_1 * dden_sz_eval_device[ tid_x ]
-                        + gga_fact_2 * (Hz_device[ tid_x ] * dden_zz_eval_device[ tid_x ]
-                                     +  Hy_device[ tid_x ] * dden_yz_eval_device[ tid_x ]
-                                     +  Hx_device[ tid_x ] * dden_xz_eval_device[ tid_x ] );
-    }
+    //   x_fact = gga_fact_1 * dden_sx_eval_device[ tid_x ]
+    //          + gga_fact_2 * (Hz_device[ tid_x ] * dden_zx_eval_device[ tid_x ]
+    //                       +  Hy_device[ tid_x ] * dden_yx_eval_device[ tid_x ]
+    //                       +  Hx_device[ tid_x ] * dden_xx_eval_device[ tid_x ] );
+    //   y_fact = gga_fact_1 * dden_sy_eval_device[ tid_x ]
+    //          + gga_fact_2 * (Hz_device[ tid_x ] * dden_zy_eval_device[ tid_x ]
+    //                       +  Hy_device[ tid_x ] * dden_yy_eval_device[ tid_x ]
+    //                       +  Hx_device[ tid_x ] * dden_xy_eval_device[ tid_x ] );
+    //   z_fact = gga_fact_1 * dden_sz_eval_device[ tid_x ]
+    //                     + gga_fact_2 * (Hz_device[ tid_x ] * dden_zz_eval_device[ tid_x ]
+    //                                  +  Hy_device[ tid_x ] * dden_yz_eval_device[ tid_x ]
+    //                                  +  Hx_device[ tid_x ] * dden_xz_eval_device[ tid_x ] );
+    // }
 
-    if constexpr ( den_selector == DEN_Z_SS_dY ) {
-      s_fact  = K_device[ tid_x ] * 0.5 * (fact_p - fact_m);
-      x_fact  = gga_fact_3 * dden_zx_eval_device[ tid_x ]
-             +  gga_fact_2 * H_device[ tid_x ] * dden_sx_eval_device[ tid_x ];
-      y_fact  = gga_fact_3 * dden_zy_eval_device[ tid_x ]
-             +  gga_fact_2 * H_device[ tid_x ] * dden_sy_eval_device[ tid_x ];
-      z_fact  = gga_fact_3 * dden_zz_eval_device[ tid_x ]
-             +  gga_fact_2 * H_device[ tid_x ] * dden_sz_eval_device[ tid_x ];
-    }
+    // if constexpr ( den_selector == DEN_Z_SS_dY ) {
+    //   s_fact  = K_device[ tid_x ] * 0.5 * (fact_p - fact_m);
+    //   x_fact  = gga_fact_3 * dden_zx_eval_device[ tid_x ]
+    //          +  gga_fact_2 * H_device[ tid_x ] * dden_sx_eval_device[ tid_x ];
+    //   y_fact  = gga_fact_3 * dden_zy_eval_device[ tid_x ]
+    //          +  gga_fact_2 * H_device[ tid_x ] * dden_sy_eval_device[ tid_x ];
+    //   z_fact  = gga_fact_3 * dden_zz_eval_device[ tid_x ]
+    //          +  gga_fact_2 * H_device[ tid_x ] * dden_sz_eval_device[ tid_x ];
+    // }
 
-    if constexpr ( den_selector == DEN_Y_SS_dY ) {
-      s_fact  = K_device[ tid_x ] * 0.5 * (fact_p - fact_m);
-      x_fact  = gga_fact_3 * dden_yx_eval_device[ tid_x ]
-             +  gga_fact_2 * H_device[ tid_x ] * dden_sx_eval_device[ tid_x ];
-      y_fact  = gga_fact_3 * dden_yy_eval_device[ tid_x ]
-             +  gga_fact_2 * H_device[ tid_x ] * dden_sy_eval_device[ tid_x ];
-      z_fact  = gga_fact_3 * dden_yz_eval_device[ tid_x ]
-             +  gga_fact_2 * H_device[ tid_x ] * dden_sz_eval_device[ tid_x ];
-    }
+    // if constexpr ( den_selector == DEN_Y_SS_dY ) {
+    //   s_fact  = K_device[ tid_x ] * 0.5 * (fact_p - fact_m);
+    //   x_fact  = gga_fact_3 * dden_yx_eval_device[ tid_x ]
+    //          +  gga_fact_2 * H_device[ tid_x ] * dden_sx_eval_device[ tid_x ];
+    //   y_fact  = gga_fact_3 * dden_yy_eval_device[ tid_x ]
+    //          +  gga_fact_2 * H_device[ tid_x ] * dden_sy_eval_device[ tid_x ];
+    //   z_fact  = gga_fact_3 * dden_yz_eval_device[ tid_x ]
+    //          +  gga_fact_2 * H_device[ tid_x ] * dden_sz_eval_device[ tid_x ];
+    // }
 
-    if constexpr ( den_selector == DEN_X_SS_dY ) {
-      s_fact  = K_device[ tid_x ] * 0.5 * (fact_p - fact_m);
-      x_fact  = gga_fact_3 * dden_xx_eval_device[ tid_x ]
-             +  gga_fact_2 * H_device[ tid_x ] * dden_sx_eval_device[ tid_x ];
-      y_fact  = gga_fact_3 * dden_xy_eval_device[ tid_x ]
-             +  gga_fact_2 * H_device[ tid_x ] * dden_sy_eval_device[ tid_x ];
-      z_fact  = gga_fact_3 * dden_xz_eval_device[ tid_x ]
-             +  gga_fact_2 * H_device[ tid_x ] * dden_sz_eval_device[ tid_x ];
-    }
+    // if constexpr ( den_selector == DEN_X_SS_dY ) {
+    //   s_fact  = K_device[ tid_x ] * 0.5 * (fact_p - fact_m);
+    //   x_fact  = gga_fact_3 * dden_xx_eval_device[ tid_x ]
+    //          +  gga_fact_2 * H_device[ tid_x ] * dden_sx_eval_device[ tid_x ];
+    //   y_fact  = gga_fact_3 * dden_xy_eval_device[ tid_x ]
+    //          +  gga_fact_2 * H_device[ tid_x ] * dden_sy_eval_device[ tid_x ];
+    //   z_fact  = gga_fact_3 * dden_xz_eval_device[ tid_x ]
+    //          +  gga_fact_2 * H_device[ tid_x ] * dden_sz_eval_device[ tid_x ];
+    // }
 
-    if constexpr ( den_selector == DEN_S_SS_dZ ) {
-      const double* Hz_device          = task.H_z;
-      const double* Hy_device          = task.H_y;
-      const double* Hx_device          = task.H_x;
+    // if constexpr ( den_selector == DEN_S_SS_dZ ) {
+    //   const double* Hz_device          = task.H_z;
+    //   const double* Hy_device          = task.H_y;
+    //   const double* Hx_device          = task.H_x;
       
-      s_fact = 0.5 * (fact_p + fact_m);
+    //   s_fact = 0.5 * (fact_p + fact_m);
 
-      x_fact = gga_fact_1 * dden_sx_eval_device[ tid_x ]
-             + gga_fact_2 * (Hz_device[ tid_x ] * dden_zx_eval_device[ tid_x ]
-                          +  Hy_device[ tid_x ] * dden_yx_eval_device[ tid_x ]
-                          +  Hx_device[ tid_x ] * dden_xx_eval_device[ tid_x ] );
-      y_fact = gga_fact_1 * dden_sy_eval_device[ tid_x ]
-             + gga_fact_2 * (Hz_device[ tid_x ] * dden_zy_eval_device[ tid_x ]
-                          +  Hy_device[ tid_x ] * dden_yy_eval_device[ tid_x ]
-                          +  Hx_device[ tid_x ] * dden_xy_eval_device[ tid_x ] );
-      z_fact = gga_fact_1 * dden_sz_eval_device[ tid_x ]
-                        + gga_fact_2 * (Hz_device[ tid_x ] * dden_zz_eval_device[ tid_x ]
-                                     +  Hy_device[ tid_x ] * dden_yz_eval_device[ tid_x ]
-                                     +  Hx_device[ tid_x ] * dden_xz_eval_device[ tid_x ] );
-    }
+    //   x_fact = gga_fact_1 * dden_sx_eval_device[ tid_x ]
+    //          + gga_fact_2 * (Hz_device[ tid_x ] * dden_zx_eval_device[ tid_x ]
+    //                       +  Hy_device[ tid_x ] * dden_yx_eval_device[ tid_x ]
+    //                       +  Hx_device[ tid_x ] * dden_xx_eval_device[ tid_x ] );
+    //   y_fact = gga_fact_1 * dden_sy_eval_device[ tid_x ]
+    //          + gga_fact_2 * (Hz_device[ tid_x ] * dden_zy_eval_device[ tid_x ]
+    //                       +  Hy_device[ tid_x ] * dden_yy_eval_device[ tid_x ]
+    //                       +  Hx_device[ tid_x ] * dden_xy_eval_device[ tid_x ] );
+    //   z_fact = gga_fact_1 * dden_sz_eval_device[ tid_x ]
+    //                     + gga_fact_2 * (Hz_device[ tid_x ] * dden_zz_eval_device[ tid_x ]
+    //                                  +  Hy_device[ tid_x ] * dden_yz_eval_device[ tid_x ]
+    //                                  +  Hx_device[ tid_x ] * dden_xz_eval_device[ tid_x ] );
+    // }
 
-    if constexpr ( den_selector == DEN_Z_SS_dZ ) {
-      s_fact  = K_device[ tid_x ] * 0.5 * (fact_p - fact_m);
-      x_fact  = gga_fact_3 * dden_zx_eval_device[ tid_x ]
-             +  gga_fact_2 * H_device[ tid_x ] * dden_sx_eval_device[ tid_x ];
-      y_fact  = gga_fact_3 * dden_zy_eval_device[ tid_x ]
-             +  gga_fact_2 * H_device[ tid_x ] * dden_sy_eval_device[ tid_x ];
-      z_fact  = gga_fact_3 * dden_zz_eval_device[ tid_x ]
-             +  gga_fact_2 * H_device[ tid_x ] * dden_sz_eval_device[ tid_x ];
-    }
+    // if constexpr ( den_selector == DEN_Z_SS_dZ ) {
+    //   s_fact  = K_device[ tid_x ] * 0.5 * (fact_p - fact_m);
+    //   x_fact  = gga_fact_3 * dden_zx_eval_device[ tid_x ]
+    //          +  gga_fact_2 * H_device[ tid_x ] * dden_sx_eval_device[ tid_x ];
+    //   y_fact  = gga_fact_3 * dden_zy_eval_device[ tid_x ]
+    //          +  gga_fact_2 * H_device[ tid_x ] * dden_sy_eval_device[ tid_x ];
+    //   z_fact  = gga_fact_3 * dden_zz_eval_device[ tid_x ]
+    //          +  gga_fact_2 * H_device[ tid_x ] * dden_sz_eval_device[ tid_x ];
+    // }
 
-    if constexpr ( den_selector == DEN_Y_SS_dZ ) {
-      s_fact  = K_device[ tid_x ] * 0.5 * (fact_p - fact_m);
-      x_fact  = gga_fact_3 * dden_yx_eval_device[ tid_x ]
-             +  gga_fact_2 * H_device[ tid_x ] * dden_sx_eval_device[ tid_x ];
-      y_fact  = gga_fact_3 * dden_yy_eval_device[ tid_x ]
-             +  gga_fact_2 * H_device[ tid_x ] * dden_sy_eval_device[ tid_x ];
-      z_fact  = gga_fact_3 * dden_yz_eval_device[ tid_x ]
-             +  gga_fact_2 * H_device[ tid_x ] * dden_sz_eval_device[ tid_x ];
-    }
+    // if constexpr ( den_selector == DEN_Y_SS_dZ ) {
+    //   s_fact  = K_device[ tid_x ] * 0.5 * (fact_p - fact_m);
+    //   x_fact  = gga_fact_3 * dden_yx_eval_device[ tid_x ]
+    //          +  gga_fact_2 * H_device[ tid_x ] * dden_sx_eval_device[ tid_x ];
+    //   y_fact  = gga_fact_3 * dden_yy_eval_device[ tid_x ]
+    //          +  gga_fact_2 * H_device[ tid_x ] * dden_sy_eval_device[ tid_x ];
+    //   z_fact  = gga_fact_3 * dden_yz_eval_device[ tid_x ]
+    //          +  gga_fact_2 * H_device[ tid_x ] * dden_sz_eval_device[ tid_x ];
+    // }
 
-    if constexpr ( den_selector == DEN_X_SS_dZ ) {
-      s_fact  = K_device[ tid_x ] * 0.5 * (fact_p - fact_m);
-      x_fact  = gga_fact_3 * dden_xx_eval_device[ tid_x ]
-             +  gga_fact_2 * H_device[ tid_x ] * dden_sx_eval_device[ tid_x ];
-      y_fact  = gga_fact_3 * dden_xy_eval_device[ tid_x ]
-             +  gga_fact_2 * H_device[ tid_x ] * dden_sy_eval_device[ tid_x ];
-      z_fact  = gga_fact_3 * dden_xz_eval_device[ tid_x ]
-             +  gga_fact_2 * H_device[ tid_x ] * dden_sz_eval_device[ tid_x ];
-    }
+    // if constexpr ( den_selector == DEN_X_SS_dZ ) {
+    //   s_fact  = K_device[ tid_x ] * 0.5 * (fact_p - fact_m);
+    //   x_fact  = gga_fact_3 * dden_xx_eval_device[ tid_x ]
+    //          +  gga_fact_2 * H_device[ tid_x ] * dden_sx_eval_device[ tid_x ];
+    //   y_fact  = gga_fact_3 * dden_xy_eval_device[ tid_x ]
+    //          +  gga_fact_2 * H_device[ tid_x ] * dden_sy_eval_device[ tid_x ];
+    //   z_fact  = gga_fact_3 * dden_xz_eval_device[ tid_x ]
+    //          +  gga_fact_2 * H_device[ tid_x ] * dden_sz_eval_device[ tid_x ];
+    // }
 
     if constexpr ( is_LL ){
     z_matrix_device[ ibfoff ] =   x_fact * dbasis_x_eval_device[ ibfoff ]      
@@ -893,18 +893,6 @@ __global__ void zmat_mgga_vxc_uks_kernel( size_t        ntasks,
       else if ( sel == DEN_Z )  zmat_##xc_approx##_vxc_gks_kernel<DEN_Z><<< blocks, threads, 0, stream >>>( ntasks, tasks_device ); \
       else if ( sel == DEN_Y )  zmat_##xc_approx##_vxc_gks_kernel<DEN_Y><<< blocks, threads, 0, stream >>>( ntasks, tasks_device ); \
       else if ( sel == DEN_X )  zmat_##xc_approx##_vxc_gks_kernel<DEN_X><<< blocks, threads, 0, stream >>>( ntasks, tasks_device ); \
-      else if ( sel == DEN_S_SS_dX )  zmat_##xc_approx##_vxc_gks_kernel<DEN_S_SS_dX><<< blocks, threads, 0, stream >>>( ntasks, tasks_device ); \
-      else if ( sel == DEN_Z_SS_dX )  zmat_##xc_approx##_vxc_gks_kernel<DEN_Z_SS_dX><<< blocks, threads, 0, stream >>>( ntasks, tasks_device ); \
-      else if ( sel == DEN_Y_SS_dX )  zmat_##xc_approx##_vxc_gks_kernel<DEN_Y_SS_dX><<< blocks, threads, 0, stream >>>( ntasks, tasks_device ); \
-      else if ( sel == DEN_X_SS_dX )  zmat_##xc_approx##_vxc_gks_kernel<DEN_X_SS_dX><<< blocks, threads, 0, stream >>>( ntasks, tasks_device ); \
-      else if ( sel == DEN_S_SS_dY )  zmat_##xc_approx##_vxc_gks_kernel<DEN_S_SS_dY><<< blocks, threads, 0, stream >>>( ntasks, tasks_device ); \
-      else if ( sel == DEN_Z_SS_dY )  zmat_##xc_approx##_vxc_gks_kernel<DEN_Z_SS_dY><<< blocks, threads, 0, stream >>>( ntasks, tasks_device ); \
-      else if ( sel == DEN_Y_SS_dY )  zmat_##xc_approx##_vxc_gks_kernel<DEN_Y_SS_dY><<< blocks, threads, 0, stream >>>( ntasks, tasks_device ); \
-      else if ( sel == DEN_X_SS_dY )  zmat_##xc_approx##_vxc_gks_kernel<DEN_X_SS_dY><<< blocks, threads, 0, stream >>>( ntasks, tasks_device ); \
-      else if ( sel == DEN_S_SS_dZ )  zmat_##xc_approx##_vxc_gks_kernel<DEN_S_SS_dZ><<< blocks, threads, 0, stream >>>( ntasks, tasks_device ); \
-      else if ( sel == DEN_Z_SS_dZ )  zmat_##xc_approx##_vxc_gks_kernel<DEN_Z_SS_dZ><<< blocks, threads, 0, stream >>>( ntasks, tasks_device ); \
-      else if ( sel == DEN_Y_SS_dZ )  zmat_##xc_approx##_vxc_gks_kernel<DEN_Y_SS_dZ><<< blocks, threads, 0, stream >>>( ntasks, tasks_device ); \
-      else if ( sel == DEN_X_SS_dZ )  zmat_##xc_approx##_vxc_gks_kernel<DEN_X_SS_dZ><<< blocks, threads, 0, stream >>>( ntasks, tasks_device ); \
       else GAUXC_GENERIC_EXCEPTION( "zmat_##xc_approx##_vxc invalid density" ); \
       break; \
     default: \

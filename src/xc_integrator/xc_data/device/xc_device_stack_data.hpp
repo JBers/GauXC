@@ -73,6 +73,17 @@ struct XCDeviceStackData : public XCDeviceData {
     double* dmat_z_device   = nullptr;  /// Ditto for Z,Y,X densities
     double* dmat_y_device   = nullptr;
     double* dmat_x_device   = nullptr;
+
+    double* dmat_s_ss_device   = nullptr;  ///< Static density matrix storage (nbf,nbf)
+    double* dmat_z_ss_device   = nullptr;  /// SS Block for DKS (Real part)
+    double* dmat_y_ss_device   = nullptr;  /// Ditto for Z,Y,X densities
+    double* dmat_x_ss_device   = nullptr;
+
+    double* dmat_s_ss_im_device   = nullptr;  ///< Static density matrix storage (nbf,nbf)
+    double* dmat_z_ss_im_device   = nullptr;  /// SS Block for DKS (Imaginary part)
+    double* dmat_y_ss_im_device   = nullptr;  /// Ditto for Z,Y,X densities
+    double* dmat_x_ss_im_device   = nullptr;
+
     double* vxc_s_device    = nullptr;  ///< VXC storage (nbf, nbf)
     double* vxc_z_device    = nullptr;  /// Ditto for Z,Y,X densities
     double* vxc_y_device    = nullptr;
@@ -83,7 +94,7 @@ struct XCDeviceStackData : public XCDeviceData {
     double* vxc_y_ss_device    = nullptr;
     double* vxc_x_ss_device    = nullptr;
 
-    double* vxc_s_ss_im_device    = nullptr;  ///< VXC SS imag storage (nbf, nbf) (not it paper)
+    double* vxc_s_ss_im_device    = nullptr;  ///< VXC SS imag storage (nbf, nbf) (not in paper)
     double* vxc_z_ss_im_device    = nullptr;  /// Ditto for Z,Y,X densities
     double* vxc_y_ss_im_device    = nullptr;
     double* vxc_x_ss_im_device    = nullptr;
@@ -106,6 +117,14 @@ struct XCDeviceStackData : public XCDeviceData {
         case DEN_Z: return dmat_z_device;
         case DEN_Y: return dmat_y_device;
         case DEN_X: return dmat_x_device;
+        case DEN_S_SS: return dmat_s_ss_device;
+        case DEN_Z_SS: return dmat_z_ss_device;
+        case DEN_Y_SS: return dmat_y_ss_device;
+        case DEN_X_SS: return dmat_x_ss_device;
+        case DEN_S_SS_IM: return dmat_s_ss_im_device;
+        case DEN_Z_SS_IM: return dmat_z_ss_im_device;
+        case DEN_Y_SS_IM: return dmat_y_ss_im_device;
+        case DEN_X_SS_IM: return dmat_x_ss_im_device;
         default: GAUXC_GENERIC_EXCEPTION("den_selector: density_id not recognized");
       } 
       return nullptr;
@@ -117,6 +136,14 @@ struct XCDeviceStackData : public XCDeviceData {
         case DEN_Z: return vxc_z_device;
         case DEN_Y: return vxc_y_device;
         case DEN_X: return vxc_x_device;
+        case DEN_S_SS: return vxc_s_ss_device;
+        case DEN_Z_SS: return vxc_z_ss_device;
+        case DEN_Y_SS: return vxc_y_ss_device;
+        case DEN_X_SS: return vxc_x_ss_device;
+        case DEN_S_SS_IM: return vxc_s_ss_im_device;
+        case DEN_Z_SS_IM: return vxc_z_ss_im_device;
+        case DEN_Y_SS_IM: return vxc_y_ss_im_device;
+        case DEN_X_SS_IM: return vxc_x_ss_im_device;
         default: GAUXC_GENERIC_EXCEPTION("vxc_selector: density_id not recognized");
       } 
       return nullptr;
