@@ -7,7 +7,7 @@
  */
 
 #pragma once
-#include <physcon.hpp>
+#include <gauxc/physcon.hpp>
 
 namespace GauXC {
 
