@@ -125,20 +125,39 @@ void XCDeviceStackData::allocate_static_data_exc_vxc( int32_t nbf, int32_t nshel
   static_stack.dmat_s_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
   if( not (allocated_terms.ks_scheme == RKS) ) {
       static_stack.dmat_z_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
-      if( allocated_terms.ks_scheme == GKS ) {
+      if( not (allocated_terms.ks_scheme == UKS) ) {
         static_stack.dmat_y_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
         static_stack.dmat_x_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
+        if( allocated_terms.ks_scheme == DKS ) {
+          static_stack.dmat_s_ss_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
+          static_stack.dmat_z_ss_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
+          static_stack.dmat_y_ss_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
+          static_stack.dmat_x_ss_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
+          static_stack.dmat_s_ss_im_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
+          static_stack.dmat_z_ss_im_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
+          static_stack.dmat_y_ss_im_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
+          static_stack.dmat_x_ss_im_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
       }
+    }
   }
 
   if( do_vxc ) {
     static_stack.vxc_s_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
     if( not (allocated_terms.ks_scheme == RKS) ) {
         static_stack.vxc_z_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
-        if( allocated_terms.ks_scheme == GKS ) {
-          static_stack.vxc_y_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
-          static_stack.vxc_x_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
-        }
+      if( not (allocated_terms.ks_scheme == UKS) ) {
+        static_stack.vxc_y_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
+        static_stack.vxc_x_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
+        if( allocated_terms.ks_scheme == DKS ) {
+          static_stack.vxc_s_ss_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
+          static_stack.vxc_z_ss_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
+          static_stack.vxc_y_ss_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
+          static_stack.vxc_x_ss_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
+          static_stack.vxc_s_ss_im_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
+          static_stack.vxc_z_ss_im_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
+          static_stack.vxc_y_ss_im_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
+          static_stack.vxc_x_ss_im_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
+      }
     }
   }
 
