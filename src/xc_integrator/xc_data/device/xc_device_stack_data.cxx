@@ -383,11 +383,29 @@ void XCDeviceStackData::send_static_data_density_basis( const double* Ps, int32_
   if( not is_rks ) {
     if( ldpz != (int)nbf ) GAUXC_GENERIC_EXCEPTION("LDPz must bf NBF");
     device_backend_->copy_async( nbf*nbf, Pz, static_stack.dmat_z_device, "P_z H2D" );
-    if( is_gks ) {
+    if( not is_uks ) {
       if( ldpy != (int)nbf ) GAUXC_GENERIC_EXCEPTION("LDPy must bf NBF");
       if( ldpx != (int)nbf ) GAUXC_GENERIC_EXCEPTION("LDPx must bf NBF");
       device_backend_->copy_async( nbf*nbf, Py, static_stack.dmat_y_device, "P_y H2D" );
       device_backend_->copy_async( nbf*nbf, Px, static_stack.dmat_x_device, "P_x H2D" );
+      if( not is_gks ) {
+        if( ldps_ss != (int)nbf ) GAUXC_GENERIC_EXCEPTION("LDPy SS must bf NBF");
+        if( ldpz_ss != (int)nbf ) GAUXC_GENERIC_EXCEPTION("LDPx SS must bf NBF");
+        if( ldpy_ss != (int)nbf ) GAUXC_GENERIC_EXCEPTION("LDPy SS must bf NBF");
+        if( ldpx_ss != (int)nbf ) GAUXC_GENERIC_EXCEPTION("LDPx SS must bf NBF");
+        device_backend_->copy_async( nbf*nbf, Ps_SS, static_stack.dmat_s_ss_device, "P_y SS H2D" );
+        device_backend_->copy_async( nbf*nbf, Pz_SS, static_stack.dmat_z_ss_device, "P_x SS H2D" );
+        device_backend_->copy_async( nbf*nbf, Py_SS, static_stack.dmat_y_ss_device, "P_y SS H2D" );
+        device_backend_->copy_async( nbf*nbf, Px_SS, static_stack.dmat_x_ss_device, "P_x SS H2D" );
+        if( ldps_ss_im != (int)nbf ) GAUXC_GENERIC_EXCEPTION("LDPy SS im must bf NBF");
+        if( ldpz_ss_im != (int)nbf ) GAUXC_GENERIC_EXCEPTION("LDPx SS im must bf NBF");
+        if( ldpy_ss_im != (int)nbf ) GAUXC_GENERIC_EXCEPTION("LDPy SS im must bf NBF");
+        if( ldpx_ss_im != (int)nbf ) GAUXC_GENERIC_EXCEPTION("LDPx SS im must bf NBF");
+        device_backend_->copy_async( nbf*nbf, Ps_SS_imag, static_stack.dmat_s_ss_im_device, "P_y SS im H2D" );
+        device_backend_->copy_async( nbf*nbf, Pz_SS_imag, static_stack.dmat_z_ss_im_device, "P_x SS im H2D" );
+        device_backend_->copy_async( nbf*nbf, Py_SS_imag, static_stack.dmat_y_ss_im_device, "P_y SS im H2D" );
+        device_backend_->copy_async( nbf*nbf, Px_SS_imag, static_stack.dmat_x_ss_im_device, "P_x SS im H2D" );
+    }
     }
   }
 
@@ -580,6 +598,14 @@ void XCDeviceStackData::zero_exc_vxc_integrands(integrator_term_tracker enabled_
   if(static_stack.vxc_z_device) device_backend_->set_zero( nbf*nbf, static_stack.vxc_z_device, "VXCz Zero" );
   if(static_stack.vxc_y_device) device_backend_->set_zero( nbf*nbf, static_stack.vxc_y_device, "VXCy Zero" );
   if(static_stack.vxc_x_device) device_backend_->set_zero( nbf*nbf, static_stack.vxc_x_device, "VXCx Zero" );
+  if(static_stack.vxc_s_ss_device) device_backend_->set_zero( nbf*nbf, static_stack.vxc_s_ss_device, "VXCs SS Zero" );
+  if(static_stack.vxc_z_ss_device) device_backend_->set_zero( nbf*nbf, static_stack.vxc_z_ss_device, "VXCz SS Zero" );
+  if(static_stack.vxc_y_ss_device) device_backend_->set_zero( nbf*nbf, static_stack.vxc_y_ss_device, "VXCy SS Zero" );
+  if(static_stack.vxc_x_ss_device) device_backend_->set_zero( nbf*nbf, static_stack.vxc_x_ss_device, "VXCx SS Zero" );
+  if(static_stack.vxc_s_ss_im_device) device_backend_->set_zero( nbf*nbf, static_stack.vxc_s_ss_im_device, "VXCs SS Im Zero" );
+  if(static_stack.vxc_z_ss_im_device) device_backend_->set_zero( nbf*nbf, static_stack.vxc_z_ss_im_device, "VXCz SS Im Zero" );
+  if(static_stack.vxc_y_ss_im_device) device_backend_->set_zero( nbf*nbf, static_stack.vxc_y_ss_im_device, "VXCy SS Im Zero" );
+  if(static_stack.vxc_x_ss_im_device) device_backend_->set_zero( nbf*nbf, static_stack.vxc_x_ss_im_device, "VXCx SS Im Zero" );
   device_backend_->set_zero( 1,       static_stack.exc_device, "EXC Zero" );
   device_backend_->set_zero( 1,       static_stack.nel_device, "NEL Zero" );
 
