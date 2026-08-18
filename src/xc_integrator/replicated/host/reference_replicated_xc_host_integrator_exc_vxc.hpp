@@ -974,8 +974,8 @@ void ReferenceReplicatedXCHostIntegrator<ValueType>::
   *spin_N_EL = spin_NEL_WORK;
 
   // Prints integrated charge density (N_EL) and integrated mnorm (spin_N_EL)
-  // std::cout<<"N_EL =  "<<*N_EL<<std::endl;
-  // std::cout<<"spin N_EL =  "<<*spin_N_EL<<std::endl;
+  std::cout<<"N_EL =  "<<*N_EL<<std::endl;
+  std::cout<<"spin N_EL =  "<<*spin_N_EL<<std::endl;
   // std::cout<<"EXC =  "<<*EXC<<std::endl;
 
 
