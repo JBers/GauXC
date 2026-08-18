@@ -263,7 +263,8 @@ namespace GauXC {
 
   
     auto flip = -1.0;
-
+    std::cout<<"speedof light GAUXC "<<SpeedOfLight<<std::endl;
+    std::cout<<"RKB_factor GAUXC "<<RKB_factor<<std::endl;
  
     for( int32_t i = 0; i < (int32_t)npts; ++i ) {
 
