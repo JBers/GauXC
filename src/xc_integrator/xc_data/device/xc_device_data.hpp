@@ -41,10 +41,22 @@ enum integrator_ks_scheme : uint32_t {
 
 enum density_id : uint32_t {
   _UNDEF_DEN      = 0,
-  DEN_S           = 1,    // RKS, UKS, GKS
-  DEN_Z           = 2,    // UKS, GKS
-  DEN_Y           = 3,    // GKS
-  DEN_X           = 4     // GKS
+  DEN_S           = 1,    // RKS, UKS, GKS, DKS
+  DEN_Z           = 2,    // UKS, GKS, DKS
+  DEN_Y           = 3,    // GKS, DKS
+  DEN_X           = 4,    // GKS, DKS
+  DEN_S_SS_dX     = 5,    // DKS
+  DEN_Z_SS_dX     = 6,    // DKS
+  DEN_Y_SS_dX     = 7,    // DKS
+  DEN_X_SS_dX     = 8,    // DKS
+  DEN_S_SS_dY     = 9,    // DKS
+  DEN_Z_SS_dY     = 10,   // DKS
+  DEN_Y_SS_dY     = 11,   // DKS
+  DEN_X_SS_dY     = 12,   // DKS
+  DEN_S_SS_dZ     = 13,   // DKS
+  DEN_Z_SS_dZ     = 14,   // DKS
+  DEN_Y_SS_dZ     = 15,   // DKS
+  DEN_X_SS_dZ     = 16    // DKS
 };
 
 struct integrator_term_tracker {
