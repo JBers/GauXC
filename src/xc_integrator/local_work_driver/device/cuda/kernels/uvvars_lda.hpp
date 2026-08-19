@@ -72,6 +72,62 @@ __global__ void eval_vvar_lda_kern( size_t        ntasks,
   
 }
 
+template <bool trial, density_id den_select>
+__global__ void eval_vvar_lda_dks_kern( size_t        ntasks,
+                                    XCDeviceTask* tasks_device) {
+
+  const int batch_idx = blockIdx.z;
+  if( batch_idx >= ntasks ) return;
+
+  auto& task = tasks_device[ batch_idx ];
+
+  const auto npts            = task.npts;
+  const auto nbf             = task.bfn_screening.nbe;
+
+  double* den_eval_device   = nullptr;
+  // use the "U" variable (+/- for UKS) even though at this point the density (S/Z) is stored
+  if constexpr (trial){
+    if constexpr (den_select == DEN_S) den_eval_device = task.tden_s;
+    if constexpr (den_select == DEN_Z) den_eval_device = task.tden_z;
+    if constexpr (den_select == DEN_Y) den_eval_device = task.tden_y;
+    if constexpr (den_select == DEN_X) den_eval_device = task.tden_x;
+  }else{
+      if constexpr (den_select == DEN_S) den_eval_device = task.den_s;
+      if constexpr (den_select == DEN_Z) den_eval_device = task.den_z;
+      if constexpr (den_select == DEN_Y) den_eval_device = task.den_y;
+      if constexpr (den_select == DEN_X) den_eval_device = task.den_x;
+  }
+
+  const auto* basis_eval_device = task.bf;
+
+  const auto* den_basis_prod_device = task.zmat;
+
+  const int tid_x = blockIdx.x * blockDim.x + threadIdx.x;
+  const int tid_y = blockIdx.y * blockDim.y + threadIdx.y;
+
+  register double den_reg = 0.;
+
+  if( tid_x < nbf and tid_y < npts ) {
+
+    const double* bf_col   = basis_eval_device     + tid_x*npts;
+    const double* db_col   = den_basis_prod_device + tid_x*npts;
+
+    den_reg = bf_col[ tid_y ]   * db_col[ tid_y ];
+
+  }
+
+  // Warp blocks are stored col major
+  constexpr auto warp_size = cuda::warp_size;
+  //constexpr auto max_warps_per_thread_block = cuda::max_warps_per_thread_block;
+  den_reg = cuda::warp_reduce_sum<warp_size>( den_reg );
+
+
+  if( threadIdx.x == 0 and tid_y < npts ) {
+    atomicAdd( den_eval_device   + tid_y, den_reg );
+  }
+  
+}
+
 __global__ void eval_uvars_lda_rks_kernel( size_t ntasks, XCDeviceTask* tasks_device) {
   // eval_vvars populated uvar storage already in the case of LDA+RKS
   return;

@@ -156,6 +156,143 @@ __global__ void eval_vvar_gga_kern( size_t        ntasks,
 
 }
 
+template <bool trial, density_id den_select>
+__global__ void eval_vvar_gga_dks_kern( size_t        ntasks,
+                                    XCDeviceTask* tasks_device) {
+
+  const int batch_idx = blockIdx.z;
+  if( batch_idx >= ntasks ) return;
+
+  auto& task = tasks_device[ batch_idx ];
+
+  const auto npts            = task.npts;
+  const auto nbf             = task.bfn_screening.nbe;
+
+  double* den_eval_device   = nullptr;
+  double* den_x_eval_device = nullptr;
+  double* den_y_eval_device = nullptr;
+  double* den_z_eval_device = nullptr;
+
+  constexpr auto warp_size = cuda::warp_size;
+
+  if constexpr (trial){
+    if constexpr (den_select == DEN_S) {
+      den_eval_device   = task.tden_s;
+      den_x_eval_device = task.tdden_sx;
+      den_y_eval_device = task.tdden_sy;
+      den_z_eval_device = task.tdden_sz;
+    }
+    if constexpr (den_select == DEN_Z) {
+      den_eval_device   = task.tden_z;
+      den_x_eval_device = task.tdden_zx;
+      den_y_eval_device = task.tdden_zy;
+      den_z_eval_device = task.tdden_zz;
+    }
+    if constexpr (den_select == DEN_Y) {
+      den_eval_device   = task.tden_y;
+      den_x_eval_device = task.tdden_yx;
+      den_y_eval_device = task.tdden_yy;
+      den_z_eval_device = task.tdden_yz;
+    }
+    if constexpr (den_select == DEN_X) {
+      den_eval_device   = task.tden_x;
+      den_x_eval_device = task.tdden_xx;
+      den_y_eval_device = task.tdden_xy;
+      den_z_eval_device = task.tdden_xz;
+    }
+  }else{
+    if constexpr (den_select == DEN_S) {
+      den_eval_device   = task.den_s;
+      den_x_eval_device = task.dden_sx;
+      den_y_eval_device = task.dden_sy;
+      den_z_eval_device = task.dden_sz;
+    }
+    if constexpr (den_select == DEN_Z) {
+      den_eval_device   = task.den_z;
+      den_x_eval_device = task.dden_zx;
+      den_y_eval_device = task.dden_zy;
+      den_z_eval_device = task.dden_zz;
+    }
+    if constexpr (den_select == DEN_Y) {
+      den_eval_device   = task.den_y;
+      den_x_eval_device = task.dden_yx;
+      den_y_eval_device = task.dden_yy;
+      den_z_eval_device = task.dden_yz;
+    }
+    if constexpr (den_select == DEN_X) {
+      den_eval_device   = task.den_x;
+      den_x_eval_device = task.dden_xx;
+      den_y_eval_device = task.dden_xy;
+      den_z_eval_device = task.dden_xz;
+    }
+  }
+
+  const auto* basis_eval_device = task.bf;
+  const auto* dbasis_x_eval_device = task.dbfx;
+  const auto* dbasis_y_eval_device = task.dbfy;
+  const auto* dbasis_z_eval_device = task.dbfz;
+
+  const auto* den_basis_prod_device = task.zmat;
+  
+  __shared__ double den_shared[4][warp_size][VVAR_KERNEL_SM_BLOCK+1];
+
+  for ( int bid_x = blockIdx.x * blockDim.x; 
+        bid_x < nbf;
+        bid_x += blockDim.x * gridDim.x ) {
+    
+    for ( int bid_y = blockIdx.y * VVAR_KERNEL_SM_BLOCK; 
+          bid_y < npts;
+          bid_y += VVAR_KERNEL_SM_BLOCK * gridDim.y ) {
+        
+      for (int sm_y = threadIdx.y; sm_y < VVAR_KERNEL_SM_BLOCK; sm_y += blockDim.y) {
+        den_shared[0][threadIdx.x][sm_y] = 0.;
+        den_shared[1][threadIdx.x][sm_y] = 0.;
+        den_shared[2][threadIdx.x][sm_y] = 0.;
+        den_shared[3][threadIdx.x][sm_y] = 0.;
+
+        if (bid_y + threadIdx.x < npts and bid_x + sm_y < nbf) { 
+          const double* db_col   = den_basis_prod_device + (bid_x + sm_y)*npts;
+          const double* bf_col   = basis_eval_device     + (bid_x + sm_y)*npts;
+          const double* bf_x_col = dbasis_x_eval_device  + (bid_x + sm_y)*npts;
+          const double* bf_y_col = dbasis_y_eval_device  + (bid_x + sm_y)*npts;
+          const double* bf_z_col = dbasis_z_eval_device  + (bid_x + sm_y)*npts;
+
+          den_shared[0][threadIdx.x][sm_y] = bf_col  [ bid_y + threadIdx.x ] * db_col[ bid_y + threadIdx.x ];
+          den_shared[1][threadIdx.x][sm_y] = bf_x_col[ bid_y + threadIdx.x ] * db_col[ bid_y + threadIdx.x ];
+          den_shared[2][threadIdx.x][sm_y] = bf_y_col[ bid_y + threadIdx.x ] * db_col[ bid_y + threadIdx.x ];
+          den_shared[3][threadIdx.x][sm_y] = bf_z_col[ bid_y + threadIdx.x ] * db_col[ bid_y + threadIdx.x ];
+        }
+      }
+      __syncthreads();
+
+
+      for (int sm_y = threadIdx.y; sm_y < VVAR_KERNEL_SM_BLOCK; sm_y += blockDim.y) {
+        const int tid_y = bid_y + sm_y;
+        register double den_reg = den_shared[0][sm_y][threadIdx.x];
+        register double dx_reg  = den_shared[1][sm_y][threadIdx.x];
+        register double dy_reg  = den_shared[2][sm_y][threadIdx.x];
+        register double dz_reg  = den_shared[3][sm_y][threadIdx.x];
+
+        // Warp blocks are stored col major
+        den_reg =     cuda::warp_reduce_sum<warp_size>( den_reg );
+        dx_reg  = 2. * cuda::warp_reduce_sum<warp_size>( dx_reg );
+        dy_reg  = 2. * cuda::warp_reduce_sum<warp_size>( dy_reg );
+        dz_reg  = 2. * cuda::warp_reduce_sum<warp_size>( dz_reg );
+
+
+        if( threadIdx.x == 0 and tid_y < npts ) {
+          atomicAdd( den_eval_device   + tid_y, den_reg );
+          atomicAdd( den_x_eval_device + tid_y, dx_reg  );
+          atomicAdd( den_y_eval_device + tid_y, dy_reg  );
+          atomicAdd( den_z_eval_device + tid_y, dz_reg  );
+        }
+      }
+      __syncthreads();
+    }
+  }
+
+}
+
 __global__ void eval_uvars_gga_rks_kernel( size_t ntasks, XCDeviceTask* tasks_device) {
   const int batch_idx = blockIdx.z;
   if( batch_idx >= ntasks ) return;

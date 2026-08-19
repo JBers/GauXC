@@ -61,22 +61,42 @@ namespace GauXC {
 
 #define EVAL_VVARS_KERNEL(xc_approx) \
   cudaStream_t stream = queue.queue_as<util::cuda_stream>();  \
-  switch ( den_select ) { \
-    case DEN_S: \
-      eval_vvar_##xc_approx##_kern<trial,DEN_S><<< blocks, threads, 0, stream >>>( ntasks, device_tasks ); \
-      break; \
-    case DEN_Z: \
-      eval_vvar_##xc_approx##_kern<trial,DEN_Z><<< blocks, threads, 0, stream >>>( ntasks, device_tasks ); \
-      break; \
-    case DEN_Y: \
-      eval_vvar_##xc_approx##_kern<trial,DEN_Y><<< blocks, threads, 0, stream >>>( ntasks, device_tasks ); \
-      break; \
-    case DEN_X: \
-      eval_vvar_##xc_approx##_kern<trial,DEN_X><<< blocks, threads, 0, stream >>>( ntasks, device_tasks ); \
-      break; \
+  switch ( ks_scheme ) { \
+    case DKS: \
+      switch ( den_select ) { \
+        case DEN_S: \
+          eval_vvar_##xc_approx##_dks_kern<trial,DEN_S><<< blocks, threads, 0, stream >>>( ntasks, device_tasks ); \
+          break; \
+        case DEN_Z: \
+          eval_vvar_##xc_approx##_dks_kern<trial,DEN_Z><<< blocks, threads, 0, stream >>>( ntasks, device_tasks ); \
+          break; \
+        case DEN_Y: \
+          eval_vvar_##xc_approx##_dks_kern<trial,DEN_Y><<< blocks, threads, 0, stream >>>( ntasks, device_tasks ); \
+          break; \
+        case DEN_X: \
+          eval_vvar_##xc_approx##_dks_kern<trial,DEN_X><<< blocks, threads, 0, stream >>>( ntasks, device_tasks ); \
+          break; \
+        default: \
+          GAUXC_GENERIC_EXCEPTION( "Unexpected KS scheme when attempting to evaluate V vars" ); \
+      }
     default: \
-      GAUXC_GENERIC_EXCEPTION( "Unexpected KS scheme when attempting to evaluate V vars" ); \
+      switch ( den_select ) { \
+        case DEN_S: \
+          eval_vvar_##xc_approx##_kern<trial,DEN_S><<< blocks, threads, 0, stream >>>( ntasks, device_tasks ); \
+          break; \
+        case DEN_Z: \
+          eval_vvar_##xc_approx##_kern<trial,DEN_Z><<< blocks, threads, 0, stream >>>( ntasks, device_tasks ); \
+          break; \
+        case DEN_Y: \
+          eval_vvar_##xc_approx##_kern<trial,DEN_Y><<< blocks, threads, 0, stream >>>( ntasks, device_tasks ); \
+          break; \
+        case DEN_X: \
+          eval_vvar_##xc_approx##_kern<trial,DEN_X><<< blocks, threads, 0, stream >>>( ntasks, device_tasks ); \
+          break; \
+        default: \
+          GAUXC_GENERIC_EXCEPTION( "Unexpected KS scheme when attempting to evaluate V vars" ); \
   }
+}
 
 // Internal implementation with trial parameter
 void eval_tmat_lda( size_t ntasks, int32_t npts_max, integrator_ks_scheme ks_scheme,

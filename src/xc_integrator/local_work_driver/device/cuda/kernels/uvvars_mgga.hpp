@@ -156,7 +156,13 @@ __global__ void eval_vvar_mgga_kern( size_t           ntasks,
   }
 }
 
+template <bool trial, density_id den_select, bool need_lapl>
+__global__ void eval_vvar_mgga_dks_kern( size_t           ntasks,
+                                     XCDeviceTask* tasks_device) {
 
+  GAUXC_GENERIC_EXCEPTION( "V vars for mgga + DKS NYI" );
+
+}
 
 
 template <bool need_lapl>
