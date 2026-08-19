@@ -479,24 +479,43 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
       else                   lwd->eval_vvars_mgga( &device_data, enabled_terms.ks_scheme, den_id, need_lapl );
     };
 
-    do_xmat_vvar(DEN_S);
-    if (not is_rks) {
-      do_xmat_vvar(DEN_Z);
-      if (not is_uks) {
-        do_xmat_vvar(DEN_Y);
-        do_xmat_vvar(DEN_X);
-        if (not is_gks) {
-          do_xmat_vvar(DEN_S_SS);
-          do_xmat_vvar(DEN_Z_SS);
-          do_xmat_vvar(DEN_Y_SS);
-          do_xmat_vvar(DEN_X_SS);
-          do_xmat_vvar(DEN_S_SS_IM);
-          do_xmat_vvar(DEN_Z_SS_IM);
-          do_xmat_vvar(DEN_Y_SS_IM);
-          do_xmat_vvar(DEN_X_SS_IM);
+    auto do_xmat = [&](density_id den_id) {
+      lwd->eval_xmat( xmat_fac, &device_data, need_xmat_grad, den_id );
+    };
+
+    auto do_vvar = [&](density_id den_id) {
+      if(func.is_lda())      lwd->eval_vvars_lda( &device_data, enabled_terms.ks_scheme, den_id );
+      else if(func.is_gga()) lwd->eval_vvars_gga( &device_data, enabled_terms.ks_scheme, den_id ); 
+      else                   lwd->eval_vvars_mgga( &device_data, enabled_terms.ks_scheme, den_id, need_lapl );
+    };
+
+    if (not is_dks) {
+      do_xmat_vvar(DEN_S);
+      if (not is_rks) {
+        do_xmat_vvar(DEN_Z);
+        if (not is_uks) {
+          do_xmat_vvar(DEN_Y);
+          do_xmat_vvar(DEN_X);
         }
+      } 
+    } else {
+        do_xmat(DEN_S);
+        do_xmat(DEN_Z);
+        do_xmat(DEN_Y);
+        do_xmat(DEN_X);
+        do_xmat(DEN_S_SS);
+        do_xmat(DEN_Z_SS);
+        do_xmat(DEN_Y_SS);
+        do_xmat(DEN_X_SS);
+        do_xmat(DEN_S_SS_IM);
+        do_xmat(DEN_Z_SS_IM);
+        do_xmat(DEN_Y_SS_IM);
+        do_xmat(DEN_X_SS_IM);
+        do_vvar(DEN_S);
+        do_vvar(DEN_Z);
+        do_vvar(DEN_Y);
+        do_vvar(DEN_X);
     }
-  }
 
 
     // Evaluate U variables
