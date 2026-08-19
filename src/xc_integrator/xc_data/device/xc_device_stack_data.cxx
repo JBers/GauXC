@@ -157,6 +157,7 @@ void XCDeviceStackData::allocate_static_data_exc_vxc( int32_t nbf, int32_t nshel
           static_stack.vxc_z_ss_im_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
           static_stack.vxc_y_ss_im_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
           static_stack.vxc_x_ss_im_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
+        }
       }
     }
   }
