@@ -136,7 +136,7 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
 
     // Evaluate the density
     const bool do_vvar_grad = false;
-    lwd->eval_vvars_lda( &device_data, DEN_S );
+    lwd->eval_vvars_lda( &device_data, enabled_terms.ks_scheme, DEN_S );
 
     // Do scalar N_EL integration
     lwd->inc_nel( &device_data );

@@ -74,16 +74,16 @@ public:
   void eval_uvars_lda ( XCDeviceData*, integrator_ks_scheme ) ;
   void eval_uvars_gga ( XCDeviceData*, integrator_ks_scheme ) ;
   void eval_uvars_mgga( XCDeviceData*, integrator_ks_scheme, bool ) ;
-  void eval_vvars_lda ( XCDeviceData*, density_id ) ;
-  void eval_vvars_gga ( XCDeviceData*, density_id ) ;
-  void eval_vvars_mgga( XCDeviceData*, density_id, bool ) ;
+  void eval_vvars_lda ( XCDeviceData*, integrator_ks_scheme, density_id ) ;
+  void eval_vvars_gga ( XCDeviceData*, integrator_ks_scheme, density_id ) ;
+  void eval_vvars_mgga( XCDeviceData*, integrator_ks_scheme, density_id, bool ) ;
 
   void eval_tmat_lda ( XCDeviceData*, integrator_ks_scheme ) ;
   void eval_tmat_gga ( XCDeviceData*, integrator_ks_scheme ) ;
   void eval_tmat_mgga( XCDeviceData*, integrator_ks_scheme, bool ) ;
-  void eval_vvars_lda_trial ( XCDeviceData*, density_id ) ;
-  void eval_vvars_gga_trial ( XCDeviceData*, density_id ) ;
-  void eval_vvars_mgga_trial( XCDeviceData*, density_id, bool ) ;
+  void eval_vvars_lda_trial ( XCDeviceData*, integrator_ks_scheme, density_id ) ;
+  void eval_vvars_gga_trial ( XCDeviceData*, integrator_ks_scheme, density_id ) ;
+  void eval_vvars_mgga_trial( XCDeviceData*, integrator_ks_scheme, density_id, bool ) ;
 
 
   void eval_kern_exc_vxc_lda( const functional_type&, XCDeviceData* );

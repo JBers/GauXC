@@ -251,9 +251,9 @@ namespace GauXC::detail {
       // Evaluate X matrix and V vars
       auto do_xmat_vvar = [&](density_id den_id) {
         lwd->eval_xmat( xmat_fac, &device_data, need_xmat_grad, den_id );
-        if(func.is_lda())      lwd->eval_vvars_lda( &device_data, den_id );
-        else if(func.is_gga()) lwd->eval_vvars_gga( &device_data, den_id ); 
-        else                   lwd->eval_vvars_mgga( &device_data, den_id, need_lapl );
+        if(func.is_lda())      lwd->eval_vvars_lda( &device_data, enabled_terms.ks_scheme, den_id );
+        else if(func.is_gga()) lwd->eval_vvars_gga( &device_data, enabled_terms.ks_scheme, den_id ); 
+        else                   lwd->eval_vvars_mgga( &device_data, enabled_terms.ks_scheme, den_id, need_lapl );
       };
 
       do_xmat_vvar(DEN_S);
@@ -278,9 +278,9 @@ namespace GauXC::detail {
       // Evaluate X matrix and V vars from trial density
       auto do_xmat_vvar_trial = [&](density_id den_id) {
         lwd->eval_xmat_trial( xmat_fac, &device_data, need_xmat_grad, den_id );
-        if(func.is_lda())      lwd->eval_vvars_lda_trial( &device_data, den_id );
-        else if(func.is_gga()) lwd->eval_vvars_gga_trial( &device_data, den_id ); 
-        else                   lwd->eval_vvars_mgga_trial( &device_data, den_id, need_lapl );
+        if(func.is_lda())      lwd->eval_vvars_lda_trial( &device_data, enabled_terms.ks_scheme, den_id );
+        else if(func.is_gga()) lwd->eval_vvars_gga_trial( &device_data, enabled_terms.ks_scheme, den_id ); 
+        else                   lwd->eval_vvars_mgga_trial( &device_data, enabled_terms.ks_scheme, den_id, need_lapl );
       };
 
       do_xmat_vvar_trial(DEN_S);

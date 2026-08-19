@@ -685,7 +685,7 @@ void AoSScheme1Base::eval_uvars_mgga( XCDeviceData* _data, integrator_ks_scheme 
   data->device_backend_->check_error("uvvar mgga" __FILE__ ": " + std::to_string(__LINE__));
 }
 
-void AoSScheme1Base::eval_vvars_lda( XCDeviceData* _data, density_id den_select){
+void AoSScheme1Base::eval_vvars_lda( XCDeviceData* _data, integrator_ks_scheme ks_scheme, density_id den_select){
   auto* data = dynamic_cast<Data*>(_data);
   if ( !data ) GAUXC_BAD_LWD_DATA_CAST();
 
@@ -723,12 +723,12 @@ void AoSScheme1Base::eval_vvars_lda( XCDeviceData* _data, density_id den_select)
 
   // Evaluate V variable
   auto aos_stack     = data->aos_stack;
-  GauXC::eval_vvars_lda( ntasks, nbe_max, npts_max, den_select,
+  GauXC::eval_vvars_lda( ntasks, nbe_max, npts_max, den_select, ks_scheme, 
     aos_stack.device_tasks, data->device_backend_->queue() );
 
 }
 
-void AoSScheme1Base::eval_vvars_gga( XCDeviceData* _data, density_id den_select){
+void AoSScheme1Base::eval_vvars_gga( XCDeviceData* _data, integrator_ks_scheme ks_scheme, density_id den_select){
   auto* data = dynamic_cast<Data*>(_data);
   if ( !data ) GAUXC_BAD_LWD_DATA_CAST();
 
@@ -784,12 +784,12 @@ void AoSScheme1Base::eval_vvars_gga( XCDeviceData* _data, density_id den_select)
   
   // Evaluate V variable
   auto aos_stack = data->aos_stack;
-  GauXC::eval_vvars_gga( ntasks, nbe_max, npts_max, den_select,
+  GauXC::eval_vvars_gga( ntasks, nbe_max, npts_max, den_select, ks_scheme, 
     aos_stack.device_tasks, data->device_backend_->queue() );
 
 }
 
-void AoSScheme1Base::eval_vvars_mgga( XCDeviceData* _data, density_id den_select, bool need_lapl){
+void AoSScheme1Base::eval_vvars_mgga( XCDeviceData* _data, integrator_ks_scheme ks_scheme, density_id den_select, bool need_lapl){
   auto* data = dynamic_cast<Data*>(_data);
   if ( !data ) GAUXC_BAD_LWD_DATA_CAST();
 
@@ -855,7 +855,7 @@ void AoSScheme1Base::eval_vvars_mgga( XCDeviceData* _data, density_id den_select
   
   // Evaluate V variable
   auto aos_stack = data->aos_stack;
-  GauXC::eval_vvars_mgga( ntasks, nbe_max, npts_max, den_select, need_lapl,
+  GauXC::eval_vvars_mgga( ntasks, nbe_max, npts_max, den_select, ks_scheme, need_lapl, 
     aos_stack.device_tasks, data->device_backend_->queue() );
 
 }
@@ -934,7 +934,7 @@ void AoSScheme1Base::eval_tmat_mgga( XCDeviceData* _data, integrator_ks_scheme s
   data->device_backend_->check_error("uvvar mgga trial" __FILE__ ": " + std::to_string(__LINE__));
 }
 
-void AoSScheme1Base::eval_vvars_lda_trial( XCDeviceData* _data, density_id den_select){
+void AoSScheme1Base::eval_vvars_lda_trial( XCDeviceData* _data, integrator_ks_scheme ks_scheme, density_id den_select){
   auto* data = dynamic_cast<Data*>(_data);
   if ( !data ) GAUXC_BAD_LWD_DATA_CAST();
 
@@ -972,12 +972,12 @@ void AoSScheme1Base::eval_vvars_lda_trial( XCDeviceData* _data, density_id den_s
 
   // Evaluate V variable
   auto aos_stack     = data->aos_stack;
-  GauXC::eval_vvars_lda_trial( ntasks, nbe_max, npts_max, den_select,
+  GauXC::eval_vvars_lda_trial( ntasks, nbe_max, npts_max, den_select, ks_scheme, 
     aos_stack.device_tasks, data->device_backend_->queue() );
 
 }
 
-void AoSScheme1Base::eval_vvars_gga_trial( XCDeviceData* _data, density_id den_select){
+void AoSScheme1Base::eval_vvars_gga_trial( XCDeviceData* _data, integrator_ks_scheme ks_scheme, density_id den_select){
   auto* data = dynamic_cast<Data*>(_data);
   if ( !data ) GAUXC_BAD_LWD_DATA_CAST();
 
@@ -1033,12 +1033,12 @@ void AoSScheme1Base::eval_vvars_gga_trial( XCDeviceData* _data, density_id den_s
   
   // Evaluate V variable
   auto aos_stack = data->aos_stack;
-  GauXC::eval_vvars_gga_trial( ntasks, nbe_max, npts_max, den_select,
+  GauXC::eval_vvars_gga_trial( ntasks, nbe_max, npts_max, den_select, ks_scheme, 
     aos_stack.device_tasks, data->device_backend_->queue() );
 
 }
 
-void AoSScheme1Base::eval_vvars_mgga_trial( XCDeviceData* _data, density_id den_select, bool need_lapl){
+void AoSScheme1Base::eval_vvars_mgga_trial( XCDeviceData* _data, integrator_ks_scheme ks_scheme, density_id den_select, bool need_lapl){
   auto* data = dynamic_cast<Data*>(_data);
   if ( !data ) GAUXC_BAD_LWD_DATA_CAST();
 
@@ -1104,7 +1104,7 @@ void AoSScheme1Base::eval_vvars_mgga_trial( XCDeviceData* _data, density_id den_
   
   // Evaluate V variable
   auto aos_stack = data->aos_stack;
-  GauXC::eval_vvars_mgga_trial( ntasks, nbe_max, npts_max, den_select, need_lapl,
+  GauXC::eval_vvars_mgga_trial( ntasks, nbe_max, npts_max, den_select, ks_scheme, need_lapl,
     aos_stack.device_tasks, data->device_backend_->queue() );
 
 }

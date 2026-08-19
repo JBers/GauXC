@@ -84,6 +84,7 @@ __global__ void eval_vvar_lda_dks_kern( size_t        ntasks,
   const auto npts            = task.npts;
   const auto nbf             = task.bfn_screening.nbe;
 
+
   double* den_eval_device   = nullptr;
   // use the "U" variable (+/- for UKS) even though at this point the density (S/Z) is stored
   if constexpr (trial){
@@ -99,6 +100,9 @@ __global__ void eval_vvar_lda_dks_kern( size_t        ntasks,
   }
 
   const auto* basis_eval_device = task.bf;
+  const auto* dbasis_x_eval_device = task.dbfx;
+  const auto* dbasis_y_eval_device = task.dbfy;
+  const auto* dbasis_z_eval_device = task.dbfz;
 
   const auto* den_basis_prod_device = task.zmat;
 
@@ -110,9 +114,17 @@ __global__ void eval_vvar_lda_dks_kern( size_t        ntasks,
   if( tid_x < nbf and tid_y < npts ) {
 
     const double* bf_col   = basis_eval_device     + tid_x*npts;
+    const double* bf_x_col = dbasis_x_eval_device  + tid_x*npts;
+    const double* bf_y_col = dbasis_y_eval_device  + tid_x*npts;
+    const double* bf_z_col = dbasis_z_eval_device  + tid_x*npts;
+
     const double* db_col   = den_basis_prod_device + tid_x*npts;
 
     den_reg = bf_col[ tid_y ]   * db_col[ tid_y ];
+
+    // rho SS
+
+
 
   }
 

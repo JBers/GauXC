@@ -228,9 +228,9 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
     const auto need_xmat_grad = not func.is_lda();
     auto do_xmat_vvar = [&](density_id den_id) {
       lwd->eval_xmat( xmat_fac, &device_data, need_xmat_grad, den_id );
-      if(func.is_lda())      lwd->eval_vvars_lda( &device_data, den_id );
-      else if(func.is_gga()) lwd->eval_vvars_gga( &device_data, den_id ); 
-      else                   lwd->eval_vvars_mgga( &device_data, den_id, need_lapl );
+      if(func.is_lda())      lwd->eval_vvars_lda( &device_data, enabled_terms.ks_scheme, den_id );
+      else if(func.is_gga()) lwd->eval_vvars_gga( &device_data, enabled_terms.ks_scheme, den_id ); 
+      else                   lwd->eval_vvars_mgga( &device_data, enabled_terms.ks_scheme, den_id, need_lapl );
 
       // Save XMat for EXC gradient assembly
       if(is_uks) lwd->save_xmat( &device_data, need_xmat_grad, den_id );

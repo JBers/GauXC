@@ -27,16 +27,16 @@ struct AoSScheme1Base : public detail::LocalDeviceWorkDriverPIMPL {
   void eval_uvars_lda( XCDeviceData*, integrator_ks_scheme ) override final;
   void eval_uvars_gga( XCDeviceData*, integrator_ks_scheme ) override final;
   void eval_uvars_mgga( XCDeviceData*, integrator_ks_scheme, bool ) override final;
-  void eval_vvars_lda ( XCDeviceData*, density_id ) override final;
-  void eval_vvars_gga ( XCDeviceData*, density_id ) override final;
-  void eval_vvars_mgga( XCDeviceData*, density_id, bool ) override final;
+  void eval_vvars_lda ( XCDeviceData*, integrator_ks_scheme, density_id ) override final;
+  void eval_vvars_gga ( XCDeviceData*, integrator_ks_scheme, density_id ) override final;
+  void eval_vvars_mgga( XCDeviceData*, integrator_ks_scheme,density_id, bool ) override final;
 
   void eval_tmat_lda( XCDeviceData*, integrator_ks_scheme ) override final;
   void eval_tmat_gga( XCDeviceData*, integrator_ks_scheme ) override final;
   void eval_tmat_mgga( XCDeviceData*, integrator_ks_scheme, bool ) override final;
-  void eval_vvars_lda_trial ( XCDeviceData*, density_id ) override final;
-  void eval_vvars_gga_trial ( XCDeviceData*, density_id ) override final;
-  void eval_vvars_mgga_trial( XCDeviceData*, density_id, bool ) override final;
+  void eval_vvars_lda_trial ( XCDeviceData*, integrator_ks_scheme, density_id ) override final;
+  void eval_vvars_gga_trial ( XCDeviceData*, integrator_ks_scheme, density_id ) override final;
+  void eval_vvars_mgga_trial( XCDeviceData*, integrator_ks_scheme, density_id, bool ) override final;
 
   void eval_zmat_lda_vxc( XCDeviceData*, integrator_ks_scheme, density_id ) override final;
   void eval_zmat_gga_vxc( XCDeviceData*, integrator_ks_scheme, density_id ) override final;

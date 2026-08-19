@@ -96,8 +96,8 @@ namespace GauXC {
           break; \
         default: \
           GAUXC_GENERIC_EXCEPTION( "Unexpected KS scheme when attempting to evaluate V vars" ); \
-  } \
-}
+    } \
+  }
 
 // Internal implementation with trial parameter
 void eval_tmat_lda( size_t ntasks, int32_t npts_max, integrator_ks_scheme ks_scheme,
@@ -117,6 +117,7 @@ void eval_uvars_lda( size_t ntasks, int32_t npts_max, integrator_ks_scheme ks_sc
 // Internal implementation with trial as template parameter
 template<bool trial>
 void eval_vvars_lda_impl( size_t ntasks, int32_t nbf_max, int32_t npts_max, density_id den_select,
+  integrator_ks_scheme ks_scheme,
   XCDeviceTask* device_tasks, device_queue queue ) {
   dim3 threads( cuda::warp_size, cuda::max_warps_per_thread_block, 1 );
   dim3 blocks( util::div_ceil( nbf_max,  threads.x ),
@@ -125,12 +126,14 @@ void eval_vvars_lda_impl( size_t ntasks, int32_t nbf_max, int32_t npts_max, dens
   EVAL_VVARS_KERNEL(lda);
 }
 void eval_vvars_lda( size_t ntasks, int32_t nbf_max, int32_t npts_max, density_id den_select,
+  integrator_ks_scheme ks_scheme,
   XCDeviceTask* device_tasks, device_queue queue ) {
-  eval_vvars_lda_impl<false>(ntasks, nbf_max, npts_max, den_select, device_tasks, queue);
+  eval_vvars_lda_impl<false>(ntasks, nbf_max, npts_max, den_select, ks_scheme, device_tasks, queue);
 }
 void eval_vvars_lda_trial( size_t ntasks, int32_t nbf_max, int32_t npts_max, density_id den_select,
+  integrator_ks_scheme ks_scheme,
   XCDeviceTask* device_tasks, device_queue queue ) {
-  eval_vvars_lda_impl<true>(ntasks, nbf_max, npts_max, den_select, device_tasks, queue);
+  eval_vvars_lda_impl<true>(ntasks, nbf_max, npts_max, den_select, ks_scheme, device_tasks, queue);
 }
 
 // Internal implementation with trial parameter
@@ -151,6 +154,7 @@ void eval_uvars_gga( size_t ntasks, int32_t npts_max, integrator_ks_scheme ks_sc
 // Internal implementation with trial as template parameter
 template<bool trial>
 void eval_vvars_gga_impl( size_t ntasks, int32_t nbf_max, int32_t npts_max, density_id den_select,
+  integrator_ks_scheme ks_scheme,
   XCDeviceTask* device_tasks, device_queue queue ) {
   dim3 threads( cuda::warp_size, cuda::max_warps_per_thread_block, 1 );
   dim3 blocks( util::div_ceil( nbf_max,  threads.x ),
@@ -159,12 +163,14 @@ void eval_vvars_gga_impl( size_t ntasks, int32_t nbf_max, int32_t npts_max, dens
   EVAL_VVARS_KERNEL(gga);
 }
 void eval_vvars_gga( size_t ntasks, int32_t nbf_max, int32_t npts_max, density_id den_select,
+  integrator_ks_scheme ks_scheme,
   XCDeviceTask* device_tasks, device_queue queue ) {
-  eval_vvars_gga_impl<false>(ntasks, nbf_max, npts_max, den_select, device_tasks, queue);
+  eval_vvars_gga_impl<false>(ntasks, nbf_max, npts_max, den_select, ks_scheme, device_tasks, queue);
 }
 void eval_vvars_gga_trial( size_t ntasks, int32_t nbf_max, int32_t npts_max, density_id den_select,
+  integrator_ks_scheme ks_scheme,
   XCDeviceTask* device_tasks, device_queue queue ) {
-  eval_vvars_gga_impl<true>(ntasks, nbf_max, npts_max, den_select, device_tasks, queue);
+  eval_vvars_gga_impl<true>(ntasks, nbf_max, npts_max, den_select, ks_scheme, device_tasks, queue);
 }
 
 // Internal implementation with trial parameter
@@ -214,9 +220,10 @@ void eval_uvars_mgga( size_t ntasks, int32_t npts_max, integrator_ks_scheme ks_s
 // Internal implementation with trial as template parameter
 template<bool trial>
 void eval_vvars_mgga_impl( size_t ntasks, int32_t nbf_max, int32_t npts_max, density_id den_select,
+  integrator_ks_scheme ks_scheme,
   bool need_lapl, XCDeviceTask* device_tasks, device_queue queue ) {
   // First evaluate GGA variables
-  eval_vvars_gga_impl<trial>(ntasks, nbf_max, npts_max, den_select, device_tasks, queue);
+  eval_vvars_gga_impl<trial>(ntasks, nbf_max, npts_max, den_select, ks_scheme, device_tasks, queue);
 
   dim3 threads( cuda::warp_size, cuda::max_warps_per_thread_block, 1 );
   dim3 blocks( util::div_ceil( nbf_max,  threads.x ),
@@ -244,12 +251,14 @@ void eval_vvars_mgga_impl( size_t ntasks, int32_t nbf_max, int32_t npts_max, den
   }
 }
 void eval_vvars_mgga( size_t ntasks, int32_t nbf_max, int32_t npts_max, density_id den_select,
+  integrator_ks_scheme ks_scheme,
   bool need_lapl, XCDeviceTask* device_tasks, device_queue queue ) {
-  eval_vvars_mgga_impl<false>(ntasks, nbf_max, npts_max, den_select, need_lapl, device_tasks, queue);
+  eval_vvars_mgga_impl<false>(ntasks, nbf_max, npts_max, den_select, need_lapl, ks_scheme, device_tasks, queue);
 }
 void eval_vvars_mgga_trial( size_t ntasks, int32_t nbf_max, int32_t npts_max, density_id den_select,
+  integrator_ks_scheme ks_scheme,
   bool need_lapl, XCDeviceTask* device_tasks, device_queue queue ) {
-  eval_vvars_mgga_impl<true>(ntasks, nbf_max, npts_max, den_select, need_lapl, device_tasks, queue);
+  eval_vvars_mgga_impl<true>(ntasks, nbf_max, npts_max, den_select, need_lapl, ks_scheme, device_tasks, queue);
 }
 
 }

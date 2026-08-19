@@ -469,14 +469,14 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
     else                     lwd->eval_collocation( &device_data );
       
     const double xmat_fac = is_rks ? 2.0 : 1.0;
-    const bool need_xmat_grad = func.is_mgga();
+    const bool need_xmat_grad = func.is_mgga() or is_dks;
 
     // Evaluate X matrix and V vars
     auto do_xmat_vvar = [&](density_id den_id) {
       lwd->eval_xmat( xmat_fac, &device_data, need_xmat_grad, den_id );
-      if(func.is_lda())      lwd->eval_vvars_lda( &device_data, den_id );
-      else if(func.is_gga()) lwd->eval_vvars_gga( &device_data, den_id ); 
-      else                   lwd->eval_vvars_mgga( &device_data, den_id, need_lapl );
+      if(func.is_lda())      lwd->eval_vvars_lda( &device_data, enabled_terms.ks_scheme, den_id );
+      else if(func.is_gga()) lwd->eval_vvars_gga( &device_data, enabled_terms.ks_scheme, den_id ); 
+      else                   lwd->eval_vvars_mgga( &device_data, enabled_terms.ks_scheme, den_id, need_lapl );
     };
 
     do_xmat_vvar(DEN_S);
@@ -485,11 +485,15 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
       if (not is_uks) {
         do_xmat_vvar(DEN_Y);
         do_xmat_vvar(DEN_X);
-        // if (not is_gks) {
-        //   do_xmat_vvar(DEN_Y);
-        //   do_xmat_vvar(DEN_X);
-        //   do_xmat_vvar(DEN_Y);
-        //   do_xmat_vvar(DEN_X);
+        if (not is_gks) {
+          do_xmat_vvar(DEN_S_SS);
+          do_xmat_vvar(DEN_Z_SS);
+          do_xmat_vvar(DEN_Y_SS);
+          do_xmat_vvar(DEN_X_SS);
+          do_xmat_vvar(DEN_S_SS_IM);
+          do_xmat_vvar(DEN_Z_SS_IM);
+          do_xmat_vvar(DEN_Y_SS_IM);
+          do_xmat_vvar(DEN_X_SS_IM);
         }
     }
 
