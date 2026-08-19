@@ -79,6 +79,7 @@ namespace GauXC {
         default: \
           GAUXC_GENERIC_EXCEPTION( "Unexpected KS scheme when attempting to evaluate V vars" ); \
       } \
+      break; \
     default: \
       switch ( den_select ) { \
         case DEN_S: \
