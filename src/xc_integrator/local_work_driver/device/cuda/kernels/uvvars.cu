@@ -253,12 +253,12 @@ void eval_vvars_mgga_impl( size_t ntasks, int32_t nbf_max, int32_t npts_max, den
 void eval_vvars_mgga( size_t ntasks, int32_t nbf_max, int32_t npts_max, density_id den_select,
   integrator_ks_scheme ks_scheme,
   bool need_lapl, XCDeviceTask* device_tasks, device_queue queue ) {
-  eval_vvars_mgga_impl<false>(ntasks, nbf_max, npts_max, den_select, need_lapl, ks_scheme, device_tasks, queue);
+  eval_vvars_mgga_impl<false>(ntasks, nbf_max, npts_max, den_select, ks_scheme, need_lapl, device_tasks, queue);
 }
 void eval_vvars_mgga_trial( size_t ntasks, int32_t nbf_max, int32_t npts_max, density_id den_select,
   integrator_ks_scheme ks_scheme,
   bool need_lapl, XCDeviceTask* device_tasks, device_queue queue ) {
-  eval_vvars_mgga_impl<true>(ntasks, nbf_max, npts_max, den_select, need_lapl, ks_scheme, device_tasks, queue);
+  eval_vvars_mgga_impl<true>(ntasks, nbf_max, npts_max, den_select, ks_scheme, need_lapl, device_tasks, queue);
 }
 
 }
