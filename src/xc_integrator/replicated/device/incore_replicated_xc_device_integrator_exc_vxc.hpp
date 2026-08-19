@@ -496,6 +496,7 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
           do_xmat_vvar(DEN_X_SS_IM);
         }
     }
+  }
 
 
     // Evaluate U variables
