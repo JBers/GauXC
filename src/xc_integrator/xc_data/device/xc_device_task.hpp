@@ -38,12 +38,20 @@ struct XCDeviceTask {
   double* weights        = nullptr;
 
   double*   nbe_scr = nullptr;
-  double*   zmat    = nullptr;
+  double*   zmat    = nullptr; // For DKS contains LL xmat
   double*   fmat    = nullptr;
   double*   gmat    = nullptr;
-  double*   xmat_x  = nullptr;
+  double*   xmat_x  = nullptr; // For DKS contains SS "dot" xmats
   double*   xmat_y  = nullptr;
   double*   xmat_z  = nullptr;
+
+  double*   xmat_k_ij  = nullptr; // For DKS contains SS "cross" and "anti" xmats
+  double*   xmat_k_ji  = nullptr; // where _k_ is the density matrix P_k :  k in {s,x,y,z}
+  double*   xmat_j_ik  = nullptr; // rhoz_xz_ss = dot( dbfx , xmat_x_zx)
+  double*   xmat_j_ki  = nullptr;
+  double*   xmat_i_jk  = nullptr;
+  double*   xmat_i_kj  = nullptr;
+
   double*   bf      = nullptr;
   double*   dbfx    = nullptr;
   double*   dbfy    = nullptr;

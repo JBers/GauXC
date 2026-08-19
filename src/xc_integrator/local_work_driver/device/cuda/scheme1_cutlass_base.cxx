@@ -104,12 +104,100 @@ void AoSScheme1CUTLASSBase::eval_xmat_impl(double fac, XCDeviceData* _data, bool
   }
 }
 
+// implementation for eval_xmat_dks
+template<bool is_trial>
+void AoSScheme1CUTLASSBase::eval_xmat_dks_impl(double fac, XCDeviceData* _data, bool do_grad, density_id den_id) {
+  auto* data = dynamic_cast<AoSScheme1CUTLASSBase::Data*>(_data);
+  if( !data ) GAUXC_BAD_LWD_DATA_CAST();
+
+  if( not data->device_backend_ ) GAUXC_UNINITIALIZED_DEVICE_BACKEND();
+
+  auto tasks = data->host_device_tasks;
+  const auto ntasks = tasks.size();
+
+  // Pack density matrix 
+  const auto nbf = data->global_dims.nbf;
+  const auto submat_block_size = data->get_submat_chunk_size( nbf, 0 );
+  auto static_stack  = data->static_stack;
+  auto aos_stack     = data->aos_stack;
+  
+  double* dmat_ptr;
+  if constexpr (is_trial) {
+    dmat_ptr = static_stack.tden_selector(den_id);
+    // now screened trial density matrix is stored in aos_stack.device_tasks[itask].nbe_scr
+  } else {
+    dmat_ptr = static_stack.den_selector(den_id);
+  }
+  
+  sym_pack_submat( ntasks, aos_stack.device_tasks, dmat_ptr, 
+    nbf, submat_block_size, data->device_backend_->queue() );
+
+  auto cutlass_stack = data->cutlass_stack;
+  double** dmat_array;
+  if constexpr (is_trial) {
+    dmat_array = cutlass_stack.tdmat_array(den_id);
+  } else {
+    dmat_array = cutlass_stack.dmat_array(den_id);
+  }
+  cutlass_gemm(
+    cutlass_stack.problem_sizes_device,
+    data->problem_sizes_host.data(),
+    ntasks,
+    cutlass_stack.bf_array_device, dmat_array,
+    cutlass_stack.zmat_array_device, cutlass_stack.zmat_array_device,
+    cutlass_stack.ld64_bf_array_device, cutlass_stack.ld64_dmat_array_device,
+    cutlass_stack.ld64_zmat_array_device, cutlass_stack.ld64_zmat_array_device,
+    fac, 0.0,
+    data->device_backend_->queue()
+  );
+
+  if(do_grad) {
+    cutlass_gemm(
+      cutlass_stack.problem_sizes_device,
+      data->problem_sizes_host.data(),
+      ntasks,
+      cutlass_stack.bfx_array_device, dmat_array,
+      cutlass_stack.xmat_x_array_device, cutlass_stack.xmat_x_array_device,
+      cutlass_stack.ld64_bf_array_device, cutlass_stack.ld64_dmat_array_device,
+      cutlass_stack.ld64_zmat_array_device, cutlass_stack.ld64_zmat_array_device,
+      fac, 0.0,
+      data->device_backend_->queue()
+    );
+    cutlass_gemm(
+      cutlass_stack.problem_sizes_device,
+      data->problem_sizes_host.data(),
+      ntasks,
+      cutlass_stack.bfy_array_device, dmat_array,
+      cutlass_stack.xmat_y_array_device, cutlass_stack.xmat_y_array_device,
+      cutlass_stack.ld64_bf_array_device, cutlass_stack.ld64_dmat_array_device,
+      cutlass_stack.ld64_zmat_array_device, cutlass_stack.ld64_zmat_array_device,
+      fac, 0.0,
+      data->device_backend_->queue()
+    );
+    cutlass_gemm(
+      cutlass_stack.problem_sizes_device,
+      data->problem_sizes_host.data(),
+      ntasks,
+      cutlass_stack.bfz_array_device, dmat_array,
+      cutlass_stack.xmat_z_array_device, cutlass_stack.xmat_z_array_device,
+      cutlass_stack.ld64_bf_array_device, cutlass_stack.ld64_dmat_array_device,
+      cutlass_stack.ld64_zmat_array_device, cutlass_stack.ld64_zmat_array_device,
+      fac, 0.0,
+      data->device_backend_->queue()
+    );
+  }
+}
+
 void AoSScheme1CUTLASSBase::eval_xmat(double fac, XCDeviceData* _data, bool do_grad, density_id den_id ) {
   eval_xmat_impl<false>(fac, _data, do_grad, den_id);
 }
 
 void AoSScheme1CUTLASSBase::eval_xmat_trial(double fac, XCDeviceData* _data, bool do_grad, density_id den_id ) {
   eval_xmat_impl<true>(fac, _data, do_grad, den_id);
+}
+
+void AoSScheme1CUTLASSBase::eval_xmat_dks(double fac, XCDeviceData* _data, bool do_grad, density_id den_id ) {
+  eval_xmat_dks_impl<true>(fac, _data, do_grad, den_id);
 }
 
 

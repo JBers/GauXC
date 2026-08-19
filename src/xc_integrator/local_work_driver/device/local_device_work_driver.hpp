@@ -68,6 +68,7 @@ public:
   void eval_collocation_laplacian( XCDeviceData* );
   void eval_collocation_lapgrad( XCDeviceData* );
   void eval_xmat( double fac, XCDeviceData*, bool do_grad, density_id den );
+  void eval_xmat_dks( double fac, XCDeviceData*, bool do_grad, density_id den );
   void eval_xmat_trial( double fac, XCDeviceData*, bool do_grad, density_id den );
   void save_xmat( XCDeviceData*, bool grad, density_id den );
   

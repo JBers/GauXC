@@ -469,7 +469,7 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
     else                     lwd->eval_collocation( &device_data );
       
     const double xmat_fac = is_rks ? 2.0 : 1.0;
-    const bool need_xmat_grad = func.is_mgga() or is_dks;
+    const bool need_xmat_grad = func.is_mgga();
 
     // Evaluate X matrix and V vars
     auto do_xmat_vvar = [&](density_id den_id) {
@@ -480,7 +480,7 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
     };
 
     auto do_xmat = [&](density_id den_id) {
-      lwd->eval_xmat( xmat_fac, &device_data, need_xmat_grad, den_id );
+      lwd->eval_xmat_dks( xmat_fac, &device_data, need_xmat_grad, den_id );
     };
 
     auto do_vvar = [&](density_id den_id) {
