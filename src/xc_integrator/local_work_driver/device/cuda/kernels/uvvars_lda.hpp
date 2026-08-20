@@ -191,7 +191,7 @@ __global__ void eval_vvar_lda_dks_kern( size_t        ntasks,
     den_reg += mkxy*RKB_factor*(bf_y_col[ tid_y ]   * db_col[ tid_y ]);
 
     db_col   = den_basis_SS_kyx_prod_device + tid_x*npts;
-    den_reg += mkyx**RKB_factor*(bf_x_col[ tid_y ]   * db_col[ tid_y ]);
+    den_reg += mkyx*RKB_factor*(bf_x_col[ tid_y ]   * db_col[ tid_y ]);
 
     db_col   = den_basis_SS_jzx_prod_device + tid_x*npts;
     den_reg += mjzx*RKB_factor*(bf_x_col[ tid_y ]   * db_col[ tid_y ]);
