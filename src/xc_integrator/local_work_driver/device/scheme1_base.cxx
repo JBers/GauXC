@@ -1743,13 +1743,8 @@ void AoSScheme1Base::eval_xmat_dks_impl( double fac, XCDeviceData* _data, bool d
     auto& task = tasks[iT];
       auto den_ptr_LL = task.bfn_screening.ncut > 1 ? task.nbe_scr : dmat_ptr + task.bfn_screening.ibf_begin*(nbf+1);
       auto den_ptr_SS_dot = task.bfn_screening.ncut > 1 ? task.nbe_scr : dmat_ptr_SS_dot + task.bfn_screening.ibf_begin*(nbf+1);
-      auto den_ptr_SS_dot = task.bfn_screening.ncut > 1 ? task.nbe_scr : dmat_ptr_SS_dot + task.bfn_screening.ibf_begin*(nbf+1);
-      auto den_ptr_SS_dot = task.bfn_screening.ncut > 1 ? task.nbe_scr : dmat_ptr_SS_dot + task.bfn_screening.ibf_begin*(nbf+1);
-      auto den_ptr_SS_cross_anti_k = task.bfn_screening.ncut > 1 ? task.nbe_scr : dmat_ptr_SS_k + task.bfn_screening.ibf_begin*(nbf+1);
       auto den_ptr_SS_cross_anti_k = task.bfn_screening.ncut > 1 ? task.nbe_scr : dmat_ptr_SS_k + task.bfn_screening.ibf_begin*(nbf+1);
       auto den_ptr_SS_cross_anti_j = task.bfn_screening.ncut > 1 ? task.nbe_scr : dmat_ptr_SS_j + task.bfn_screening.ibf_begin*(nbf+1);
-      auto den_ptr_SS_cross_anti_j = task.bfn_screening.ncut > 1 ? task.nbe_scr : dmat_ptr_SS_j + task.bfn_screening.ibf_begin*(nbf+1);
-      auto den_ptr_SS_cross_anti_i = task.bfn_screening.ncut > 1 ? task.nbe_scr : dmat_ptr_SS_i + task.bfn_screening.ibf_begin*(nbf+1);
       auto den_ptr_SS_cross_anti_i = task.bfn_screening.ncut > 1 ? task.nbe_scr : dmat_ptr_SS_i + task.bfn_screening.ibf_begin*(nbf+1);
 
       int  ldden   = task.bfn_screening.ncut > 1 ? task.bfn_screening.nbe : nbf;
