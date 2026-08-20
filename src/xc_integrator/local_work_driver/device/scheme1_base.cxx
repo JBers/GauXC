@@ -1697,27 +1697,27 @@ void AoSScheme1Base::eval_xmat_dks_impl( double fac, XCDeviceData* _data, bool d
     dmat_ptr = static_stack.den_selector(den_select);
   }
   if (den_select == DEN_S) {
-        dmat_ptr_SS_dot = static_stack.den_selector(DEN_S_SS);
-        dmat_ptr_SS_k   = static_stack.den_selector(DEN_Z_SS_IM);
-        dmat_ptr_SS_j   = static_stack.den_selector(DEN_Y_SS_IM);
-        dmat_ptr_SS_i   = static_stack.den_selector(DEN_X_SS_IM);
+      dmat_ptr_SS_dot = static_stack.den_selector(DEN_S_SS);
+      dmat_ptr_SS_k   = static_stack.den_selector(DEN_Z_SS_IM);
+      dmat_ptr_SS_j   = static_stack.den_selector(DEN_X_SS_IM);
+      dmat_ptr_SS_i   = static_stack.den_selector(DEN_Y_SS_IM);
   }
   if (den_select == DEN_Z) {
       dmat_ptr_SS_dot = static_stack.den_selector(DEN_Z_SS);
-      dmat_ptr_SS_k   = static_stack.den_selector(DEN_Z_SS);
-      dmat_ptr_SS_j   = static_stack.den_selector(DEN_Y_SS);
-      dmat_ptr_SS_i   = static_stack.den_selector(DEN_S_SS_IM);
+      dmat_ptr_SS_k   = static_stack.den_selector(DEN_S_SS_IM);
+      dmat_ptr_SS_j   = static_stack.den_selector(DEN_X_SS);
+      dmat_ptr_SS_i   = static_stack.den_selector(DEN_Y_SS);
   }
   if (den_select == DEN_Y) {
       dmat_ptr_SS_dot = static_stack.den_selector(DEN_Y_SS);
-      dmat_ptr_SS_k   = static_stack.den_selector(DEN_Z_SS_IM);
-      dmat_ptr_SS_j   = static_stack.den_selector(DEN_Y_SS_IM);
-      dmat_ptr_SS_i   = static_stack.den_selector(DEN_S_SS_IM);
+      dmat_ptr_SS_k   = static_stack.den_selector(DEN_X_SS);
+      dmat_ptr_SS_j   = static_stack.den_selector(DEN_S_SS_IM);
+      dmat_ptr_SS_i   = static_stack.den_selector(DEN_Z_SS);
   }
   if (den_select == DEN_X) {
       dmat_ptr_SS_dot = static_stack.den_selector(DEN_X_SS);
-      dmat_ptr_SS_k   = static_stack.den_selector(DEN_Z_SS);
-      dmat_ptr_SS_j   = static_stack.den_selector(DEN_Y_SS);
+      dmat_ptr_SS_k   = static_stack.den_selector(DEN_Y_SS);
+      dmat_ptr_SS_j   = static_stack.den_selector(DEN_Z_SS);
       dmat_ptr_SS_i   = static_stack.den_selector(DEN_S_SS_IM);
   }
   // Pack density matrix 

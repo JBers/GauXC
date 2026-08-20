@@ -84,7 +84,7 @@ __global__ void eval_vvar_lda_dks_kern( size_t        ntasks,
 
   const auto npts            = task.npts;
   const auto nbf             = task.bfn_screening.nbe;
-  double xx, yy ,zz, m;
+  double xx, yy ,zz, mkxy,mkyx,mjxz,mjzx,mizy,miyz;
 
   double* den_eval_device   = nullptr;
   // use the "U" variable (+/- for UKS) even though at this point the density (S/Z) is stored
@@ -94,33 +94,53 @@ __global__ void eval_vvar_lda_dks_kern( size_t        ntasks,
     if constexpr (den_select == DEN_Y) den_eval_device = task.tden_y;
     if constexpr (den_select == DEN_X) den_eval_device = task.tden_x;
   }else{
-      if constexpr (den_select == DEN_S) {
-        den_eval_device = task.den_s;
+      if constexpr (den_select == DEN_S) {  //k(xy+m*yx) j(xz+m*zx) i(zy+m*yz)
+        den_eval_device = task.den_s; // k: Z ; j: X ; i: Y
         xx = 1.;
         yy = 1.;
         zz = 1.;
-        m  = -1.;
+        mkxy=-1.;
+        mkyx=1.;
+        mjxz=1.;
+        mjzx=-1.;
+        mizy=1.;
+        miyz=-1.;
       }
       if constexpr (den_select == DEN_Z) {
-        den_eval_device = task.den_z;
+        den_eval_device = task.den_z; // k: S ; j: X ; i: Y
         xx = -1.;
         yy = -1.;
         zz = 1.;
-        m  = -1.;
+        mkxy=1.;
+        mkyx=-1.;
+        mjxz=1.;
+        mjzx=1.;
+        mizy=1.;
+        miyz=1.;
       }
-      if constexpr (den_select == DEN_Y) {
-        den_eval_device = task.den_y;
+      if constexpr (den_select == DEN_Y) { 
+        den_eval_device = task.den_y; // k: X ; j: S ; i: Z
         xx = -1.;
         yy = 1.;
         zz = -1.;
-        m  = -1.;
+        mkyx=1.;
+        mkyx=1.;
+        mjxz=-1.;
+        mjzx=1.;
+        mizy=1.;
+        miyz=1.;
       }
-      if constexpr (den_select == DEN_X) {
-        den_eval_device = task.den_x;
+      if constexpr (den_select == DEN_X) { 
+        den_eval_device = task.den_x; // k: Y ; j: Z ; i: S
         xx = 1.;
         yy = -1.;
         zz = -1.;
-        m  = -1.;
+        mkyx=1.;
+        mkyx=1.;
+        mjxz=1.;
+        mjzx=1.;
+        mizy=-1.;
+        miyz=1.;
       }
   }
 
@@ -133,12 +153,12 @@ __global__ void eval_vvar_lda_dks_kern( size_t        ntasks,
   const auto* den_basis_SS_xx_prod_device  = task.xmat_x;
   const auto* den_basis_SS_yy_prod_device  = task.xmat_y;
   const auto* den_basis_SS_zz_prod_device  = task.xmat_z;
-  const auto* den_basis_SS_kij_prod_device = task.xmat_k_ij;
-  const auto* den_basis_SS_kji_prod_device = task.xmat_k_ji;
-  const auto* den_basis_SS_jik_prod_device = task.xmat_j_ik;
-  const auto* den_basis_SS_jki_prod_device = task.xmat_j_ki;
-  const auto* den_basis_SS_ijk_prod_device = task.xmat_i_jk;
-  const auto* den_basis_SS_ikj_prod_device = task.xmat_i_kj;
+  const auto* den_basis_SS_kxy_prod_device = task.xmat_k_ij;
+  const auto* den_basis_SS_kyx_prod_device = task.xmat_k_ji;
+  const auto* den_basis_SS_jzx_prod_device = task.xmat_j_ik;
+  const auto* den_basis_SS_jxz_prod_device = task.xmat_j_ki;
+  const auto* den_basis_SS_iyz_prod_device = task.xmat_i_jk;
+  const auto* den_basis_SS_izy_prod_device = task.xmat_i_kj;
 
   const int tid_x = blockIdx.x * blockDim.x + threadIdx.x;
   const int tid_y = blockIdx.y * blockDim.y + threadIdx.y;
@@ -152,7 +172,7 @@ __global__ void eval_vvar_lda_dks_kern( size_t        ntasks,
     const double* bf_y_col = dbasis_y_eval_device  + tid_x*npts;
     const double* bf_z_col = dbasis_z_eval_device  + tid_x*npts;
 
-    const double* db_col   = den_basis_prod_device + tid_x*npts;
+    const double* db_col   = den_basis_LL_prod_device + tid_x*npts;
 
     den_reg = bf_col[ tid_y ]   * db_col[ tid_y ];
     
@@ -167,24 +187,24 @@ __global__ void eval_vvar_lda_dks_kern( size_t        ntasks,
     db_col   = den_basis_SS_zz_prod_device  + tid_x*npts;
     den_reg += zz*RKB_factor*(bf_z_col[ tid_y ]   * db_col[ tid_y ]);
 
-    db_col   = den_basis_SS_kij_prod_device + tid_x*npts;
-    den_reg += RKB_factor*(bf_x_col[ tid_y ]   * db_col[ tid_y ]);
+    db_col   = den_basis_SS_kxy_prod_device + tid_x*npts;
+    den_reg += mkxy*RKB_factor*(bf_y_col[ tid_y ]   * db_col[ tid_y ]);
 
-    db_col   = den_basis_SS_kji_prod_device + tid_x*npts;
-    den_reg += m*RKB_factor*(bf_x_col[ tid_y ]   * db_col[ tid_y ]);
+    db_col   = den_basis_SS_kyx_prod_device + tid_x*npts;
+    den_reg += mkyx**RKB_factor*(bf_x_col[ tid_y ]   * db_col[ tid_y ]);
 
-    db_col   = den_basis_SS_jik_prod_device + tid_x*npts;
-    den_reg += RKB_factor*(bf_x_col[ tid_y ]   * db_col[ tid_y ]);
+    db_col   = den_basis_SS_jzx_prod_device + tid_x*npts;
+    den_reg += mjzx*RKB_factor*(bf_x_col[ tid_y ]   * db_col[ tid_y ]);
 
-    db_col   = den_basis_SS_jki_prod_device + tid_x*npts;
-    den_reg += m*RKB_factor*(bf_x_col[ tid_y ]   * db_col[ tid_y ]);
+    db_col   = den_basis_SS_jxz_prod_device + tid_x*npts;
+    den_reg += mjxz*RKB_factor*(bf_z_col[ tid_y ]   * db_col[ tid_y ]);
 
-    db_col   = den_basis_SS_ijk_prod_device + tid_x*npts;
-    den_reg += RKB_factor*(bf_x_col[ tid_y ]   * db_col[ tid_y ]);
+    db_col   = den_basis_SS_iyz_prod_device + tid_x*npts;
+    den_reg += miyz*RKB_factor*(bf_y_col[ tid_y ]   * db_col[ tid_y ]);
 
-    db_col   = den_basis_SS_ikj_prod_device + tid_x*npts;
-    den_reg -= RKB_factor*(bf_x_col[ tid_y ]   * db_col[ tid_y ]);
-
+    db_col   = den_basis_SS_izy_prod_device + tid_x*npts;
+    den_reg += mizy*RKB_factor*(bf_z_col[ tid_y ]   * db_col[ tid_y ]);
+    
   }
 
   // Warp blocks are stored col major
