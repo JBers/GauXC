@@ -1684,14 +1684,38 @@ void AoSScheme1Base::eval_xmat_dks_impl( double fac, XCDeviceData* _data, bool d
   const auto submat_block_size = data->get_submat_chunk_size( nbf, 0 );
   auto static_stack  = data->static_stack;
   auto aos_stack     = data->aos_stack;
-  double * dmat_ptr;
+  double * dmat_ptr, dmat_ptr_SS_dot, dmat_ptr_SS_k, dmat_ptr_SS_j, dmat_ptr_SS_i;
+  // double xx, yy ,zz, m;
   if constexpr (is_trial) {
     dmat_ptr = static_stack.tden_selector(den_select);
     // now screened trial density matrix is stored in aos_stack.device_tasks[itask].nbe_scr
   } else {
     dmat_ptr = static_stack.den_selector(den_select);
   }
-
+  if constexpr (den_select == DEN_S) {
+        dmat_ptr_SS_dot = static_stack.den_selector(DEN_S_SS);
+        dmat_ptr_SS_k   = static_stack.den_selector(DEN_Z_SS_IM);
+        dmat_ptr_SS_j   = static_stack.den_selector(DEN_Y_SS_IM);
+        dmat_ptr_SS_i   = static_stack.den_selector(DEN_X_SS_IM);
+    }
+    if constexpr (den_select == DEN_Z) {
+        dmat_ptr_SS_dot = static_stack.den_selector(DEN_Z_SS);
+        dmat_ptr_SS_k   = static_stack.den_selector(DEN_Z_SS);
+        dmat_ptr_SS_j   = static_stack.den_selector(DEN_Y_SS);
+        dmat_ptr_SS_i   = static_stack.den_selector(DEN_S_SS_IM);
+    }
+    if constexpr (den_select == DEN_Y) {
+        dmat_ptr_SS_dot = static_stack.den_selector(DEN_Y_SS);
+        dmat_ptr_SS_k   = static_stack.den_selector(DEN_Z_SS_IM);
+        dmat_ptr_SS_j   = static_stack.den_selector(DEN_Y_SS_IM);
+        dmat_ptr_SS_i   = static_stack.den_selector(DEN_S_SS_IM);
+    }
+    if constexpr (den_select == DEN_X) {
+        dmat_ptr_SS_dot = static_stack.den_selector(DEN_X_SS);
+        dmat_ptr_SS_k   = static_stack.den_selector(DEN_Z_SS);
+        dmat_ptr_SS_j   = static_stack.den_selector(DEN_Y_SS);
+        dmat_ptr_SS_i   = static_stack.den_selector(DEN_S_SS_IM);
+    }
   // Pack density matrix 
   sym_pack_submat( ntasks, aos_stack.device_tasks, dmat_ptr, 
     nbf, submat_block_size, data->device_backend_->queue() );
@@ -1713,15 +1737,30 @@ void AoSScheme1Base::eval_xmat_dks_impl( double fac, XCDeviceData* _data, bool d
   //size_t nsingle = 0;
   for( size_t iT = 0; iT < ntasks; ++iT ) {
     auto& task = tasks[iT];
-      auto den_ptr = task.bfn_screening.ncut > 1 ? task.nbe_scr : dmat_ptr + task.bfn_screening.ibf_begin*(nbf+1);
+      auto den_ptr_LL = task.bfn_screening.ncut > 1 ? task.nbe_scr : dmat_ptr + task.bfn_screening.ibf_begin*(nbf+1);
+      auto den_ptr_SS_dot = task.bfn_screening.ncut > 1 ? task.nbe_scr : dmat_ptr_SS_dot + task.bfn_screening.ibf_begin*(nbf+1);
+      auto den_ptr_SS_dot = task.bfn_screening.ncut > 1 ? task.nbe_scr : dmat_ptr_SS_dot + task.bfn_screening.ibf_begin*(nbf+1);
+      auto den_ptr_SS_dot = task.bfn_screening.ncut > 1 ? task.nbe_scr : dmat_ptr_SS_dot + task.bfn_screening.ibf_begin*(nbf+1);
+      auto den_ptr_SS_cross_anti_k = task.bfn_screening.ncut > 1 ? task.nbe_scr : dmat_ptr_SS_k + task.bfn_screening.ibf_begin*(nbf+1);
+      auto den_ptr_SS_cross_anti_k = task.bfn_screening.ncut > 1 ? task.nbe_scr : dmat_ptr_SS_k + task.bfn_screening.ibf_begin*(nbf+1);
+      auto den_ptr_SS_cross_anti_j = task.bfn_screening.ncut > 1 ? task.nbe_scr : dmat_ptr_SS_j + task.bfn_screening.ibf_begin*(nbf+1);
+      auto den_ptr_SS_cross_anti_j = task.bfn_screening.ncut > 1 ? task.nbe_scr : dmat_ptr_SS_j + task.bfn_screening.ibf_begin*(nbf+1);
+      auto den_ptr_SS_cross_anti_i = task.bfn_screening.ncut > 1 ? task.nbe_scr : dmat_ptr_SS_i + task.bfn_screening.ibf_begin*(nbf+1);
+      auto den_ptr_SS_cross_anti_i = task.bfn_screening.ncut > 1 ? task.nbe_scr : dmat_ptr_SS_i + task.bfn_screening.ibf_begin*(nbf+1);
+
       int  ldden   = task.bfn_screening.ncut > 1 ? task.bfn_screening.nbe : nbf;
       auto handle = data->device_backend_->blas_pool_handle( iT % n_blas_streams );
-      do_gemm( handle, task.npts, task.bfn_screening.nbe, task.bf, den_ptr, ldden, task.zmat );
-      if( do_grad ) {
-        do_gemm( handle, task.npts, task.bfn_screening.nbe, task.dbfx, den_ptr, ldden, task.xmat_x );
-        do_gemm( handle, task.npts, task.bfn_screening.nbe, task.dbfy, den_ptr, ldden, task.xmat_y );
-        do_gemm( handle, task.npts, task.bfn_screening.nbe, task.dbfz, den_ptr, ldden, task.xmat_z );
-      }
+
+      do_gemm( handle, task.npts, task.bfn_screening.nbe, task.bf, den_ptr_LL, ldden, task.zmat );
+      do_gemm( handle, task.npts, task.bfn_screening.nbe, task.dbfx, den_ptr_SS_dot, ldden, task.xmat_x );
+      do_gemm( handle, task.npts, task.bfn_screening.nbe, task.dbfy, den_ptr_SS_dot, ldden, task.xmat_y );
+      do_gemm( handle, task.npts, task.bfn_screening.nbe, task.dbfz, den_ptr_SS_dot, ldden, task.xmat_z );
+      do_gemm( handle, task.npts, task.bfn_screening.nbe, task.dbfx, den_ptr_SS_cross_anti_k, ldden, task.xmat_k_ij );
+      do_gemm( handle, task.npts, task.bfn_screening.nbe, task.dbfy, den_ptr_SS_cross_anti_k, ldden, task.xmat_k_ji );
+      do_gemm( handle, task.npts, task.bfn_screening.nbe, task.dbfz, den_ptr_SS_cross_anti_j, ldden, task.xmat_j_ik );
+      do_gemm( handle, task.npts, task.bfn_screening.nbe, task.dbfx, den_ptr_SS_cross_anti_j, ldden, task.xmat_j_ki );
+      do_gemm( handle, task.npts, task.bfn_screening.nbe, task.dbfy, den_ptr_SS_cross_anti_i, ldden, task.xmat_i_jk );
+      do_gemm( handle, task.npts, task.bfn_screening.nbe, task.dbfz, den_ptr_SS_cross_anti_i, ldden, task.xmat_i_kj );
   }
 
   
