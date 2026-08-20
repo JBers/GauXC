@@ -1684,7 +1684,11 @@ void AoSScheme1Base::eval_xmat_dks_impl( double fac, XCDeviceData* _data, bool d
   const auto submat_block_size = data->get_submat_chunk_size( nbf, 0 );
   auto static_stack  = data->static_stack;
   auto aos_stack     = data->aos_stack;
-  double * dmat_ptr, dmat_ptr_SS_dot, dmat_ptr_SS_k, dmat_ptr_SS_j, dmat_ptr_SS_i;
+  double * dmat_ptr; 
+  double * dmat_ptr_SS_dot; 
+  double * dmat_ptr_SS_k; 
+  double * dmat_ptr_SS_j
+  double * dmat_ptr_SS_i;
   // double xx, yy ,zz, m;
   if constexpr (is_trial) {
     dmat_ptr = static_stack.tden_selector(den_select);
