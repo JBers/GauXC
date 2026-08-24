@@ -158,9 +158,15 @@ __global__ void zmat_lda_vxc_dks_kernel( size_t        ntasks,
 
 
   const auto* basis_eval_device = task.bf;
+  const auto* dbasis_x_eval_device = task.dbfx;
+  const auto* dbasis_y_eval_device = task.dbfy;
+  const auto* dbasis_z_eval_device = task.dbfz;
 
 
-  auto* z_matrix_device = task.zmat;
+  auto* z_matrix_device = task.zmat;      // LL Zs 
+  auto* z_x_matrix_device = task.xmat_x;  // SS Zs_x_SS
+  auto* z_y_matrix_device = task.xmat_y;  // SS Zs_y_SS
+  auto* z_z_matrix_device = task.xmat_z;  // SS Zs_z_SS
 
   const int tid_x = blockIdx.x * blockDim.x + threadIdx.x;
   const int tid_y = blockIdx.y * blockDim.y + threadIdx.y;
@@ -172,10 +178,16 @@ __global__ void zmat_lda_vxc_dks_kernel( size_t        ntasks,
 
     if constexpr ( den_selector == DEN_S ) {
       z_matrix_device[ ibfoff ] = 0.5*(factp * basis_eval_device[ ibfoff ] + factm * basis_eval_device[ ibfoff ]);
+      z_x_matrix_device[ ibfoff ] = 0.5*(factp * dbasis_x_eval_device[ ibfoff ] + factm * dbasis_x_eval_device[ ibfoff ]);
+      z_y_matrix_device[ ibfoff ] = 0.5*(factp * dbasis_y_eval_device[ ibfoff ] + factm * dbasis_y_eval_device[ ibfoff ]);
+      z_z_matrix_device[ ibfoff ] = 0.5*(factp * dbasis_z_eval_device[ ibfoff ] + factm * dbasis_z_eval_device[ ibfoff ]);
     }
     else {
       const double factk = 0.5 * (factp - factm);
       z_matrix_device[ ibfoff ] = K_device[ ibfoff ] * factk * basis_eval_device[ ibfoff ];
+      z_x_matrix_device[ ibfoff ] = K_device[ ibfoff ] * factk * dbasis_x_eval_device[ ibfoff ];
+      z_y_matrix_device[ ibfoff ] = K_device[ ibfoff ] * factk * dbasis_y_eval_device[ ibfoff ];
+      z_z_matrix_device[ ibfoff ] = K_device[ ibfoff ] * factk * dbasis_z_eval_device[ ibfoff ];
     }
   }
 
@@ -889,10 +901,10 @@ __global__ void zmat_mgga_vxc_uks_kernel( size_t        ntasks,
       else GAUXC_GENERIC_EXCEPTION( "zmat_##xc_approx##_vxc invalid density" ); \
       break; \
     case DKS: \
-      if ( sel == DEN_S )       zmat_##xc_approx##_vxc_gks_kernel<DEN_S><<< blocks, threads, 0, stream >>>( ntasks, tasks_device ); \
-      else if ( sel == DEN_Z )  zmat_##xc_approx##_vxc_gks_kernel<DEN_Z><<< blocks, threads, 0, stream >>>( ntasks, tasks_device ); \
-      else if ( sel == DEN_Y )  zmat_##xc_approx##_vxc_gks_kernel<DEN_Y><<< blocks, threads, 0, stream >>>( ntasks, tasks_device ); \
-      else if ( sel == DEN_X )  zmat_##xc_approx##_vxc_gks_kernel<DEN_X><<< blocks, threads, 0, stream >>>( ntasks, tasks_device ); \
+      if ( sel == DEN_S )       zmat_##xc_approx##_vxc_dks_kernel<DEN_S><<< blocks, threads, 0, stream >>>( ntasks, tasks_device ); \
+      else if ( sel == DEN_Z )  zmat_##xc_approx##_vxc_dks_kernel<DEN_Z><<< blocks, threads, 0, stream >>>( ntasks, tasks_device ); \
+      else if ( sel == DEN_Y )  zmat_##xc_approx##_vxc_dks_kernel<DEN_Y><<< blocks, threads, 0, stream >>>( ntasks, tasks_device ); \
+      else if ( sel == DEN_X )  zmat_##xc_approx##_vxc_dks_kernel<DEN_X><<< blocks, threads, 0, stream >>>( ntasks, tasks_device ); \
       else GAUXC_GENERIC_EXCEPTION( "zmat_##xc_approx##_vxc invalid density" ); \
       break; \
     default: \
