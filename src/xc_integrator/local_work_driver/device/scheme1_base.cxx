@@ -22,6 +22,8 @@
 #include "device/common/increment_exc_grad.hpp"
 #include "device/common/exx_ek_screening.hpp"
 
+#include <gauxc/physcon.hpp>
+
 #include "buffer_adaptor.hpp"
 
 #include "device/common/shell_pair_to_task.hpp"
@@ -1899,7 +1901,7 @@ void AoSScheme1Base::inc_potential_dks_impl( XCDeviceData* _data, density_id den
   data->device_backend_->sync_blas_pool_with_master();
 
   auto do_syr2k = [&]( auto& handle, size_t npts, size_t nbe, auto* bf_ptr, auto* zptr, double fac, auto* v_ptr ) {
-    syr2k( handle, DeviceBlasUplo::Lower, DeviceBlasOp::Trans, nbe, npts, 1.0, bf_ptr, npts,
+    syr2k( handle, DeviceBlasUplo::Lower, DeviceBlasOp::Trans, nbe, npts, RKB_factor, bf_ptr, npts,
       zptr, npts, fac, v_ptr, nbe ); 
   };
   switch ( den_selector ) {
@@ -1930,7 +1932,6 @@ void AoSScheme1Base::inc_potential_dks_impl( XCDeviceData* _data, density_id den
     do_syr2k(handle, task.npts, task.bfn_screening.nbe, task.dbfx, task.xmat_x, 0.0, task.nbe_scr);
     do_syr2k(handle, task.npts, task.bfn_screening.nbe, task.dbfy, task.xmat_y, 1.0, task.nbe_scr);
     do_syr2k(handle, task.npts, task.bfn_screening.nbe, task.dbfz, task.xmat_z, 1.0, task.nbe_scr);
-    }
   }
 
   // Record completion of BLAS ops on master stream
@@ -1962,6 +1963,9 @@ void AoSScheme1Base::inc_vxc_dks( XCDeviceData* _data, density_id den_selector, 
   inc_potential_dks_impl<false>(_data, den_selector, do_m);
 }
 
+void AoSScheme1Base::inc_fxc_Dks( XCDeviceData* _data, density_id den_selector, bool do_m ){
+  inc_potential_dks_impl<true>(_data, den_selector, do_m);
+}
 
 
 
