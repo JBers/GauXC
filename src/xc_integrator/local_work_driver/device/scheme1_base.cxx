@@ -1723,6 +1723,15 @@ void AoSScheme1Base::eval_xmat_dks_impl( double fac, XCDeviceData* _data, bool d
   // Pack density matrix 
   sym_pack_submat( ntasks, aos_stack.device_tasks, dmat_ptr, 
     nbf, submat_block_size, data->device_backend_->queue() );
+  sym_pack_submat( ntasks, aos_stack.device_tasks, dmat_ptr_SS_dot, 
+    nbf, submat_block_size, data->device_backend_->queue() );
+  sym_pack_submat( ntasks, aos_stack.device_tasks, dmat_ptr_SS_k,
+    nbf, submat_block_size, data->device_backend_->queue() );
+  sym_pack_submat( ntasks, aos_stack.device_tasks, dmat_ptr_SS_j, 
+    nbf, submat_block_size, data->device_backend_->queue() );
+  sym_pack_submat( ntasks, aos_stack.device_tasks, dmat_ptr_SS_i, 
+    nbf, submat_block_size, data->device_backend_->queue() );
+    
 
 
   // Sync blas streams with master stream
@@ -1896,7 +1905,7 @@ void AoSScheme1Base::inc_potential_dks_impl( XCDeviceData* _data, density_id den
   const auto ntasks = tasks.size();
   double SpeedOfLight  = 137.03599917700001;
   double RKB_factor = 1./(4.*SpeedOfLight*SpeedOfLight);
-  
+
   // Sync blas streams with master stream
   data->device_backend_->sync_blas_pool_with_master();
 
