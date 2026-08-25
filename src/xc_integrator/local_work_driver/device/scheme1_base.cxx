@@ -1900,38 +1900,77 @@ void AoSScheme1Base::inc_potential_dks_impl( XCDeviceData* _data, density_id den
   // Sync blas streams with master stream
   data->device_backend_->sync_blas_pool_with_master();
 
-  auto do_syr2k = [&]( auto& handle, size_t npts, size_t nbe, auto* bf_ptr, auto* zptr, double fac, auto* v_ptr ) {
-    syr2k( handle, DeviceBlasUplo::Lower, DeviceBlasOp::Trans, nbe, npts, RKB_factor, bf_ptr, npts,
-      zptr, npts, fac, v_ptr, nbe ); 
-  };
+  double xx, yy ,zz, mkxy, mkyx, mjxz, mjzx, mizy, miyz;
   switch ( den_selector ) {
     case DEN_S_SS:
-      symmetrize_matrix( nbf, static_stack.vxc_s_device, nbf, 
-            data->device_backend_->queue() ); 
+        xx = 1.;
+        yy = 1.;
+        zz = 1.;
+        mkxy=-1.;
+        mkyx=1.;
+        mjxz=1.;
+        mjzx=-1.;
+        mizy=1.;
+        miyz=-1.;
       break;
     case DEN_Z_SS:
-      symmetrize_matrix( nbf, static_stack.vxc_z_device, nbf, 
-            data->device_backend_->queue() ); 
+        xx = -1.;
+        yy = -1.;
+        zz = 1.;
+        mkxy=1.;
+        mkyx=-1.;
+        mjxz=1.;
+        mjzx=1.;
+        mizy=1.;
+        miyz=1.;
       break;
     case DEN_Y_SS:
-      symmetrize_matrix( nbf, static_stack.vxc_y_device, nbf, 
-            data->device_backend_->queue() ); 
+        xx = -1.;
+        yy = 1.;
+        zz = -1.;
+        mkyx=1.;
+        mkyx=1.;
+        mjxz=-1.;
+        mjzx=1.;
+        mizy=1.;
+        miyz=1.;
       break;
     case DEN_X_SS:
-      symmetrize_matrix( nbf, static_stack.vxc_x_device, nbf, 
-            data->device_backend_->queue() ); 
+        xx = 1.;
+        yy = -1.;
+        zz = -1.;
+        mkyx=1.;
+        mkyx=1.;
+        mjxz=1.;
+        mjzx=1.;
+        mizy=-1.;
+        miyz=1.; 
       break;
     default:
       GAUXC_GENERIC_EXCEPTION( "inc_potential_dks_impl: invalid density selected" );
   }
+  auto do_syr2k = [&]( auto& handle, size_t npts, size_t nbe, auto* bf_ptr, auto* zptr, double fac, auto* v_ptr, double SS_fac ) {
+    syr2k( handle, DeviceBlasUplo::Lower, DeviceBlasOp::Trans, nbe, npts, SS_fac, bf_ptr, npts,
+      zptr, npts, fac, v_ptr, nbe ); 
+  };
+
   // Launch SYR2K in round robin
   const auto n_blas_streams = data->device_backend_->blas_pool_size();
   for( size_t iT = 0; iT < ntasks; ++iT ) {
     auto& task = tasks[iT];
     auto handle = data->device_backend_->blas_pool_handle( iT % n_blas_streams );
-    do_syr2k(handle, task.npts, task.bfn_screening.nbe, task.dbfx, task.xmat_x, 0.0, task.nbe_scr);
-    do_syr2k(handle, task.npts, task.bfn_screening.nbe, task.dbfy, task.xmat_y, 1.0, task.nbe_scr);
-    do_syr2k(handle, task.npts, task.bfn_screening.nbe, task.dbfz, task.xmat_z, 1.0, task.nbe_scr);
+    do_syr2k(handle, task.npts, task.bfn_screening.nbe, task.dbfx, task.xmat_x, 0.0, task.nbe_scr, xx * RKB_factor);
+    do_syr2k(handle, task.npts, task.bfn_screening.nbe, task.dbfy, task.xmat_y, 1.0, task.nbe_scr, yy * RKB_factor);
+    do_syr2k(handle, task.npts, task.bfn_screening.nbe, task.dbfz, task.xmat_z, 1.0, task.nbe_scr, zz * RKB_factor);
+
+    do_syr2k(handle, task.npts, task.bfn_screening.nbe, task.dbfy, task.xmat_k_ij, 1.0, task.nbe_scr, mkij * RKB_factor);
+    do_syr2k(handle, task.npts, task.bfn_screening.nbe, task.dbfx, task.xmat_k_ji, 1.0, task.nbe_scr, mkji * RKB_factor);
+
+    do_syr2k(handle, task.npts, task.bfn_screening.nbe, task.dbfx, task.xmat_j_ik, 1.0, task.nbe_scr, mjik * RKB_factor);
+    do_syr2k(handle, task.npts, task.bfn_screening.nbe, task.dbfz, task.xmat_j_ki, 1.0, task.nbe_scr, mjki * RKB_factor);
+
+    do_syr2k(handle, task.npts, task.bfn_screening.nbe, task.dbfz, task.xmat_i_jk, 1.0, task.nbe_scr, mijk * RKB_factor);
+    do_syr2k(handle, task.npts, task.bfn_screening.nbe, task.dbfy, task.xmat_i_kj, 1.0, task.nbe_scr, mikj * RKB_factor);
   }
 
   // Record completion of BLAS ops on master stream

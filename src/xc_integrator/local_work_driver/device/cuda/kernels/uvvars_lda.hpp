@@ -84,7 +84,7 @@ __global__ void eval_vvar_lda_dks_kern( size_t        ntasks,
 
   const auto npts            = task.npts;
   const auto nbf             = task.bfn_screening.nbe;
-  double xx, yy ,zz, mkxy,mkyx,mjxz,mjzx,mizy,miyz;
+  double xx, yy ,zz, mkxy ,mkyx, mjxz, mjzx, mizy, miyz;
 
   double* den_eval_device   = nullptr;
   // use the "U" variable (+/- for UKS) even though at this point the density (S/Z) is stored
