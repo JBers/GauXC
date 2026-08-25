@@ -126,7 +126,8 @@ struct required_term_storage {
       // 2*npts for S,Z densities, 2*npts for interleaved density
       if( ref_tracker.ks_scheme == UKS ) return 4*npts;
       // Same as above, but also X,Y densities
-      if( ref_tracker.ks_scheme == GKS ) return 6*npts;  
+      if( ref_tracker.ks_scheme == GKS 
+       or ref_tracker.ks_scheme == DKS) return 6*npts;  
     }
     return 0ul;
   }
@@ -135,7 +136,8 @@ struct required_term_storage {
       // 3*npts for each density in play
       if( ref_tracker.ks_scheme == RKS ) return 3*npts;
       if( ref_tracker.ks_scheme == UKS ) return 6*npts;
-      if( ref_tracker.ks_scheme == GKS ) return 12*npts;
+      if( ref_tracker.ks_scheme == GKS
+       or ref_tracker.ks_scheme == DKS ) return 12*npts;
     }
     return 0ul;
   }
@@ -143,7 +145,8 @@ struct required_term_storage {
     if( grid_gamma ) {
       if(  ref_tracker.ks_scheme == RKS ) return npts;
       if(  ref_tracker.ks_scheme == UKS 
-        or ref_tracker.ks_scheme == GKS ) return 6*npts;
+        or ref_tracker.ks_scheme == GKS
+        or ref_tracker.ks_scheme == DKS ) return 6*npts;
     }
     return 0ul;
   }
@@ -178,7 +181,8 @@ struct required_term_storage {
     if( grid_vrho ) {
       if(   ref_tracker.ks_scheme == RKS ) return npts;
       if(   ref_tracker.ks_scheme == UKS 
-        or  ref_tracker.ks_scheme == GKS ) return 4*npts;
+        or  ref_tracker.ks_scheme == GKS
+        or  ref_tracker.ks_scheme == DKS ) return 4*npts;
     }
     return 0ul;
   }
@@ -186,12 +190,14 @@ struct required_term_storage {
     if( grid_vgamma ) {
       if(   ref_tracker.ks_scheme == RKS ) return npts;
       if(   ref_tracker.ks_scheme == UKS 
-        or  ref_tracker.ks_scheme == GKS ) return 6*npts;
+        or  ref_tracker.ks_scheme == GKS
+        or  ref_tracker.ks_scheme == DKS ) return 6*npts;
     }
     return 0ul;
   }
   inline size_t grid_HK_size(size_t npts){
-    if( ref_tracker.ks_scheme == GKS ) {
+    if( ref_tracker.ks_scheme == GKS 
+     or ref_tracker.ks_scheme == DKS ) {
       if( ref_tracker.xc_approx == GGA ) return 6*npts;
       if( ref_tracker.xc_approx == LDA ) return 3*npts;
     }
@@ -380,6 +386,7 @@ struct required_term_storage {
   bool task_zmat          = false;
   bool task_xmat          = false;
   bool task_xmat_grad     = false;
+  bool task_xmat_dks     = false;
   bool task_xmat_persist  = false;
   bool task_fmat          = false;
   bool task_gmat          = false;
@@ -407,6 +414,9 @@ struct required_term_storage {
   }
   inline size_t task_xmat_grad_size(size_t nbe, size_t npts) {
     return PRDVL(task_xmat_grad, 3 * nbe * npts);
+  }
+  inline size_t task_xmat_dks_size(size_t nbe, size_t npts) {
+    return PRDVL(task_xmat_dks, 6 * nbe * npts);
   }
   inline size_t task_xmat_persist_size(size_t nbe, size_t npts) {
     // TODO Make this more robust
@@ -567,7 +577,8 @@ struct required_term_storage {
       task_bfn_lapgrad  = need_lapl and is_grad;
       task_zmat         = true;
       task_xmat         = true;
-      task_xmat_grad    = is_mgga or (is_gga and is_grad);
+      task_xmat_grad    = is_mgga or (is_gga and is_grad) or is_dks;
+      task_xmat_dks     = is_dks;
       task_xmat_persist = is_grad and not is_rks;
       task_nbe_scr      = true;
 

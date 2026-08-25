@@ -27,12 +27,14 @@ struct AoSScheme1CUTLASSBase : public AoSScheme1Base {
   void eval_xmat_dks_impl(double fac, XCDeviceData*, bool do_grad, density_id );
   template<bool is_fxc>
   void inc_potential_impl(XCDeviceData*, density_id, bool do_m);
+  void inc_potential_dks_impl(XCDeviceData*, density_id, bool do_m);
 
 
   void eval_xmat(double fac, XCDeviceData*, bool do_grad, density_id ) override final;
   void eval_xmat_trial(double fac, XCDeviceData*, bool do_grad, density_id ) override final;
   void eval_xmat_dks(double fac, XCDeviceData*, bool do_grad, density_id ) override final;
   void inc_vxc( XCDeviceData*, density_id, bool ) override final;
+  void inc_vxc_dks( XCDeviceData*, density_id, bool ) override final;
   void inc_fxc( XCDeviceData*, density_id, bool ) override final;
 
   struct Data;

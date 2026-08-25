@@ -532,15 +532,24 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
        lwd->eval_zmat_gga_vxc( &device_data, enabled_terms.ks_scheme, den_id );
      else 
        lwd->eval_zmat_lda_vxc( &device_data, enabled_terms.ks_scheme, den_id );
-     lwd->inc_vxc( &device_data, den_id, func.is_mgga() );
+       
+      lwd->inc_vxc( &device_data, den_id, func.is_mgga() );
   };
-
+  auto do_vxc = [&](density_id den_id) {
+    if( is_dks ){
+       lwd->inc_vxc_dks( &device_data, den_id, func.is_mgga() );
+     } 
+  }
   do_zmat_vxc(DEN_S);
+  do_vxc(DEN_S_SS)
   if(not is_rks) {
     do_zmat_vxc(DEN_Z);
+    do_vxc(DEN_Z_SS)
     if(not is_uks) {
       do_zmat_vxc(DEN_Y);
+      do_vxc(DEN_Y_SS)
       do_zmat_vxc(DEN_X);
+      do_vxc(DEN_X_SS)
     }
   } 
 
@@ -554,6 +563,12 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
       if (not is_uks) {
         lwd->symmetrize_vxc( &device_data, DEN_Y );
         lwd->symmetrize_vxc( &device_data, DEN_X );
+        if (not is_gks) {
+          lwd->symmetrize_vxc( &device_data, DEN_S_SS );
+          lwd->symmetrize_vxc( &device_data, DEN_Z_SS );
+          lwd->symmetrize_vxc( &device_data, DEN_Y_SS );
+          lwd->symmetrize_vxc( &device_data, DEN_X_SS );
+        }
       }
     }
   }

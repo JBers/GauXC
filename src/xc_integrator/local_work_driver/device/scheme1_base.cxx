@@ -1884,7 +1884,66 @@ void AoSScheme1Base::inc_fxc( XCDeviceData* _data, density_id den_selector, bool
 
 
 
+template<bool is_fxc>
+void AoSScheme1Base::inc_potential_dks_impl( XCDeviceData* _data, density_id den_selector, bool do_m ){
 
+  auto* data = dynamic_cast<Data*>(_data);
+  if( !data ) GAUXC_BAD_LWD_DATA_CAST();
+
+  if( not data->device_backend_ ) GAUXC_UNINITIALIZED_DEVICE_BACKEND();
+
+  auto& tasks = data->host_device_tasks;
+  const auto ntasks = tasks.size();
+
+  // Sync blas streams with master stream
+  data->device_backend_->sync_blas_pool_with_master();
+
+  auto do_syr2k = [&]( auto& handle, size_t npts, size_t nbe, auto* bf_ptr, auto* zptr, double fac, auto* v_ptr ) {
+    syr2k( handle, DeviceBlasUplo::Lower, DeviceBlasOp::Trans, nbe, npts, 1.0, bf_ptr, npts,
+      zptr, npts, fac, v_ptr, nbe ); 
+  };
+
+  // Launch SYR2K in round robin
+  const auto n_blas_streams = data->device_backend_->blas_pool_size();
+  for( size_t iT = 0; iT < ntasks; ++iT ) {
+    auto& task = tasks[iT];
+    auto handle = data->device_backend_->blas_pool_handle( iT % n_blas_streams );
+    do_syr2k(handle, task.npts, task.bfn_screening.nbe, task.bf, task.zmat, 0.0, task.nbe_scr);
+    if(do_m) {
+      do_syr2k(handle, task.npts, task.bfn_screening.nbe, task.dbfx, task.xmat_x, 1.0, task.nbe_scr);
+      do_syr2k(handle, task.npts, task.bfn_screening.nbe, task.dbfy, task.xmat_y, 1.0, task.nbe_scr);
+      do_syr2k(handle, task.npts, task.bfn_screening.nbe, task.dbfz, task.xmat_z, 1.0, task.nbe_scr);
+    }
+  }
+
+  // Record completion of BLAS ops on master stream
+  data->device_backend_->sync_master_with_blas_pool();
+
+  // Increment global VXC
+  const auto nbf = data->global_dims.nbf;
+  const auto submat_block_size = data->get_submat_chunk_size( nbf, 0 );
+  auto static_stack  = data->static_stack;
+  auto aos_stack     = data->aos_stack;
+  
+  double* potential_ptr;
+  if constexpr (is_fxc) {
+    potential_ptr = static_stack.fxc_selector(den_selector);
+    // cutlass_stack.vmat_array_device points to aos_stack.device_tasks[itask].nbe_scr
+  } else {
+    potential_ptr = static_stack.vxc_selector(den_selector);
+  }
+
+  auto vxc_ptr = static_stack.vxc_selector(den_selector);
+  sym_task_inc_potential( ntasks, aos_stack.device_tasks,
+    potential_ptr, nbf, submat_block_size,
+    data->device_backend_->queue() );
+  
+  data->device_backend_->check_error("inc_potential_ptr" __FILE__ ": " + std::to_string(__LINE__));
+}
+
+void AoSScheme1Base::inc_vxc_dks( XCDeviceData* _data, density_id den_selector, bool do_m ){
+  inc_potential_dks_impl<false>(_data, den_selector, do_m);
+}
 
 
 
