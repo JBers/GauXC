@@ -1902,17 +1902,34 @@ void AoSScheme1Base::inc_potential_dks_impl( XCDeviceData* _data, density_id den
     syr2k( handle, DeviceBlasUplo::Lower, DeviceBlasOp::Trans, nbe, npts, 1.0, bf_ptr, npts,
       zptr, npts, fac, v_ptr, nbe ); 
   };
-
+  switch ( den_selector ) {
+    case DEN_S_SS:
+      symmetrize_matrix( nbf, static_stack.vxc_s_device, nbf, 
+            data->device_backend_->queue() ); 
+      break;
+    case DEN_Z_SS:
+      symmetrize_matrix( nbf, static_stack.vxc_z_device, nbf, 
+            data->device_backend_->queue() ); 
+      break;
+    case DEN_Y_SS:
+      symmetrize_matrix( nbf, static_stack.vxc_y_device, nbf, 
+            data->device_backend_->queue() ); 
+      break;
+    case DEN_X_SS:
+      symmetrize_matrix( nbf, static_stack.vxc_x_device, nbf, 
+            data->device_backend_->queue() ); 
+      break;
+    default:
+      GAUXC_GENERIC_EXCEPTION( "inc_potential_dks_impl: invalid density selected" );
+  }
   // Launch SYR2K in round robin
   const auto n_blas_streams = data->device_backend_->blas_pool_size();
   for( size_t iT = 0; iT < ntasks; ++iT ) {
     auto& task = tasks[iT];
     auto handle = data->device_backend_->blas_pool_handle( iT % n_blas_streams );
-    do_syr2k(handle, task.npts, task.bfn_screening.nbe, task.bf, task.zmat, 0.0, task.nbe_scr);
-    if(do_m) {
-      do_syr2k(handle, task.npts, task.bfn_screening.nbe, task.dbfx, task.xmat_x, 1.0, task.nbe_scr);
-      do_syr2k(handle, task.npts, task.bfn_screening.nbe, task.dbfy, task.xmat_y, 1.0, task.nbe_scr);
-      do_syr2k(handle, task.npts, task.bfn_screening.nbe, task.dbfz, task.xmat_z, 1.0, task.nbe_scr);
+    do_syr2k(handle, task.npts, task.bfn_screening.nbe, task.dbfx, task.xmat_x, 0.0, task.nbe_scr);
+    do_syr2k(handle, task.npts, task.bfn_screening.nbe, task.dbfy, task.xmat_y, 1.0, task.nbe_scr);
+    do_syr2k(handle, task.npts, task.bfn_screening.nbe, task.dbfz, task.xmat_z, 1.0, task.nbe_scr);
     }
   }
 
