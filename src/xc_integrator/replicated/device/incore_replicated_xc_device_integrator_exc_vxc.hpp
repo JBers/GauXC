@@ -539,7 +539,7 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
     if( is_dks ){
        lwd->inc_vxc_dks( &device_data, den_id, func.is_mgga() );
      } 
-  }
+  };
   do_zmat_vxc(DEN_S);
   do_vxc(DEN_S_SS);
   if(not is_rks) {
