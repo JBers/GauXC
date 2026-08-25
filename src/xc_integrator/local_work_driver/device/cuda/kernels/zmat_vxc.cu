@@ -150,24 +150,29 @@ __global__ void zmat_lda_vxc_dks_kernel( size_t        ntasks,
   const double* vrho_pos_device    = task.vrho_pos;
   const double* vrho_neg_device    = task.vrho_neg;
 
-  double* K_device;
-  if constexpr ( den_selector == DEN_Z ) K_device = task.K_z;
-  if constexpr ( den_selector == DEN_Y ) K_device = task.K_y;
-  if constexpr ( den_selector == DEN_X ) K_device = task.K_x;
-  
-
+  double* K_z_device = task.K_z;
+  double* K_y_device = task.K_y;
+  double* K_x_device = task.K_x;
 
   const auto* basis_eval_device = task.bf;
   const auto* dbasis_x_eval_device = task.dbfx;
   const auto* dbasis_y_eval_device = task.dbfy;
   const auto* dbasis_z_eval_device = task.dbfz;
 
+                                          //    # S       # Z       # X       # Y       #
+  auto* z_matrix_device = task.zmat;      // LL # Zs      # Zz      # Zx      # Zy      #
+  auto* z_x_matrix_device = task.xmat_x;  // SS # Zs_x_SS # Zz_x_SS # Zx_x_SS # Zy_x_SS #
+  auto* z_y_matrix_device = task.xmat_y;  // SS # Zs_y_SS # Zz_y_SS # Zx_y_SS # Zy_y_SS #
+  auto* z_z_matrix_device = task.xmat_z;  // SS # Zs_z_SS # Zz_z_SS # Zx_z_SS # Zy_z_SS #
 
-  auto* z_matrix_device = task.zmat;      // LL Zs 
-  auto* z_x_matrix_device = task.xmat_x;  // SS Zs_x_SS
-  auto* z_y_matrix_device = task.xmat_y;  // SS Zs_y_SS
-  auto* z_z_matrix_device = task.xmat_z;  // SS Zs_z_SS
-
+  // if constexpr( den_selector != DEN_S){      //    # S       # Z       # X       # Y       #   
+  auto* z_k_ij_matrix_device = task.xmat_k_ij;  // SS # Zz_x_SS # Zs_x_SS # Zy_x_SS # Zx_x_SS # 
+  auto* z_k_ji_matrix_device = task.xmat_k_ji;  // SS # Zz_y_SS # Zs_y_SS # Zy_y_SS # Zx_y_SS #
+  auto* z_j_ik_matrix_device = task.xmat_j_ik;  // SS # Zy_z_SS # Zx_z_SS # Zz_z_SS # Zs_z_SS #
+  auto* z_j_ki_matrix_device = task.xmat_j_ki;  // SS # Zy_x_SS # Zx_x_SS # Zz_x_SS # Zs_x_SS #
+  auto* z_i_jk_matrix_device = task.xmat_i_jk;  // SS # Zx_y_SS # Zy_y_SS # Zs_y_SS # Zz_y_SS #
+  auto* z_i_kj_matrix_device = task.xmat_i_kj;  // SS # Zx_z_SS # Zy_z_SS # Zs_z_SS # Zz_z_SS #
+  
   const int tid_x = blockIdx.x * blockDim.x + threadIdx.x;
   const int tid_y = blockIdx.y * blockDim.y + threadIdx.y;
 
@@ -175,24 +180,58 @@ __global__ void zmat_lda_vxc_dks_kernel( size_t        ntasks,
     const size_t ibfoff = tid_y * npts + tid_x;
     const double factp = 0.5 * vrho_pos_device[tid_x];
     const double factm = 0.5 * vrho_neg_device[tid_x];
+    const double factk = 0.5 * (factp - factm);
 
     if constexpr ( den_selector == DEN_S ) {
       z_matrix_device[ ibfoff ] = 0.5*(factp * basis_eval_device[ ibfoff ] + factm * basis_eval_device[ ibfoff ]);
       z_x_matrix_device[ ibfoff ] = 0.5*(factp * dbasis_x_eval_device[ ibfoff ] + factm * dbasis_x_eval_device[ ibfoff ]);
       z_y_matrix_device[ ibfoff ] = 0.5*(factp * dbasis_y_eval_device[ ibfoff ] + factm * dbasis_y_eval_device[ ibfoff ]);
       z_z_matrix_device[ ibfoff ] = 0.5*(factp * dbasis_z_eval_device[ ibfoff ] + factm * dbasis_z_eval_device[ ibfoff ]);
+      z_k_ij_matrix_device[ ibfoff ] = K_z_device[ ibfoff ] * factk * dbasis_x_eval_device[ ibfoff ];
+      z_k_ji_matrix_device[ ibfoff ] = K_z_device[ ibfoff ] * factk * dbasis_y_eval_device[ ibfoff ];
+      z_j_ik_matrix_device[ ibfoff ] = K_y_device[ ibfoff ] * factk * dbasis_z_eval_device[ ibfoff ];
+      z_j_ki_matrix_device[ ibfoff ] = K_y_device[ ibfoff ] * factk * dbasis_x_eval_device[ ibfoff ];
+      z_i_jk_matrix_device[ ibfoff ] = K_x_device[ ibfoff ] * factk * dbasis_y_eval_device[ ibfoff ];
+      z_i_kj_matrix_device[ ibfoff ] = K_x_device[ ibfoff ] * factk * dbasis_z_eval_device[ ibfoff ];
     }
-    else {
-      const double factk = 0.5 * (factp - factm);
-      z_matrix_device[ ibfoff ] = K_device[ ibfoff ] * factk * basis_eval_device[ ibfoff ];
-      z_x_matrix_device[ ibfoff ] = K_device[ ibfoff ] * factk * dbasis_x_eval_device[ ibfoff ];
-      z_y_matrix_device[ ibfoff ] = K_device[ ibfoff ] * factk * dbasis_y_eval_device[ ibfoff ];
-      z_z_matrix_device[ ibfoff ] = K_device[ ibfoff ] * factk * dbasis_z_eval_device[ ibfoff ];
+    if constexpr ( den_selector == DEN_Z ) {
+      z_matrix_device[ ibfoff ] = K_z_device[ ibfoff ] * factk * basis_eval_device[ ibfoff ];
+      z_x_matrix_device[ ibfoff ] = K_z_device[ ibfoff ] * factk * dbasis_x_eval_device[ ibfoff ];
+      z_y_matrix_device[ ibfoff ] = K_z_device[ ibfoff ] * factk * dbasis_y_eval_device[ ibfoff ];
+      z_z_matrix_device[ ibfoff ] = K_z_device[ ibfoff ] * factk * dbasis_z_eval_device[ ibfoff ];
+      z_k_ij_matrix_device[ ibfoff ] = 0.5*(factp * dbasis_x_eval_device[ ibfoff ] + factm * dbasis_x_eval_device[ ibfoff ]);
+      z_k_ji_matrix_device[ ibfoff ] = 0.5*(factp * dbasis_y_eval_device[ ibfoff ] + factm * dbasis_y_eval_device[ ibfoff ]);
+      z_j_ik_matrix_device[ ibfoff ] = K_x_device[ ibfoff ] * factk * dbasis_z_eval_device[ ibfoff ];
+      z_j_ki_matrix_device[ ibfoff ] = K_x_device[ ibfoff ] * factk * dbasis_x_eval_device[ ibfoff ];
+      z_i_jk_matrix_device[ ibfoff ] = K_y_device[ ibfoff ] * factk * dbasis_y_eval_device[ ibfoff ];
+      z_i_kj_matrix_device[ ibfoff ] = K_y_device[ ibfoff ] * factk * dbasis_z_eval_device[ ibfoff ];
+    }
+    if constexpr ( den_selector == DEN_Y ) {
+      z_matrix_device[ ibfoff ] = K_y_device[ ibfoff ] * factk * basis_eval_device[ ibfoff ];
+      z_x_matrix_device[ ibfoff ] = K_y_device[ ibfoff ] * factk * dbasis_x_eval_device[ ibfoff ];
+      z_y_matrix_device[ ibfoff ] = K_y_device[ ibfoff ] * factk * dbasis_y_eval_device[ ibfoff ];
+      z_z_matrix_device[ ibfoff ] = K_y_device[ ibfoff ] * factk * dbasis_z_eval_device[ ibfoff ];
+      z_k_ij_matrix_device[ ibfoff ] = K_x_device[ ibfoff ] * factk * dbasis_x_eval_device[ ibfoff ];
+      z_k_ji_matrix_device[ ibfoff ] = K_x_device[ ibfoff ] * factk * dbasis_y_eval_device[ ibfoff ];
+      z_j_ik_matrix_device[ ibfoff ] = 0.5*(factp * dbasis_z_eval_device[ ibfoff ] + factm * dbasis_z_eval_device[ ibfoff ]);
+      z_j_ki_matrix_device[ ibfoff ] = 0.5*(factp * dbasis_x_eval_device[ ibfoff ] + factm * dbasis_x_eval_device[ ibfoff ]);
+      z_i_jk_matrix_device[ ibfoff ] = K_z_device[ ibfoff ] * factk * dbasis_y_eval_device[ ibfoff ];
+      z_i_kj_matrix_device[ ibfoff ] = K_z_device[ ibfoff ] * factk * dbasis_z_eval_device[ ibfoff ];
+    }
+    if constexpr ( den_selector == DEN_X ) {
+      z_matrix_device[ ibfoff ] = K_x_device[ ibfoff ] * factk * basis_eval_device[ ibfoff ];
+      z_x_matrix_device[ ibfoff ] = K_x_device[ ibfoff ] * factk * dbasis_x_eval_device[ ibfoff ];
+      z_y_matrix_device[ ibfoff ] = K_x_device[ ibfoff ] * factk * dbasis_y_eval_device[ ibfoff ];
+      z_z_matrix_device[ ibfoff ] = K_x_device[ ibfoff ] * factk * dbasis_z_eval_device[ ibfoff ];
+      z_k_ij_matrix_device[ ibfoff ] = K_y_device[ ibfoff ] * factk * dbasis_x_eval_device[ ibfoff ];
+      z_k_ji_matrix_device[ ibfoff ] = K_y_device[ ibfoff ] * factk * dbasis_y_eval_device[ ibfoff ];
+      z_j_ik_matrix_device[ ibfoff ] = K_z_device[ ibfoff ] * factk * dbasis_z_eval_device[ ibfoff ];
+      z_j_ki_matrix_device[ ibfoff ] = K_z_device[ ibfoff ] * factk * dbasis_x_eval_device[ ibfoff ];
+      z_i_jk_matrix_device[ ibfoff ] = 0.5*(factp * dbasis_y_eval_device[ ibfoff ] + factm * dbasis_y_eval_device[ ibfoff ]);
+      z_i_kj_matrix_device[ ibfoff ] = 0.5*(factp * dbasis_z_eval_device[ ibfoff ] + factm * dbasis_z_eval_device[ ibfoff ]);
     }
   }
-
 }
-
 
 
 __global__ void zmat_gga_vxc_rks_kernel( size_t        ntasks,

@@ -461,13 +461,17 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
     
     const bool need_lapl = func.needs_laplacian();
     // Evaluate collocation
-    if( func.is_mgga() ) {
-      if(need_lapl) lwd->eval_collocation_laplacian( &device_data );
-      else          lwd->eval_collocation_gradient( &device_data );
+    if( is_dks ){
+      if( func.is_gga() ) lwd->eval_collocation_hessian( &device_data );
+      else                lwd->eval_collocation_gradient( &device_data );
+    } else {
+      if( func.is_mgga() ) {
+        if(need_lapl) lwd->eval_collocation_laplacian( &device_data );
+        else          lwd->eval_collocation_gradient( &device_data );
+      }
+      else if( func.is_gga() ) lwd->eval_collocation_gradient( &device_data );
+      else                     lwd->eval_collocation( &device_data );
     }
-    else if( func.is_gga() ) lwd->eval_collocation_gradient( &device_data );
-    else                     lwd->eval_collocation( &device_data );
-      
     const double xmat_fac = is_rks ? 2.0 : 1.0;
     const bool need_xmat_grad = func.is_mgga();
 
