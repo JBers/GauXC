@@ -1969,8 +1969,8 @@ void AoSScheme1Base::inc_potential_dks_impl( XCDeviceData* _data, density_id den
     do_syr2k(handle, task.npts, task.bfn_screening.nbe, task.dbfx, task.xmat_j_ik, 1.0, task.nbe_scr, mjxz * RKB_factor);
     do_syr2k(handle, task.npts, task.bfn_screening.nbe, task.dbfz, task.xmat_j_ki, 1.0, task.nbe_scr, mjzx * RKB_factor);
 
-    do_syr2k(handle, task.npts, task.bfn_screening.nbe, task.dbfz, task.xmat_i_jk, 1.0, task.nbe_scr, mixy * RKB_factor);
-    do_syr2k(handle, task.npts, task.bfn_screening.nbe, task.dbfy, task.xmat_i_kj, 1.0, task.nbe_scr, miyx * RKB_factor);
+    do_syr2k(handle, task.npts, task.bfn_screening.nbe, task.dbfz, task.xmat_i_jk, 1.0, task.nbe_scr, mizy * RKB_factor);
+    do_syr2k(handle, task.npts, task.bfn_screening.nbe, task.dbfy, task.xmat_i_kj, 1.0, task.nbe_scr, miyz * RKB_factor);
   }
 
   // Record completion of BLAS ops on master stream
