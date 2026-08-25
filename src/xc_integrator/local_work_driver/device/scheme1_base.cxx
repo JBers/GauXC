@@ -1906,19 +1906,19 @@ void AoSScheme1Base::inc_potential_dks_impl( XCDeviceData* _data, density_id den
         xx = 1.;
         yy = 1.;
         zz = 1.;
-        mkxy=-1.;
-        mkyx=1.;
-        mjxz=1.;
-        mjzx=-1.;
-        mizy=1.;
-        miyz=-1.;
+        mkxy=0.;
+        mkyx=0.;
+        mjxz=0.;
+        mjzx=0.;
+        mizy=0.;
+        miyz=0.;
       break;
     case DEN_Z_SS:
         xx = -1.;
         yy = -1.;
         zz = 1.;
-        mkxy=1.;
-        mkyx=-1.;
+        mkxy=0.;
+        mkyx=0.;
         mjxz=1.;
         mjzx=1.;
         mizy=1.;
@@ -1930,8 +1930,8 @@ void AoSScheme1Base::inc_potential_dks_impl( XCDeviceData* _data, density_id den
         zz = -1.;
         mkyx=1.;
         mkyx=1.;
-        mjxz=-1.;
-        mjzx=1.;
+        mjxz=0.;
+        mjzx=0.;
         mizy=1.;
         miyz=1.;
       break;
@@ -1943,8 +1943,8 @@ void AoSScheme1Base::inc_potential_dks_impl( XCDeviceData* _data, density_id den
         mkyx=1.;
         mjxz=1.;
         mjzx=1.;
-        mizy=-1.;
-        miyz=1.; 
+        mizy=0.;
+        miyz=0.; 
       break;
     default:
       GAUXC_GENERIC_EXCEPTION( "inc_potential_dks_impl: invalid density selected" );
@@ -1963,14 +1963,14 @@ void AoSScheme1Base::inc_potential_dks_impl( XCDeviceData* _data, density_id den
     do_syr2k(handle, task.npts, task.bfn_screening.nbe, task.dbfy, task.xmat_y, 1.0, task.nbe_scr, yy * RKB_factor);
     do_syr2k(handle, task.npts, task.bfn_screening.nbe, task.dbfz, task.xmat_z, 1.0, task.nbe_scr, zz * RKB_factor);
 
-    do_syr2k(handle, task.npts, task.bfn_screening.nbe, task.dbfy, task.xmat_k_ij, 1.0, task.nbe_scr, mkij * RKB_factor);
-    do_syr2k(handle, task.npts, task.bfn_screening.nbe, task.dbfx, task.xmat_k_ji, 1.0, task.nbe_scr, mkji * RKB_factor);
+    do_syr2k(handle, task.npts, task.bfn_screening.nbe, task.dbfy, task.xmat_k_ij, 1.0, task.nbe_scr, mkxy * RKB_factor);
+    do_syr2k(handle, task.npts, task.bfn_screening.nbe, task.dbfx, task.xmat_k_ji, 1.0, task.nbe_scr, mkyx * RKB_factor);
 
-    do_syr2k(handle, task.npts, task.bfn_screening.nbe, task.dbfx, task.xmat_j_ik, 1.0, task.nbe_scr, mjik * RKB_factor);
-    do_syr2k(handle, task.npts, task.bfn_screening.nbe, task.dbfz, task.xmat_j_ki, 1.0, task.nbe_scr, mjki * RKB_factor);
+    do_syr2k(handle, task.npts, task.bfn_screening.nbe, task.dbfx, task.xmat_j_ik, 1.0, task.nbe_scr, mjxz * RKB_factor);
+    do_syr2k(handle, task.npts, task.bfn_screening.nbe, task.dbfz, task.xmat_j_ki, 1.0, task.nbe_scr, mjzx * RKB_factor);
 
-    do_syr2k(handle, task.npts, task.bfn_screening.nbe, task.dbfz, task.xmat_i_jk, 1.0, task.nbe_scr, mijk * RKB_factor);
-    do_syr2k(handle, task.npts, task.bfn_screening.nbe, task.dbfy, task.xmat_i_kj, 1.0, task.nbe_scr, mikj * RKB_factor);
+    do_syr2k(handle, task.npts, task.bfn_screening.nbe, task.dbfz, task.xmat_i_jk, 1.0, task.nbe_scr, mixy * RKB_factor);
+    do_syr2k(handle, task.npts, task.bfn_screening.nbe, task.dbfy, task.xmat_i_kj, 1.0, task.nbe_scr, miyx * RKB_factor);
   }
 
   // Record completion of BLAS ops on master stream
