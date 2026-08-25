@@ -22,8 +22,6 @@
 #include "device/common/increment_exc_grad.hpp"
 #include "device/common/exx_ek_screening.hpp"
 
-#include <gauxc/physcon.hpp>
-
 #include "buffer_adaptor.hpp"
 
 #include "device/common/shell_pair_to_task.hpp"
@@ -1896,7 +1894,9 @@ void AoSScheme1Base::inc_potential_dks_impl( XCDeviceData* _data, density_id den
 
   auto& tasks = data->host_device_tasks;
   const auto ntasks = tasks.size();
-
+  double SpeedOfLight  = 137.03599917700001;
+  double RKB_factor = 1./(4.*SpeedOfLight*SpeedOfLight);
+  
   // Sync blas streams with master stream
   data->device_backend_->sync_blas_pool_with_master();
 

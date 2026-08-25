@@ -11,7 +11,7 @@
 
 namespace GauXC {
 
-	  double SpeedOfLight  = 137.035999074;
+	  double SpeedOfLight  = 137.03599917700001;
 	  double RKB_factor = 1./(4.*SpeedOfLight*SpeedOfLight);
 
 };

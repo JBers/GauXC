@@ -13,7 +13,6 @@
 #include "device_specific/cuda_device_constants.hpp"
 #include "device_specific/cuda_util.hpp"
 #include "device/xc_device_data.hpp"
-#include <gauxc/physcon.hpp>
 
 namespace GauXC {
 
@@ -85,6 +84,9 @@ __global__ void eval_vvar_lda_dks_kern( size_t        ntasks,
   const auto npts            = task.npts;
   const auto nbf             = task.bfn_screening.nbe;
   double xx, yy ,zz, mkxy ,mkyx, mjxz, mjzx, mizy, miyz;
+  
+  double SpeedOfLight  = 137.03599917700001;
+  double RKB_factor = 1./(4.*SpeedOfLight*SpeedOfLight);
 
   double* den_eval_device   = nullptr;
   // use the "U" variable (+/- for UKS) even though at this point the density (S/Z) is stored
