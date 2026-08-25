@@ -87,8 +87,9 @@ struct AoSScheme1Base : public detail::LocalDeviceWorkDriverPIMPL {
   virtual void eval_xmat_dks( double fac, XCDeviceData*, bool , density_id ) override;
   virtual void eval_exx_fmat( XCDeviceData* ) override;
   virtual void inc_vxc( XCDeviceData*, density_id, bool ) override;
-  virtual void inc_vxc_dks( XCDeviceData*, density_id, bool ) override;
   virtual void inc_fxc( XCDeviceData*, density_id, bool ) override;
+  virtual void inc_vxc_dks( XCDeviceData*, density_id, bool ) override;
+  virtual void inc_fxc_dks( XCDeviceData*, density_id, bool ) override;
   virtual void inc_exx_k( XCDeviceData* ) override;
 
 

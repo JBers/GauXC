@@ -1963,7 +1963,7 @@ void AoSScheme1Base::inc_vxc_dks( XCDeviceData* _data, density_id den_selector, 
   inc_potential_dks_impl<false>(_data, den_selector, do_m);
 }
 
-void AoSScheme1Base::inc_fxc_Dks( XCDeviceData* _data, density_id den_selector, bool do_m ){
+void AoSScheme1Base::inc_fxc_dks( XCDeviceData* _data, density_id den_selector, bool do_m ){
   inc_potential_dks_impl<true>(_data, den_selector, do_m);
 }
 

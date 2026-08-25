@@ -112,6 +112,8 @@ public:
   void inc_nel( XCDeviceData* );
   void inc_vxc( XCDeviceData*, density_id, bool do_m = false );
   void inc_fxc( XCDeviceData*, density_id, bool do_m = false );
+  void inc_vxc_dks( XCDeviceData*, density_id, bool do_m = false );
+  void inc_fxc_dks( XCDeviceData*, density_id, bool do_m = false );
   void inc_exc_grad_lda( XCDeviceData*, integrator_ks_scheme, bool );
   void inc_exc_grad_gga( XCDeviceData*, integrator_ks_scheme, bool );
   void inc_exc_grad_mgga( XCDeviceData*, integrator_ks_scheme , bool, bool );

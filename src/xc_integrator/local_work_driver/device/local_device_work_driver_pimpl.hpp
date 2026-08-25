@@ -71,6 +71,7 @@ struct LocalDeviceWorkDriverPIMPL {
   virtual void inc_vxc( XCDeviceData* , density_id, bool) = 0;
   virtual void inc_vxc_dks( XCDeviceData* , density_id, bool) = 0;
   virtual void inc_fxc( XCDeviceData* , density_id, bool) = 0;  
+  virtual void inc_fxc_dks( XCDeviceData* , density_id, bool) = 0; 
   virtual void inc_exc_grad_lda( XCDeviceData*, integrator_ks_scheme, bool  ) = 0;
   virtual void inc_exc_grad_gga( XCDeviceData*, integrator_ks_scheme, bool  ) = 0;
   virtual void inc_exc_grad_mgga( XCDeviceData*, integrator_ks_scheme , bool, bool ) = 0;
