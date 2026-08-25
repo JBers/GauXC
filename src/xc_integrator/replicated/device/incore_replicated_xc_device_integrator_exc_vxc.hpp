@@ -541,15 +541,15 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
      } 
   }
   do_zmat_vxc(DEN_S);
-  do_vxc(DEN_S_SS)
+  do_vxc(DEN_S_SS);
   if(not is_rks) {
     do_zmat_vxc(DEN_Z);
-    do_vxc(DEN_Z_SS)
+    do_vxc(DEN_Z_SS);
     if(not is_uks) {
       do_zmat_vxc(DEN_Y);
-      do_vxc(DEN_Y_SS)
+      do_vxc(DEN_Y_SS);
       do_zmat_vxc(DEN_X);
-      do_vxc(DEN_X_SS)
+      do_vxc(DEN_X_SS);
     }
   } 
 
