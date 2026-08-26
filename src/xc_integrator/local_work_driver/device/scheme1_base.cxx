@@ -1678,7 +1678,7 @@ void AoSScheme1Base::eval_xmat_dks_impl( double fac, XCDeviceData* _data, bool d
 
   auto tasks = data->host_device_tasks;
   const auto ntasks = tasks.size();
-
+  std::cou<<"eval_xmat_dks_impl"<<std::endl;
   // Set correct density matrix pointer on the stack
   const auto nbf = data->global_dims.nbf;
   const auto submat_block_size = data->get_submat_chunk_size( nbf, 0 );
@@ -1905,7 +1905,7 @@ void AoSScheme1Base::inc_potential_dks_impl( XCDeviceData* _data, density_id den
   const auto ntasks = tasks.size();
   double SpeedOfLight  = 137.03599917700001;
   double RKB_factor = 1./(4.*SpeedOfLight*SpeedOfLight);
-
+  std::cout<<"inc_potential_dks_impl"<<std::endl;
   // Sync blas streams with master stream
   data->device_backend_->sync_blas_pool_with_master();
 

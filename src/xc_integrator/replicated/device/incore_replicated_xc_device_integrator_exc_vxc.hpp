@@ -458,7 +458,7 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
       device_data.generate_buffers( enabled_terms, basis_map, task_it, task_end );
 
     /*** Process the batches ***/
-    
+    std::cout<<"exc_vxc_local_work_"<<std::endl;
     const bool need_lapl = func.needs_laplacian();
     // Evaluate collocation
     if( is_dks ){
