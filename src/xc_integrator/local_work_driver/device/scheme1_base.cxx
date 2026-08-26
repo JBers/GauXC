@@ -1760,7 +1760,7 @@ void AoSScheme1Base::eval_xmat_dks_impl( double fac, XCDeviceData* _data, bool d
       int  ldden   = task.bfn_screening.ncut > 1 ? task.bfn_screening.nbe : nbf;
       auto handle = data->device_backend_->blas_pool_handle( iT % n_blas_streams );
       std::cout<<"eval_xmat_dks_impl do_gemm 0"<<std::endl;
-      do_gemm( handle, task.npts, task.bfn_screening.nbe, task.bf, den_ptr_LL, ldden, task.zmat );
+      // do_gemm( handle, task.npts, task.bfn_screening.nbe, task.bf, den_ptr_LL, ldden, task.zmat );
         std::cout<<"eval_xmat_dks_impl do_gemm 1"<<std::endl;
       do_gemm( handle, task.npts, task.bfn_screening.nbe, task.dbfx, den_ptr_SS_dot, ldden, task.xmat_x );
         std::cout<<"eval_xmat_dks_impl do_gemm 2"<<std::endl;
