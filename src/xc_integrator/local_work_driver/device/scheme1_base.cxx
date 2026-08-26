@@ -1745,6 +1745,7 @@ void AoSScheme1Base::eval_xmat_dks_impl( double fac, XCDeviceData* _data, bool d
   // Launch GEMM in round-robin
   const auto n_blas_streams = data->device_backend_->blas_pool_size();
   
+  std::cout<<"eval_xmat_dks_impl before do_gemm"<<std::endl;
    
 
   //size_t nsingle = 0;
@@ -1771,6 +1772,7 @@ void AoSScheme1Base::eval_xmat_dks_impl( double fac, XCDeviceData* _data, bool d
       do_gemm( handle, task.npts, task.bfn_screening.nbe, task.dbfz, den_ptr_SS_cross_anti_i, ldden, task.xmat_i_kj );
   }
 
+  std::cout<<"eval_xmat_dks_impl after do_gemm"<<std::endl;
   
   data->device_backend_->check_error("xmat impl" __FILE__ ": " + std::to_string(__LINE__));
   // Record completion of BLAS ops on master stream
