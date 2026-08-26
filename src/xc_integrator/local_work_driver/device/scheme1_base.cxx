@@ -690,7 +690,7 @@ void AoSScheme1Base::eval_vvars_lda( XCDeviceData* _data, integrator_ks_scheme k
   if ( !data ) GAUXC_BAD_LWD_DATA_CAST();
 
   if( not data->device_backend_ ) GAUXC_UNINITIALIZED_DEVICE_BACKEND();
-
+  std::cout<<"eval_vvars_lda"<<std::endl;
   auto& tasks = data->host_device_tasks;
   const auto ntasks = tasks.size();
   size_t nbe_max = 0, npts_max = 0;
