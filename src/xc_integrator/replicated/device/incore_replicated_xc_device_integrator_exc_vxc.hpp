@@ -490,7 +490,7 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
       else                   lwd->eval_vvars_mgga( &device_data, enabled_terms.ks_scheme, den_id, need_lapl );
     };
 
-    // if (not is_dks) {
+    if (not is_dks) {
       do_xmat_vvar(DEN_S);
       if (not is_rks) {
         do_xmat_vvar(DEN_Z);
@@ -499,12 +499,12 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
           do_xmat_vvar(DEN_X);
         }
       } 
-    // } else {
-    //     do_xmat_vvar_dks(DEN_S);
-    //     do_xmat_vvar_dks(DEN_Z);
-    //     do_xmat_vvar_dks(DEN_Y);
-    //     do_xmat_vvar_dks(DEN_X);
-    // }
+    } else {
+        do_xmat_vvar_dks(DEN_S);
+        do_xmat_vvar_dks(DEN_Z);
+        do_xmat_vvar_dks(DEN_Y);
+        do_xmat_vvar_dks(DEN_X);
+    }
 
 
     // Evaluate U variables
