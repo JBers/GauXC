@@ -14,6 +14,8 @@
 #include "device_specific/cuda_util.hpp"
 #include "device/xc_device_data.hpp"
 
+#include <stdio.h>
+
 namespace GauXC {
 
 template <bool trial, density_id den_select>
@@ -80,7 +82,7 @@ __global__ void eval_vvar_lda_dks_kern( size_t        ntasks,
   if( batch_idx >= ntasks ) return;
 
   auto& task = tasks_device[ batch_idx ];
-  std::cout<<"eval_vvar_lda_dks_kern"<<std::endl;
+  printf("eval_vvar_lda_dks_kern");
   const auto npts            = task.npts;
   const auto nbf             = task.bfn_screening.nbe;
   double xx, yy ,zz, mkxy ,mkyx, mjxz, mjzx, mizy, miyz;
