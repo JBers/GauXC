@@ -506,18 +506,19 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
         do_xmat_vvar_dks(DEN_X);
     }
 
-
+    std::cout<<"// Evaluate U variables"<<std::endl;
     // Evaluate U variables
     if( func.is_mgga() )      lwd->eval_uvars_mgga( &device_data, enabled_terms.ks_scheme, need_lapl );
     else if( func.is_gga() )  lwd->eval_uvars_gga ( &device_data, enabled_terms.ks_scheme );
     else                      lwd->eval_uvars_lda ( &device_data, enabled_terms.ks_scheme );
 
+    std::cout<<"// Evaluate XC functional"<<std::endl;
     // Evaluate XC functional
     if( func.is_mgga() )     lwd->eval_kern_exc_vxc_mgga( func, &device_data );
     else if( func.is_gga() ) lwd->eval_kern_exc_vxc_gga ( func, &device_data );
     else                     lwd->eval_kern_exc_vxc_lda ( func, &device_data );
     
-
+    std::cout<<"// Do scalar EXC/N_EL integrations"<<std::endl;
     // Do scalar EXC/N_EL integrations
     lwd->inc_exc( &device_data );
     lwd->inc_nel( &device_data );
@@ -540,15 +541,23 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
        lwd->inc_vxc_dks( &device_data, den_id, func.is_mgga() );
      } 
   };
+  std::cout<<"do_zmat_vxc(DEN_S);"<<std::endl;
   do_zmat_vxc(DEN_S);
+  std::cout<<"do_vxc(DEN_S_SS);"<<std::endl;
   do_vxc(DEN_S_SS);
   if(not is_rks) {
+    std::cout<<"do_zmat_vxc(DEN_Z);"<<std::endl;
     do_zmat_vxc(DEN_Z);
+    std::cout<<"do_vxc(DEN_Z_SS);"<<std::endl;
     do_vxc(DEN_Z_SS);
     if(not is_uks) {
+      std::cout<<"do_zmat_vxc(DEN_Y);"<<std::endl;
       do_zmat_vxc(DEN_Y);
+      std::cout<<"do_vxc(DEN_Y_SS);"<<std::endl;
       do_vxc(DEN_Y_SS);
+      std::cout<<"do_zmat_vxc(DEN_X);"<<std::endl;
       do_zmat_vxc(DEN_X);
+      std::cout<<"do_vxc(DEN_X_SS);"<<std::endl;
       do_vxc(DEN_X_SS);
     }
   } 
