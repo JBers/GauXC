@@ -1803,7 +1803,7 @@ void AoSScheme1Base::eval_xmat_trial( double fac, XCDeviceData* _data, bool do_g
   eval_xmat_impl<true>(fac, _data, do_grad, den_select);
 }
 void AoSScheme1Base::eval_xmat_dks( double fac, XCDeviceData* _data, bool do_grad, density_id den_select ){
-  eval_xmat_dks_impl<true>(fac, _data, do_grad, den_select);
+  eval_xmat_dks_impl<false>(fac, _data, do_grad, den_select);
 }
 void AoSScheme1Base::save_xmat( XCDeviceData* _data, bool do_grad, density_id den_select ){
 
