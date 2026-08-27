@@ -2053,7 +2053,7 @@ void AoSScheme1Base::symmetrize_vxc( XCDeviceData* _data, density_id den_selecto
   if( !data ) GAUXC_BAD_LWD_DATA_CAST();
 
   if( not data->device_backend_ ) GAUXC_UNINITIALIZED_DEVICE_BACKEND();
-
+  std::cout<<"symmetrize_vxc"<<std::endl;
   const auto nbf = data->global_dims.nbf;
   auto static_stack  = data->static_stack;
   switch ( den_selector ) {
