@@ -692,6 +692,8 @@ void XCDeviceStackData::retrieve_exc_vxc_integrands( double* EXC, double* N_EL,
   std::cout<<"retrieve_exc_vxc_integrands"<<std::endl;
   device_backend_->copy_async( 1,       static_stack.nel_device, N_EL, "NEL D2H" );
   device_backend_->copy_async( 1,       static_stack.exc_device, EXC,  "EXC D2H" );
+  std::cout<<"N_EL "<<*N_EL<<std::endl;
+  std::cout<<"EXC "<<*EXC<<std::endl;
 
   if( ldvxcs and (ldvxcs != (int)nbf) ) GAUXC_GENERIC_EXCEPTION("LDVXCs must be NBF");
   if( VXCs )
