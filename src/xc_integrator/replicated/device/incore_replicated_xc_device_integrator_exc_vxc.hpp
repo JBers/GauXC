@@ -114,7 +114,7 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
   const bool is_rks = (Ps != nullptr) and (not is_uks and not is_gks and not is_dks);
 
   const auto& basis = this->load_balancer_->basis();
-
+  std::cout<<"eval_exc_vxc_"<<std::endl;
   // Check that P / VXC are sane
   const int64_t nbf = basis.nbf();
   if( m != n ) 
@@ -156,7 +156,7 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
 
   // Temporary electron count to judge integrator accuracy
   value_type N_EL;
-
+  std::cout<<"N_EL "<<N_EL<<std::endl;
   if( this->reduction_driver_->takes_device_memory() ) {
 
     // If we can do reductions on the device (e.g. NCCL)
@@ -198,6 +198,7 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
       vxc_z_device = device_data_ptr->vxc_z_device_data();
       if( is_dks ) {
         // DKS
+        std::cout<<"DKS reduction"<<std::endl;
         vxc_y_device = device_data_ptr->vxc_y_device_data();
         vxc_x_device = device_data_ptr->vxc_x_device_data();
 
@@ -261,8 +262,7 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
         this->reduction_driver_->allreduce_inplace( nel_device, 1,       ReductionOp::Sum, queue );
       });
     }
-
-    std::cout<<"EXC in gauxc "<<*EXC<<std::endl;
+    std::cout<<"about to retrieve data to host"<<std::endl;
     // Retrieve data to host
     this->timer_.time_op("XCIntegrator.DeviceToHostCopy_EXC_VXC",[&](){
       device_data_ptr->retrieve_exc_vxc_integrands( EXC, &N_EL, VXCs, ldvxcs, VXCz, ldvxcz,

@@ -561,7 +561,7 @@ void AoSScheme1Base::inc_exc( XCDeviceData* _data ){
   if( !data ) GAUXC_BAD_LWD_DATA_CAST();
 
   if( not data->device_backend_ ) GAUXC_UNINITIALIZED_DEVICE_BACKEND();
-  std::cout<<"inc_vxc"<<std::endl;
+  std::cout<<"inc_exc"<<std::endl;
   auto base_stack    = data->base_stack;
   auto static_stack  = data->static_stack;
   const bool is_RKS  = data->allocated_terms.ks_scheme == RKS;
