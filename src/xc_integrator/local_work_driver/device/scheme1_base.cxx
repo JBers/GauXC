@@ -1365,7 +1365,7 @@ void scale_mgga_output(size_t npts, T& base_stack, DeviceBackend* backend, bool 
 
 void AoSScheme1Base::eval_kern_exc_vxc_lda( const functional_type& func, 
   XCDeviceData* _data ) {
-
+    std::cout<<"eval_kern_exc_vxc_lda"<<std::endl;
   auto* data = dynamic_cast<Data*>(_data);
   if( !data ) GAUXC_BAD_LWD_DATA_CAST();
 
@@ -1385,18 +1385,22 @@ void AoSScheme1Base::eval_kern_exc_vxc_lda( const functional_type& func,
   const size_t npts = data->total_npts_task_batch ;
   
   auto* den_eval_ptr = base_stack.den_s_eval_device;
-
+    std::cout<<"eval_kern_exc_vxc_lda 1"<<std::endl;
   if ( is_pol ) {
     den_eval_ptr = base_stack.den_interleaved_device;
     interleave_lda_input(npts, base_stack, data->device_backend_);
   }
+  std::cout<<"eval_kern_exc_vxc_lda 2"<<std::endl;
 
   GauXC::eval_kern_exc_vxc_lda( func, npts,
     den_eval_ptr, base_stack.eps_eval_device, 
     base_stack.vrho_eval_device, data->device_backend_->queue() );
 
+  std::cout<<"eval_kern_exc_vxc_lda 3"<<std::endl;
+
   if(is_pol) deinterleave_lda_output(npts, base_stack, data->device_backend_);
   scale_lda_output(npts, base_stack, data->device_backend_, is_pol);
+  std::cout<<"eval_kern_exc_vxc_lda 4"<<std::endl;
   
   data->device_backend_->check_error("exc_vxc lda" __FILE__ ": " + std::to_string(__LINE__));
 }

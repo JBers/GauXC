@@ -384,7 +384,8 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
     GAUXC_GENERIC_EXCEPTION("MUST BE EITHER RKS, UKS, GKS, or DKS!");
   }
   
-
+  std::cout<<"rks uks gks dks "<<is_rks<<" "<<is_uks<<" "<<is_gks<<" "<<is_dks<<std::endl;
+  std::cout<<"lda gga mgga "<<func.is_lda()<<" "<<func.is_gga()<<" "<<func.is_mgga()<<std::endl;
   // Cast LWD to LocalDeviceWorkDriver
   auto* lwd = dynamic_cast<LocalDeviceWorkDriver*>(this->local_work_driver_.get() );
 
