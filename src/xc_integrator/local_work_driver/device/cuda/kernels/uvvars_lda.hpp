@@ -402,7 +402,7 @@ __global__ void eval_uvars_lda_dks_kernel( size_t        ntasks,
 
     den_s_eval_device[ tid ] = 0.5*(ps + mnorm);
     den_z_eval_device[ tid ] = 0.5*(ps - mnorm);
-    printf("den_s_eval_device, lda rho+ ",0.5*(ps + mnorm));
+    printf("den_s_eval_device, lda rho+ %d!\n",0.5*(ps + mnorm));
   }
 }
 
