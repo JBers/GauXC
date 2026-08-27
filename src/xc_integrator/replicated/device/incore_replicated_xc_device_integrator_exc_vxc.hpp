@@ -538,29 +538,29 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
        
       lwd->inc_vxc( &device_data, den_id, func.is_mgga() );
   };
-  auto do_vxc = [&](density_id den_id) {
+  auto do_vxc_ss = [&](density_id den_id) {
     if( is_dks ){
        lwd->inc_vxc_dks( &device_data, den_id, func.is_mgga() );
      } 
   };
   std::cout<<"do_zmat_vxc(DEN_S);"<<std::endl;
   do_zmat_vxc(DEN_S);
-  std::cout<<"do_vxc(DEN_S_SS);"<<std::endl;
-  do_vxc(DEN_S_SS);
+  std::cout<<"do_vxc_ss(DEN_S_SS);"<<std::endl;
+  do_vxc_ss(DEN_S_SS);
   if(not is_rks) {
     std::cout<<"do_zmat_vxc(DEN_Z);"<<std::endl;
     do_zmat_vxc(DEN_Z);
-    std::cout<<"do_vxc(DEN_Z_SS);"<<std::endl;
-    do_vxc(DEN_Z_SS);
+    std::cout<<"do_vxc_ss(DEN_Z_SS);"<<std::endl;
+    do_vxc_ss(DEN_Z_SS);
     if(not is_uks) {
       std::cout<<"do_zmat_vxc(DEN_Y);"<<std::endl;
       do_zmat_vxc(DEN_Y);
-      std::cout<<"do_vxc(DEN_Y_SS);"<<std::endl;
-      do_vxc(DEN_Y_SS);
+      std::cout<<"do_vxc_ss(DEN_Y_SS);"<<std::endl;
+      do_vxc_ss(DEN_Y_SS);
       std::cout<<"do_zmat_vxc(DEN_X);"<<std::endl;
       do_zmat_vxc(DEN_X);
-      std::cout<<"do_vxc(DEN_X_SS);"<<std::endl;
-      do_vxc(DEN_X_SS);
+      std::cout<<"do_vxc_ss(DEN_X_SS);"<<std::endl;
+      do_vxc_ss(DEN_X_SS);
     }
   } 
 

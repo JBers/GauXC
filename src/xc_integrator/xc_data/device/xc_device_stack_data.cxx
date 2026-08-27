@@ -108,7 +108,7 @@ void XCDeviceStackData::allocate_static_data_exc_vxc( int32_t nbf, int32_t nshel
     GAUXC_GENERIC_EXCEPTION("Attempting to reallocate Stack EXC VXC");
   if( enabled_terms.ks_scheme == _UNDEF_SCHEME )
     GAUXC_GENERIC_EXCEPTION("Must have a KS Scheme set to allocate Stack EXC VXC");
-
+  std::cout<<"allocate_static_data_exc_vxc"<<std::endl;
   // Save state
   global_dims.nshells = nshells;
   global_dims.nbf     = nbf; 
@@ -129,6 +129,7 @@ void XCDeviceStackData::allocate_static_data_exc_vxc( int32_t nbf, int32_t nshel
         static_stack.dmat_y_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
         static_stack.dmat_x_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
         if( allocated_terms.ks_scheme == DKS ) {
+          std::cout<<"dmat allocated_terms.ks_scheme == DKS"<<std::endl;
           static_stack.dmat_s_ss_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
           static_stack.dmat_z_ss_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
           static_stack.dmat_y_ss_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
@@ -149,6 +150,7 @@ void XCDeviceStackData::allocate_static_data_exc_vxc( int32_t nbf, int32_t nshel
         static_stack.vxc_y_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
         static_stack.vxc_x_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
         if( allocated_terms.ks_scheme == DKS ) {
+          std::cout<<"do_vxc allocated_terms.ks_scheme == DKS"<<std::endl;
           static_stack.vxc_s_ss_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
           static_stack.vxc_z_ss_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
           static_stack.vxc_y_ss_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
@@ -615,7 +617,7 @@ void XCDeviceStackData::zero_den_integrands() {
 void XCDeviceStackData::zero_exc_vxc_integrands(integrator_term_tracker enabled_terms) {
 
   if( not device_backend_ ) GAUXC_GENERIC_EXCEPTION("Invalid Device Backend");
-
+  std::cout<<"zero_exc_vxc_integrands"<<std::endl;
   const auto nbf = global_dims.nbf;
   if(static_stack.vxc_s_device) device_backend_->set_zero( nbf*nbf, static_stack.vxc_s_device, "VXCs Zero" );
   if(static_stack.vxc_z_device) device_backend_->set_zero( nbf*nbf, static_stack.vxc_z_device, "VXCz Zero" );
