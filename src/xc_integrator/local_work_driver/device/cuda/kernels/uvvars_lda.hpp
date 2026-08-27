@@ -180,7 +180,6 @@ __global__ void eval_vvar_lda_dks_kern( size_t        ntasks,
 
     den_reg = bf_col[ tid_y ]   * db_col[ tid_y ];
     
-
     // rho SS
     db_col   = den_basis_SS_xx_prod_device  + tid_x*npts;
     den_reg += xx*RKB_factor*(bf_x_col[ tid_y ]   * db_col[ tid_y ]);
@@ -208,7 +207,7 @@ __global__ void eval_vvar_lda_dks_kern( size_t        ntasks,
 
     db_col   = den_basis_SS_izy_prod_device + tid_x*npts;
     den_reg += mizy*RKB_factor*(bf_z_col[ tid_y ]   * db_col[ tid_y ]);
-    
+    printf("eval_vvar_lda_dks_kern, den_reg %.10f\n",den_reg);
   }
 
   // Warp blocks are stored col major
@@ -402,7 +401,7 @@ __global__ void eval_uvars_lda_dks_kernel( size_t        ntasks,
 
     den_s_eval_device[ tid ] = 0.5*(ps + mnorm);
     den_z_eval_device[ tid ] = 0.5*(ps - mnorm);
-    printf("den_s_eval_device, lda rho+ %.10f\n",0.5*(ps + mnorm));
+    // printf("den_s_eval_device, lda rho+ %.10f\n",0.5*(ps + mnorm));
   }
 }
 
