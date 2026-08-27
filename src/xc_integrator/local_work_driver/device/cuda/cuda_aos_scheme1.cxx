@@ -56,7 +56,8 @@ void CudaAoSScheme1<Base>::eval_weight_1st_deriv_contracted( XCDeviceData* _data
   // make w times f vector
   const bool is_UKS = data->allocated_terms.ks_scheme == UKS;
   const bool is_GKS = data->allocated_terms.ks_scheme == GKS;
-  const bool is_pol  = is_UKS or is_GKS;
+  const bool is_DKS = data->allocated_terms.ks_scheme == DKS;
+  const bool is_pol  = is_UKS or is_GKS or is_DKS;
   auto base_stack    = data->base_stack;
   if( is_pol )
     increment( data->device_backend_->master_blas_handle(), base_stack.den_z_eval_device, 
