@@ -385,13 +385,13 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
   }
   
   std::cout<<"rks uks gks dks "<<is_rks<<" "<<is_uks<<" "<<is_gks<<" "<<is_dks<<std::endl;
-  std::cout<<"lda gga mgga "<<func.is_lda()<<" "<<func.is_gga()<<" "<<func.is_mgga()<<std::endl;
   // Cast LWD to LocalDeviceWorkDriver
   auto* lwd = dynamic_cast<LocalDeviceWorkDriver*>(this->local_work_driver_.get() );
 
   // Setup Aliases
   const auto& func  = *this->func_;
   const auto& mol   = this->load_balancer_->molecule();
+  std::cout<<"lda gga mgga "<<func.is_lda()<<" "<<func.is_gga()<<" "<<func.is_mgga()<<std::endl;
 
   if( func.is_mgga() and is_gks ) GAUXC_GENERIC_EXCEPTION("GKS mGGAs NYI!");
   if( func.is_mgga() and is_dks ) GAUXC_GENERIC_EXCEPTION("DKS mGGAs NYI!");
