@@ -311,6 +311,7 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
       });
     } else {
       if( is_dks ) {
+        std::cout<<"DKS reduction"<<std::endl;
         this->timer_.time_op("XCIntegrator.Allreduce_EXC_VXC", [&](){
           this->reduction_driver_->allreduce_inplace( VXCs, nbf*nbf, ReductionOp::Sum );
           this->reduction_driver_->allreduce_inplace( VXCz, nbf*nbf, ReductionOp::Sum );
@@ -383,7 +384,7 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
   if (not is_rks and not is_uks and not is_gks and not is_dks) {
     GAUXC_GENERIC_EXCEPTION("MUST BE EITHER RKS, UKS, GKS, or DKS!");
   }
-  
+  std::cout<<"exc_vxc_local_work_"<<std::endl;
   std::cout<<"rks uks gks dks "<<is_rks<<" "<<is_uks<<" "<<is_gks<<" "<<is_dks<<std::endl;
   // Cast LWD to LocalDeviceWorkDriver
   auto* lwd = dynamic_cast<LocalDeviceWorkDriver*>(this->local_work_driver_.get() );
@@ -612,7 +613,7 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
                             value_type* VXCx_SS_im, int64_t ldvxcx_ss_im, value_type* EXC, value_type *N_EL,
                             host_task_iterator task_begin, host_task_iterator task_end,
                             XCDeviceData& device_data ) {
-  
+  std::cout<<"exc_vxc_local_work_ with VXCsss"<<std::endl;
   // Get integrate and keep data on device
   const bool do_vxc = VXCs;
   exc_vxc_local_work_( basis, Ps, ldps, Pz, ldpz, Py, ldpy, Px, ldpx, 
@@ -621,7 +622,7 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
                             task_begin, task_end, device_data, do_vxc );
   auto rt  = detail::as_device_runtime(this->load_balancer_->runtime());
   rt.device_backend()->master_queue_synchronize();
-
+    std::cout<<"about to // Receive XC terms from host"<<std::endl;
   // Receive XC terms from host
   this->timer_.time_op("XCIntegrator.DeviceToHostCopy_EXC_VXC",[&](){
     device_data.retrieve_exc_vxc_integrands( EXC, N_EL, VXCs, ldvxcs, VXCz, ldvxcz, VXCy, ldvxcy, VXCx, ldvxcx,
