@@ -690,7 +690,7 @@ void AoSScheme1Base::eval_vvars_lda( XCDeviceData* _data, integrator_ks_scheme k
   if ( !data ) GAUXC_BAD_LWD_DATA_CAST();
 
   if( not data->device_backend_ ) GAUXC_UNINITIALIZED_DEVICE_BACKEND();
-  std::cout<<"eval_vvars_lda"<<std::endl;
+  std::cout<<"eval_vvars_lda begin"<<std::endl;
   auto& tasks = data->host_device_tasks;
   const auto ntasks = tasks.size();
   size_t nbe_max = 0, npts_max = 0;
@@ -705,21 +705,27 @@ void AoSScheme1Base::eval_vvars_lda( XCDeviceData* _data, integrator_ks_scheme k
   switch ( den_select ) {
     case DEN_S:
       den_eval_ptr = base_stack.den_s_eval_device;
+      std::cout<<"eval_vvars_lda case DEN_S"<<std::endl;
       break;
     case DEN_Z:
+      std::cout<<"eval_vvars_lda case DEN_Z"<<std::endl;
       den_eval_ptr = base_stack.den_z_eval_device;
       break;
     case DEN_Y:
+      std::cout<<"eval_vvars_lda case DEN_Y"<<std::endl;
       den_eval_ptr = base_stack.den_y_eval_device;
       break;
     case DEN_X:
+      std::cout<<"eval_vvars_lda case DEN_X"<<std::endl;
       den_eval_ptr = base_stack.den_x_eval_device;
       break;
     default:
       GAUXC_GENERIC_EXCEPTION( "eval_vvars_lda called with invalid density selected!" );
   }
 
+      std::cout<<"set_zero_async_master_queue berfore"<<std::endl;
   data->device_backend_->set_zero_async_master_queue( data->total_npts_task_batch, den_eval_ptr, "Den Zero" );
+      std::cout<<"set_zero_async_master_queue after"<<std::endl;
 
   // Evaluate V variable
   auto aos_stack     = data->aos_stack;
@@ -1765,27 +1771,27 @@ void AoSScheme1Base::eval_xmat_dks_impl( double fac, XCDeviceData* _data, bool d
 
       int  ldden   = task.bfn_screening.ncut > 1 ? task.bfn_screening.nbe : nbf;
       auto handle = data->device_backend_->blas_pool_handle( iT % n_blas_streams );
-      std::cout<<"eval_xmat_dks_impl do_gemm 0"<<std::endl;
+      // std::cout<<"eval_xmat_dks_impl do_gemm 0"<<std::endl;
       do_gemm( handle, task.npts, task.bfn_screening.nbe, task.bf, den_ptr_LL, ldden, task.zmat );
-        std::cout<<"eval_xmat_dks_impl do_gemm 1"<<std::endl;
+        // std::cout<<"eval_xmat_dks_impl do_gemm 1"<<std::endl;
       do_gemm( handle, task.npts, task.bfn_screening.nbe, task.dbfx, den_ptr_SS_dot, ldden, task.xmat_x );
-        std::cout<<"eval_xmat_dks_impl do_gemm 2"<<std::endl;
+        // std::cout<<"eval_xmat_dks_impl do_gemm 2"<<std::endl;
       do_gemm( handle, task.npts, task.bfn_screening.nbe, task.dbfy, den_ptr_SS_dot, ldden, task.xmat_y );
-        std::cout<<"eval_xmat_dks_impl do_gemm 3"<<std::endl;
+        // std::cout<<"eval_xmat_dks_impl do_gemm 3"<<std::endl;
       do_gemm( handle, task.npts, task.bfn_screening.nbe, task.dbfz, den_ptr_SS_dot, ldden, task.xmat_z );
-        std::cout<<"eval_xmat_dks_impl do_gemm 4"<<std::endl;
+        // std::cout<<"eval_xmat_dks_impl do_gemm 4"<<std::endl;
       do_gemm( handle, task.npts, task.bfn_screening.nbe, task.dbfx, den_ptr_SS_cross_anti_k, ldden, task.xmat_k_ij );
-        std::cout<<"eval_xmat_dks_impl do_gemm 5"<<std::endl;
+        // std::cout<<"eval_xmat_dks_impl do_gemm 5"<<std::endl;
       do_gemm( handle, task.npts, task.bfn_screening.nbe, task.dbfy, den_ptr_SS_cross_anti_k, ldden, task.xmat_k_ji );
-        std::cout<<"eval_xmat_dks_impl do_gemm 6"<<std::endl;
+        // std::cout<<"eval_xmat_dks_impl do_gemm 6"<<std::endl;
       do_gemm( handle, task.npts, task.bfn_screening.nbe, task.dbfz, den_ptr_SS_cross_anti_j, ldden, task.xmat_j_ik );
-        std::cout<<"eval_xmat_dks_impl do_gemm 7"<<std::endl;
+        // std::cout<<"eval_xmat_dks_impl do_gemm 7"<<std::endl;
       do_gemm( handle, task.npts, task.bfn_screening.nbe, task.dbfx, den_ptr_SS_cross_anti_j, ldden, task.xmat_j_ki );
-        std::cout<<"eval_xmat_dks_impl do_gemm 8"<<std::endl;
+        // std::cout<<"eval_xmat_dks_impl do_gemm 8"<<std::endl;
       do_gemm( handle, task.npts, task.bfn_screening.nbe, task.dbfy, den_ptr_SS_cross_anti_i, ldden, task.xmat_i_jk );
-        std::cout<<"eval_xmat_dks_impl do_gemm 9"<<std::endl;
+        // std::cout<<"eval_xmat_dks_impl do_gemm 9"<<std::endl;
       do_gemm( handle, task.npts, task.bfn_screening.nbe, task.dbfz, den_ptr_SS_cross_anti_i, ldden, task.xmat_i_kj );
-        std::cout<<"eval_xmat_dks_impl do_gemm 10"<<std::endl;
+        // std::cout<<"eval_xmat_dks_impl do_gemm 10"<<std::endl;
   }
 
   std::cout<<"eval_xmat_dks_impl after do_gemm"<<std::endl;
