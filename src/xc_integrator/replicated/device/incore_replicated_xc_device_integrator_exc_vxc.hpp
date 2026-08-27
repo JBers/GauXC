@@ -273,7 +273,7 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
                                                                 VXCy_SS_im, ldvxcy_ss_im, VXCx_SS_im, ldvxcx_ss_im   );
     });
 
-
+    std::cout<<"EXC in gauxc "<<*EXC<<std::endl;
   } else {
 
     // Compute local contributions to EXC/VXC and retrieve
