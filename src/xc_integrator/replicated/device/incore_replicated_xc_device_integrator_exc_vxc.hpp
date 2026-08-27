@@ -275,7 +275,7 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
 
     
   } else {
-
+    std::cout<<"// Compute local contributions to EXC/VXC and retrieve data from device "<<std::endl;
     // Compute local contributions to EXC/VXC and retrieve
     // data from device 
     this->timer_.time_op("XCIntegrator.LocalWork_EXC_VXC", [&](){
