@@ -384,10 +384,11 @@ void XCDeviceStackData::send_static_data_density_basis( const double* Ps, int32_
   const double* Ps_SS_imag, int32_t ldps_ss_im, const double* Pz_SS_imag, int32_t ldpz_ss_im,
   const double* Py_SS_imag, int32_t ldpy_ss_im, const double* Px_SS_imag, int32_t ldpx_ss_im,
   const BasisSet<double>& basis ) {
-  const bool is_gks = (Pz != nullptr) and (Py != nullptr) and (Px != nullptr);
-  const bool is_uks = (Pz != nullptr) and (Py == nullptr) and (Px == nullptr);
-  const bool is_rks = (Ps != nullptr) and (not is_uks and not is_gks);
-  if( not is_rks and not is_uks and not is_gks )
+  const bool is_dks = (Pz != nullptr) and (Py != nullptr) and (Px != nullptr) and (Ps_SS != nullptr);
+  const bool is_gks = (Pz != nullptr) and (Py != nullptr) and (Px != nullptr) and (Ps_SS == nullptr);
+  const bool is_uks = (Pz != nullptr) and (Py == nullptr) and (Px == nullptr) and (Ps_SS == nullptr);
+  const bool is_rks = (Ps != nullptr) and (not is_uks and not is_gks and not is_dks);
+  if( not is_rks and not is_uks and not is_gks and not is_dks)
     GAUXC_GENERIC_EXCEPTION("Densities do not match RKS, UKS, or GKS schemes");
 
   if( not (allocated_terms.exx or allocated_terms.exc_vxc or allocated_terms.exc_grad or allocated_terms.den or allocated_terms.exx_ek_screening or allocated_terms.fxc_contraction ) ) 
