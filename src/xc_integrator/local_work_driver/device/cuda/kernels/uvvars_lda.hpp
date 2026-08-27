@@ -82,7 +82,7 @@ __global__ void eval_vvar_lda_dks_kern( size_t        ntasks,
   if( batch_idx >= ntasks ) return;
 
   auto& task = tasks_device[ batch_idx ];
-  printf("eval_vvar_lda_dks_kern");
+  // printf("eval_vvar_lda_dks_kern");
   const auto npts            = task.npts;
   const auto nbf             = task.bfn_screening.nbe;
   double xx, yy ,zz, mkxy ,mkyx, mjxz, mjzx, mizy, miyz;
