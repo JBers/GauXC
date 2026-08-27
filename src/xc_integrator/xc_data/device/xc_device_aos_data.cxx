@@ -534,7 +534,8 @@ void XCDeviceAoSData::pack_and_send(
     const bool is_rks = terms.ks_scheme == RKS;
     const bool is_uks = terms.ks_scheme == UKS;
     const bool is_gks = terms.ks_scheme == GKS;
-    const bool is_pol  = is_uks or is_gks;
+    const bool is_dks = terms.ks_scheme == DKS;
+    const bool is_pol  = is_uks or is_gks or is_dks;
     const bool is_gga = terms.xc_approx == GGA;
     const int den_fac   = is_pol ? 2 : 1;
     const int gamma_fac = is_pol ? 3 : 1;
