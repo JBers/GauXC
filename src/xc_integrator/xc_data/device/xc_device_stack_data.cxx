@@ -395,6 +395,7 @@ void XCDeviceStackData::send_static_data_density_basis( const double* Ps, int32_
 
   if( not device_backend_ ) GAUXC_GENERIC_EXCEPTION("Invalid Device Backend");
 
+  std::cout<<"send_static_data_density_basis"<<std::endl;
 
   const auto nbf    = global_dims.nbf;
   // Check dimensions and copy density
