@@ -262,7 +262,7 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
       });
     }
 
-
+    std::cout<<"EXC in gauxc "<<*EXC<<std::endl;
     // Retrieve data to host
     this->timer_.time_op("XCIntegrator.DeviceToHostCopy_EXC_VXC",[&](){
       device_data_ptr->retrieve_exc_vxc_integrands( EXC, &N_EL, VXCs, ldvxcs, VXCz, ldvxcz,
@@ -273,7 +273,7 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
                                                                 VXCy_SS_im, ldvxcy_ss_im, VXCx_SS_im, ldvxcx_ss_im   );
     });
 
-    std::cout<<"EXC in gauxc "<<*EXC<<std::endl;
+    
   } else {
 
     // Compute local contributions to EXC/VXC and retrieve
