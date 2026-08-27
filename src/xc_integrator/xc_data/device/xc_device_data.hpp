@@ -386,7 +386,7 @@ struct required_term_storage {
   bool task_zmat          = false;
   bool task_xmat          = false;
   bool task_xmat_grad     = false;
-  bool task_xmat_dks     = false;
+  bool task_xmat_dks      = false;
   bool task_xmat_persist  = false;
   bool task_fmat          = false;
   bool task_gmat          = false;

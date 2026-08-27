@@ -217,6 +217,15 @@ XCDeviceAoSData::device_buffer_t XCDeviceAoSData::allocate_dynamic_stack(
     aos_stack.xmat_dz_device = mem.aligned_alloc<double>( bfn_msz, csl);
   }
 
+  if(reqt.task_xmat_dks) {
+    aos_stack.xmat_k_ij_device = mem.aligned_alloc<double>( bfn_msz, csl );
+    aos_stack.xmat_k_ji_device = mem.aligned_alloc<double>( bfn_msz, csl );
+    aos_stack.xmat_j_ik_device = mem.aligned_alloc<double>( bfn_msz, csl );
+    aos_stack.xmat_j_ki_device = mem.aligned_alloc<double>( bfn_msz, csl );
+    aos_stack.xmat_i_jk_device = mem.aligned_alloc<double>( bfn_msz, csl );
+    aos_stack.xmat_i_kj_device = mem.aligned_alloc<double>( bfn_msz, csl );
+  }
+
   // Persistent X Matrix Gradient
   if(reqt.task_xmat_persist) {
     aos_stack.xmatS_device    = mem.aligned_alloc<double>( bfn_msz, csl);
@@ -514,6 +523,13 @@ void XCDeviceAoSData::pack_and_send(
     buffer_adaptor xmatZ_dx_mem( aos_stack.xmatZ_dx_device, total_nbe_bfn_npts );
     buffer_adaptor xmatZ_dy_mem( aos_stack.xmatZ_dy_device, total_nbe_bfn_npts );
     buffer_adaptor xmatZ_dz_mem( aos_stack.xmatZ_dz_device, total_nbe_bfn_npts );
+
+    buffer_adaptor xmat_k_ij_mem( aos_stack.xmat_k_ij_device, total_nbe_bfn_npts );
+    buffer_adaptor xmat_k_ji_mem( aos_stack.xmat_k_ji_device, total_nbe_bfn_npts );
+    buffer_adaptor xmat_j_ik_mem( aos_stack.xmat_j_ik_device, total_nbe_bfn_npts );
+    buffer_adaptor xmat_j_ki_mem( aos_stack.xmat_j_ki_device, total_nbe_bfn_npts );
+    buffer_adaptor xmat_i_jk_mem( aos_stack.xmat_i_jk_device, total_nbe_bfn_npts );
+    buffer_adaptor xmat_i_kj_mem( aos_stack.xmat_i_kj_device, total_nbe_bfn_npts );
     
     const bool is_rks = terms.ks_scheme == RKS;
     const bool is_uks = terms.ks_scheme == UKS;
@@ -753,6 +769,16 @@ void XCDeviceAoSData::pack_and_send(
         task.xmat_x = xmat_dx_mem.aligned_alloc<double>( nbe_bfn * npts, csl);
         task.xmat_y = xmat_dy_mem.aligned_alloc<double>( nbe_bfn * npts, csl);
         task.xmat_z = xmat_dz_mem.aligned_alloc<double>( nbe_bfn * npts, csl);
+      }
+
+      // X Matrix DKS
+      if( reqt.task_xmat_dks ) {
+        task.xmat_k_ij = xmat_k_ij_mem.aligned_alloc<double>( nbe_bfn * npts, csl);
+        task.xmat_k_ji = xmat_k_ji_mem.aligned_alloc<double>( nbe_bfn * npts, csl);
+        task.xmat_j_ik = xmat_j_ik_mem.aligned_alloc<double>( nbe_bfn * npts, csl);
+        task.xmat_j_ki = xmat_j_ki_mem.aligned_alloc<double>( nbe_bfn * npts, csl);
+        task.xmat_i_jk = xmat_i_jk_mem.aligned_alloc<double>( nbe_bfn * npts, csl);
+        task.xmat_i_kj = xmat_i_kj_mem.aligned_alloc<double>( nbe_bfn * npts, csl);
       }
 
       // Persistent X matrix
