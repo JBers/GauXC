@@ -2073,6 +2073,22 @@ void AoSScheme1Base::symmetrize_vxc( XCDeviceData* _data, density_id den_selecto
       symmetrize_matrix( nbf, static_stack.vxc_x_device, nbf, 
             data->device_backend_->queue() ); 
       break;
+    case DEN_S_SS:
+      symmetrize_matrix( nbf, static_stack.vxc_s_ss_device, nbf, 
+            data->device_backend_->queue() ); 
+      break;
+    case DEN_Z_SS:
+      symmetrize_matrix( nbf, static_stack.vxc_z_ss_device, nbf, 
+            data->device_backend_->queue() ); 
+      break;
+    case DEN_Y_SS:
+      symmetrize_matrix( nbf, static_stack.vxc_y_ss_device, nbf, 
+            data->device_backend_->queue() ); 
+      break;
+    case DEN_X_SS:
+      symmetrize_matrix( nbf, static_stack.vxc_x_ss_device, nbf, 
+            data->device_backend_->queue() ); 
+      break;
     default:
       GAUXC_GENERIC_EXCEPTION( "symmetrize_vxc: invalid density selected" );
   }
