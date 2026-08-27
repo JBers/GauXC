@@ -409,6 +409,7 @@ void XCDeviceStackData::send_static_data_density_basis( const double* Ps, int32_
       device_backend_->copy_async( nbf*nbf, Py, static_stack.dmat_y_device, "P_y H2D" );
       device_backend_->copy_async( nbf*nbf, Px, static_stack.dmat_x_device, "P_x H2D" );
       if( not is_gks ) {
+        std::cout<<"send_static_data_density_basis dks"<<std::endl;
         if( ldps_ss != (int)nbf ) GAUXC_GENERIC_EXCEPTION("LDPy SS must bf NBF");
         if( ldpz_ss != (int)nbf ) GAUXC_GENERIC_EXCEPTION("LDPx SS must bf NBF");
         if( ldpy_ss != (int)nbf ) GAUXC_GENERIC_EXCEPTION("LDPy SS must bf NBF");

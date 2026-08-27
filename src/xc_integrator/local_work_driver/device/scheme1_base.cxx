@@ -1695,42 +1695,48 @@ void AoSScheme1Base::eval_xmat_dks_impl( double fac, XCDeviceData* _data, bool d
     // now screened trial density matrix is stored in aos_stack.device_tasks[itask].nbe_scr
   } else {
     dmat_ptr = static_stack.den_selector(den_select);
+      std::cout<<"LL den dmat_ptr"<<std::endl;
   }
   if (den_select == DEN_S) {
       dmat_ptr_SS_dot = static_stack.den_selector(DEN_S_SS);
       dmat_ptr_SS_k   = static_stack.den_selector(DEN_Z_SS_IM);
       dmat_ptr_SS_j   = static_stack.den_selector(DEN_Y_SS_IM);
       dmat_ptr_SS_i   = static_stack.den_selector(DEN_X_SS_IM);
+      std::cout<<"den_select == DEN_S"<<std::endl;
   }
   if (den_select == DEN_Z) {
       dmat_ptr_SS_dot = static_stack.den_selector(DEN_Z_SS);
       dmat_ptr_SS_k   = static_stack.den_selector(DEN_S_SS_IM);
       dmat_ptr_SS_j   = static_stack.den_selector(DEN_X_SS);
       dmat_ptr_SS_i   = static_stack.den_selector(DEN_Y_SS);
+    std::cout<<"den_select == DEN_Z"<<std::endl;
   }
   if (den_select == DEN_Y) {
       dmat_ptr_SS_dot = static_stack.den_selector(DEN_Y_SS);
       dmat_ptr_SS_k   = static_stack.den_selector(DEN_X_SS);
       dmat_ptr_SS_j   = static_stack.den_selector(DEN_S_SS_IM);
       dmat_ptr_SS_i   = static_stack.den_selector(DEN_Z_SS);
+    std::cout<<"den_select == DEN_Y"<<std::endl;
   }
   if (den_select == DEN_X) {
       dmat_ptr_SS_dot = static_stack.den_selector(DEN_X_SS);
       dmat_ptr_SS_k   = static_stack.den_selector(DEN_Y_SS);
       dmat_ptr_SS_j   = static_stack.den_selector(DEN_Z_SS);
       dmat_ptr_SS_i   = static_stack.den_selector(DEN_S_SS_IM);
+    std::cout<<"den_select == DEN_X"<<std::endl;
+
   }
   // Pack density matrix 
   sym_pack_submat( ntasks, aos_stack.device_tasks, dmat_ptr, 
     nbf, submat_block_size, data->device_backend_->queue() );
-  // sym_pack_submat( ntasks, aos_stack.device_tasks, dmat_ptr_SS_dot, 
-  //   nbf, submat_block_size, data->device_backend_->queue() );
-  // sym_pack_submat( ntasks, aos_stack.device_tasks, dmat_ptr_SS_k,
-  //   nbf, submat_block_size, data->device_backend_->queue() );
-  // sym_pack_submat( ntasks, aos_stack.device_tasks, dmat_ptr_SS_j, 
-  //   nbf, submat_block_size, data->device_backend_->queue() );
-  // sym_pack_submat( ntasks, aos_stack.device_tasks, dmat_ptr_SS_i, 
-  //   nbf, submat_block_size, data->device_backend_->queue() );
+  sym_pack_submat( ntasks, aos_stack.device_tasks, dmat_ptr_SS_dot, 
+    nbf, submat_block_size, data->device_backend_->queue() );
+  sym_pack_submat( ntasks, aos_stack.device_tasks, dmat_ptr_SS_k,
+    nbf, submat_block_size, data->device_backend_->queue() );
+  sym_pack_submat( ntasks, aos_stack.device_tasks, dmat_ptr_SS_j, 
+    nbf, submat_block_size, data->device_backend_->queue() );
+  sym_pack_submat( ntasks, aos_stack.device_tasks, dmat_ptr_SS_i, 
+    nbf, submat_block_size, data->device_backend_->queue() );
     
 
 
