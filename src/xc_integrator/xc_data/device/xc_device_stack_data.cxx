@@ -948,7 +948,8 @@ XCDeviceStackData::device_buffer_t XCDeviceStackData::allocate_dynamic_stack(
   const bool is_rks = terms.ks_scheme == RKS;
   const bool is_uks = terms.ks_scheme == UKS;
   const bool is_gks = terms.ks_scheme == GKS;
-  const bool is_pol = is_uks or is_gks;
+  const bool is_dks = terms.ks_scheme == DKS;
+  const bool is_pol = is_uks or is_gks or is_dks;
   const bool is_gga = terms.xc_approx == GGA;
 
   const bool is_den = terms.den;
@@ -975,7 +976,7 @@ XCDeviceStackData::device_buffer_t XCDeviceStackData::allocate_dynamic_stack(
       base_stack.den_z_eval_device      = mem.aligned_alloc<double>(msz, aln, csl);
     }
 
-    if(is_gks){   
+    if( is_gks or is_dks ){   
       base_stack.den_y_eval_device = mem.aligned_alloc<double>(msz, aln, csl); 
       base_stack.den_x_eval_device = mem.aligned_alloc<double>(msz, aln, csl); 
     }
@@ -986,12 +987,12 @@ XCDeviceStackData::device_buffer_t XCDeviceStackData::allocate_dynamic_stack(
     base_stack.dden_sy_eval_device = mem.aligned_alloc<double>(msz, aln, csl);
     base_stack.dden_sz_eval_device = mem.aligned_alloc<double>(msz, aln, csl); 
 
-    if(is_pol) { 
+    if( is_pol ) { 
       base_stack.dden_zx_eval_device = mem.aligned_alloc<double>(msz, aln, csl);
       base_stack.dden_zy_eval_device = mem.aligned_alloc<double>(msz, aln, csl); 
       base_stack.dden_zz_eval_device = mem.aligned_alloc<double>(msz, aln, csl); 
     }
-    if( is_gks ) { 
+    if( is_gks or is_dks ) { 
       base_stack.dden_yx_eval_device = mem.aligned_alloc<double>(msz, aln, csl);
       base_stack.dden_yy_eval_device = mem.aligned_alloc<double>(msz, aln, csl); 
       base_stack.dden_yz_eval_device = mem.aligned_alloc<double>(msz, aln, csl); 
@@ -1049,7 +1050,7 @@ XCDeviceStackData::device_buffer_t XCDeviceStackData::allocate_dynamic_stack(
     }
   }
 
-  if( is_gks ) {       // H, K matrices
+  if( is_gks or is_dks ) {       // H, K matrices
     base_stack.K_x_eval_device   = mem.aligned_alloc<double>(msz, aln, csl);
     base_stack.K_y_eval_device   = mem.aligned_alloc<double>(msz, aln, csl);
     base_stack.K_z_eval_device   = mem.aligned_alloc<double>(msz, aln, csl);
@@ -1091,7 +1092,7 @@ XCDeviceStackData::device_buffer_t XCDeviceStackData::allocate_dynamic_stack(
       if(is_pol) {
         base_stack.tden_z_eval_device      = mem.aligned_alloc<double>(msz, aln, csl);
       }
-      if(is_gks){
+      if(is_gks or is_dks){
         base_stack.tden_y_eval_device = mem.aligned_alloc<double>(msz, aln, csl); 
         base_stack.tden_x_eval_device = mem.aligned_alloc<double>(msz, aln, csl); 
       }
@@ -1108,7 +1109,7 @@ XCDeviceStackData::device_buffer_t XCDeviceStackData::allocate_dynamic_stack(
         base_stack.tdden_zy_eval_device = mem.aligned_alloc<double>(msz, aln, csl); 
         base_stack.tdden_zz_eval_device = mem.aligned_alloc<double>(msz, aln, csl); 
       }
-      if( is_gks ) { 
+      if( is_gks or is_dks ) { 
         base_stack.tdden_yx_eval_device = mem.aligned_alloc<double>(msz, aln, csl);
         base_stack.tdden_yy_eval_device = mem.aligned_alloc<double>(msz, aln, csl); 
         base_stack.tdden_yz_eval_device = mem.aligned_alloc<double>(msz, aln, csl); 
