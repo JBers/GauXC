@@ -99,6 +99,7 @@ __global__ void eval_vvar_lda_dks_kern( size_t        ntasks,
     if constexpr (den_select == DEN_X) den_eval_device = task.tden_x;
   }else{
       if constexpr (den_select == DEN_S) {  //k(xy+m*yx) j(xz+m*zx) i(zy+m*yz)
+  printf("den_select == DEN_S\n");
         den_eval_device = task.den_s; // k: Z ; j: X ; i: Y
         xx = 1.;
         yy = 1.;
@@ -111,6 +112,7 @@ __global__ void eval_vvar_lda_dks_kern( size_t        ntasks,
         miyz=-1.;
       }
       if constexpr (den_select == DEN_Z) {
+  printf("den_select == DEN_Z\n");
         den_eval_device = task.den_z; // k: S ; j: X ; i: Y
         xx = -1.;
         yy = -1.;
@@ -123,6 +125,7 @@ __global__ void eval_vvar_lda_dks_kern( size_t        ntasks,
         miyz=1.;
       }
       if constexpr (den_select == DEN_Y) { 
+  printf("den_select == DEN_Y\n");
         den_eval_device = task.den_y; // k: X ; j: S ; i: Z
         xx = -1.;
         yy = 1.;
@@ -135,6 +138,7 @@ __global__ void eval_vvar_lda_dks_kern( size_t        ntasks,
         miyz=1.;
       }
       if constexpr (den_select == DEN_X) { 
+  printf("den_select == DEN_X\n");
         den_eval_device = task.den_x; // k: Y ; j: Z ; i: S
         xx = 1.;
         yy = -1.;
@@ -214,6 +218,7 @@ __global__ void eval_vvar_lda_dks_kern( size_t        ntasks,
   //constexpr auto max_warps_per_thread_block = cuda::max_warps_per_thread_block;
   den_reg = cuda::warp_reduce_sum<warp_size>( den_reg );
 
+  printf("den_reg, %.10f\n", den_reg);
 
   if( threadIdx.x == 0 and tid_y < npts ) {
     atomicAdd( den_eval_device   + tid_y, den_reg );
@@ -383,7 +388,7 @@ __global__ void eval_uvars_lda_dks_kernel( size_t        ntasks,
     const auto px = den_x_eval_device[ tid ];
     const auto mtemp = pz*pz + px*px + py*py;
     double mnorm = 0.;
-    printf("ps, %.10f pz, %.10f py, %.10f px, %.10f\n", ps, pz, py, px);
+    // printf("ps, %.10f pz, %.10f py, %.10f px, %.10f\n", ps, pz, py, px);
     
     if (mtemp > dtolsq) {
       const double inv_mnorm = rsqrt(mtemp);
