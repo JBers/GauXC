@@ -218,6 +218,8 @@ __global__ void eval_vvar_lda_dks_kern( size_t        ntasks,
 
   if( threadIdx.x == 0 and tid_y < npts ) {
     atomicAdd( den_eval_device   + tid_y, den_reg );
+    printf("den_eval_device, %.10f\n", den_eval_device   + tid_y);
+
   }
   
 }
