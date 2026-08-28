@@ -99,7 +99,6 @@ __global__ void eval_vvar_lda_dks_kern( size_t        ntasks,
     if constexpr (den_select == DEN_X) den_eval_device = task.tden_x;
   }else{
       if constexpr (den_select == DEN_S) {  //k(xy+m*yx) j(xz+m*zx) i(zy+m*yz)
-  printf("den_select == DEN_S\n");
         den_eval_device = task.den_s; // k: Z ; j: X ; i: Y
         xx = 1.;
         yy = 1.;
@@ -112,7 +111,6 @@ __global__ void eval_vvar_lda_dks_kern( size_t        ntasks,
         miyz=-1.;
       }
       if constexpr (den_select == DEN_Z) {
-  printf("den_select == DEN_Z\n");
         den_eval_device = task.den_z; // k: S ; j: X ; i: Y
         xx = -1.;
         yy = -1.;
@@ -125,7 +123,6 @@ __global__ void eval_vvar_lda_dks_kern( size_t        ntasks,
         miyz=1.;
       }
       if constexpr (den_select == DEN_Y) { 
-  printf("den_select == DEN_Y\n");
         den_eval_device = task.den_y; // k: X ; j: S ; i: Z
         xx = -1.;
         yy = 1.;
@@ -138,7 +135,6 @@ __global__ void eval_vvar_lda_dks_kern( size_t        ntasks,
         miyz=1.;
       }
       if constexpr (den_select == DEN_X) { 
-  printf("den_select == DEN_X\n");
         den_eval_device = task.den_x; // k: Y ; j: Z ; i: S
         xx = 1.;
         yy = -1.;
