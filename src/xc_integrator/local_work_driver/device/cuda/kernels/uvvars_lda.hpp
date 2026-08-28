@@ -103,8 +103,8 @@ __global__ void eval_vvar_lda_dks_kern( size_t        ntasks,
         xx = 1.;
         yy = 1.;
         zz = 1.;
-        mkxy=-1.;
-        mkyx=1.;
+        mkxy=1.;
+        mkyx=-1.;
         mjxz=1.;
         mjzx=-1.;
         mizy=1.;
@@ -115,8 +115,8 @@ __global__ void eval_vvar_lda_dks_kern( size_t        ntasks,
         xx = -1.;
         yy = -1.;
         zz = 1.;
-        mkxy=1.;
-        mkyx=-1.;
+        mkxy=-1.;
+        mkyx=1.;
         mjxz=1.;
         mjzx=1.;
         mizy=1.;
@@ -129,8 +129,8 @@ __global__ void eval_vvar_lda_dks_kern( size_t        ntasks,
         zz = -1.;
         mkyx=1.;
         mkxy=1.;
-        mjxz=-1.;
-        mjzx=1.;
+        mjxz=1.;
+        mjzx=-1.;
         mizy=1.;
         miyz=1.;
       }
@@ -143,8 +143,8 @@ __global__ void eval_vvar_lda_dks_kern( size_t        ntasks,
         mkxy=1.;
         mjxz=1.;
         mjzx=1.;
-        mizy=-1.;
-        miyz=1.;
+        mizy=1.;
+        miyz=-1.;
       }
   }
 
@@ -202,10 +202,10 @@ __global__ void eval_vvar_lda_dks_kern( size_t        ntasks,
     den_reg += mjxz*RKB_factor*(bf_z_col[ tid_y ]   * db_col[ tid_y ]);
 
     db_col   = den_basis_SS_iyz_prod_device + tid_x*npts;
-    den_reg += miyz*RKB_factor*(bf_y_col[ tid_y ]   * db_col[ tid_y ]);
+    den_reg += miyz*RKB_factor*(bf_z_col[ tid_y ]   * db_col[ tid_y ]);
 
     db_col   = den_basis_SS_izy_prod_device + tid_x*npts;
-    den_reg += mizy*RKB_factor*(bf_z_col[ tid_y ]   * db_col[ tid_y ]);
+    den_reg += mizy*RKB_factor*(bf_y_col[ tid_y ]   * db_col[ tid_y ]);
     // printf("eval_vvar_lda_dks_kern, den_reg %.10f\n",den_reg);
   }
 
