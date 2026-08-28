@@ -128,7 +128,7 @@ __global__ void eval_vvar_lda_dks_kern( size_t        ntasks,
         yy = 1.;
         zz = -1.;
         mkyx=1.;
-        mkyx=1.;
+        mkxy=1.;
         mjxz=-1.;
         mjzx=1.;
         mizy=1.;
@@ -140,7 +140,7 @@ __global__ void eval_vvar_lda_dks_kern( size_t        ntasks,
         yy = -1.;
         zz = -1.;
         mkyx=1.;
-        mkyx=1.;
+        mkxy=1.;
         mjxz=1.;
         mjzx=1.;
         mizy=-1.;
