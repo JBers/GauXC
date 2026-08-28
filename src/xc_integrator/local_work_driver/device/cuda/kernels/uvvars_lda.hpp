@@ -316,8 +316,8 @@ __global__ void eval_uvars_lda_gks_kernel( size_t        ntasks,
 
   const auto npts            = task.npts;
 
-  auto* den_z_eval_device   = task.den_s;
-  auto* den_s_eval_device   = task.den_z;
+  auto* den_s_eval_device   = task.den_s;
+  auto* den_z_eval_device   = task.den_z;
   auto* den_y_eval_device   = task.den_y;
   auto* den_x_eval_device   = task.den_x;
   auto* K_z_eval_device     = task.K_z;
@@ -366,8 +366,8 @@ __global__ void eval_uvars_lda_dks_kernel( size_t        ntasks,
 
   const auto npts            = task.npts;
 
-  auto* den_z_eval_device   = task.den_s;
-  auto* den_s_eval_device   = task.den_z;
+  auto* den_s_eval_device   = task.den_s;
+  auto* den_z_eval_device   = task.den_z;
   auto* den_y_eval_device   = task.den_y;
   auto* den_x_eval_device   = task.den_x;
   auto* K_z_eval_device     = task.K_z;

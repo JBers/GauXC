@@ -1966,7 +1966,7 @@ void AoSScheme1Base::inc_potential_dks_impl( XCDeviceData* _data, density_id den
         yy = 1.;
         zz = -1.;
         mkyx=1.;
-        mkyx=1.;
+        mkxy=1.;
         mjxz=0.;
         mjzx=0.;
         mizy=1.;
@@ -1977,7 +1977,7 @@ void AoSScheme1Base::inc_potential_dks_impl( XCDeviceData* _data, density_id den
         yy = -1.;
         zz = -1.;
         mkyx=1.;
-        mkyx=1.;
+        mkxy=1.;
         mjxz=1.;
         mjzx=1.;
         mizy=0.;

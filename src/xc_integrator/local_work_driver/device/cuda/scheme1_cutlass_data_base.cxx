@@ -86,7 +86,6 @@ AoSScheme1CUTLASSBase::Data::device_buffer_t
 
   auto is_uks = terms.ks_scheme == UKS;
   auto is_gks = terms.ks_scheme == GKS;
-  auto is_dks = terms.ks_scheme == DKS;
 
   // Allocate additional device memory 
   auto [ ptr, sz ] = buf;
