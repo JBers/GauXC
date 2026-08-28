@@ -385,7 +385,7 @@ __global__ void eval_uvars_lda_dks_kernel( size_t        ntasks,
     const auto px = den_x_eval_device[ tid ];
     const auto mtemp = pz*pz + px*px + py*py;
     double mnorm = 0.;
-    printf("ps, %.10f pz, %.10f py, %.10f px, %.10f\n", ps, pz, py, px);
+    // printf("ps, %.10f pz, %.10f py, %.10f px, %.10f\n", ps, pz, py, px);
     
     if (mtemp > dtolsq) {
       const double inv_mnorm = rsqrt(mtemp);
