@@ -34,6 +34,7 @@ size_t AoSScheme1CUTLASSBase::Data::get_mem_req( integrator_term_tracker terms,
 
   auto is_uks = terms.ks_scheme == UKS;
   auto is_gks = terms.ks_scheme == GKS;
+  auto is_dks = terms.ks_scheme == DKS;
   
   size_t base_size = base_type::get_mem_req(terms, task);
 
@@ -49,18 +50,18 @@ size_t AoSScheme1CUTLASSBase::Data::get_mem_req( integrator_term_tracker terms,
       base_size += 6 * sizeof(double*);
     }
 
-    if(is_uks or is_gks) {
+    if(is_uks or is_gks or is_dks) {
       base_size += sizeof(double*); // z dmat 
     }
-    if(is_gks) {
+    if(is_gks or is_dks) {
       base_size += 2*sizeof(double*); // x/y dmat 
     }
     
     if(terms.fxc_contraction) {
       base_size += sizeof(double*); // s tdmat
-      if(is_uks or is_gks)
+      if(is_uks or is_gks or is_dks)
         base_size += sizeof(double*); // z tdmat
-      if(is_gks) {
+      if(is_gks or is_dks) {
         base_size += 2*sizeof(double*); // x/y tdmat
       }
     }
@@ -85,6 +86,7 @@ AoSScheme1CUTLASSBase::Data::device_buffer_t
 
   auto is_uks = terms.ks_scheme == UKS;
   auto is_gks = terms.ks_scheme == GKS;
+  auto is_dks = terms.ks_scheme == DKS;
 
   // Allocate additional device memory 
   auto [ ptr, sz ] = buf;
