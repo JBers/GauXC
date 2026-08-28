@@ -214,7 +214,7 @@ __global__ void eval_vvar_lda_dks_kern( size_t        ntasks,
   //constexpr auto max_warps_per_thread_block = cuda::max_warps_per_thread_block;
   den_reg = cuda::warp_reduce_sum<warp_size>( den_reg );
 
-  // printf("den_reg, %.10f\n", den_reg);
+  printf("den_reg, %.10f\n", den_reg);
 
   if( threadIdx.x == 0 and tid_y < npts ) {
     atomicAdd( den_eval_device   + tid_y, den_reg );
