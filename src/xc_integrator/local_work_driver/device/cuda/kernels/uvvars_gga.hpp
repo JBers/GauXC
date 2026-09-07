@@ -175,6 +175,11 @@ __global__ void eval_vvar_gga_dks_kern( size_t        ntasks,
 
   constexpr auto warp_size = cuda::warp_size;
 
+  double xx, yy ,zz, mkxy ,mkyx, mjxz, mjzx, mizy, miyz;
+  
+  double SpeedOfLight  = 137.03599917700001;
+  double RKB_factor = 1./(4.*SpeedOfLight*SpeedOfLight);
+
   if constexpr (trial){
     if constexpr (den_select == DEN_S) {
       den_eval_device   = task.tden_s;
@@ -206,24 +211,60 @@ __global__ void eval_vvar_gga_dks_kern( size_t        ntasks,
       den_x_eval_device = task.dden_sx;
       den_y_eval_device = task.dden_sy;
       den_z_eval_device = task.dden_sz;
+      xx = 1.;
+      yy = 1.;
+      zz = 1.;
+      mkxy=1.;
+      mkyx=-1.;
+      mjxz=1.;
+      mjzx=-1.;
+      mizy=1.;
+      miyz=-1.;
     }
     if constexpr (den_select == DEN_Z) {
       den_eval_device   = task.den_z;
       den_x_eval_device = task.dden_zx;
       den_y_eval_device = task.dden_zy;
       den_z_eval_device = task.dden_zz;
+      xx = -1.;
+      yy = -1.;
+      zz = 1.;
+      mkxy=-1.;
+      mkyx=1.;
+      mjxz=1.;
+      mjzx=1.;
+      mizy=1.;
+      miyz=1.;
     }
     if constexpr (den_select == DEN_Y) {
       den_eval_device   = task.den_y;
       den_x_eval_device = task.dden_yx;
       den_y_eval_device = task.dden_yy;
       den_z_eval_device = task.dden_yz;
+      xx = -1.;
+      yy = 1.;
+      zz = -1.;
+      mkyx=1.;
+      mkxy=1.;
+      mjxz=1.;
+      mjzx=-1.;
+      mizy=1.;
+      miyz=1.;
     }
     if constexpr (den_select == DEN_X) {
       den_eval_device   = task.den_x;
       den_x_eval_device = task.dden_xx;
       den_y_eval_device = task.dden_xy;
       den_z_eval_device = task.dden_xz;
+      xx = 1.;
+      yy = -1.;
+      zz = -1.;
+      mkyx=1.;
+      mkxy=1.;
+      mjxz=1.;
+      mjzx=1.;
+      mizy=1.;
+      miyz=-1.;
     }
   }
 
@@ -232,7 +273,25 @@ __global__ void eval_vvar_gga_dks_kern( size_t        ntasks,
   const auto* dbasis_y_eval_device = task.dbfy;
   const auto* dbasis_z_eval_device = task.dbfz;
 
-  const auto* den_basis_prod_device = task.zmat;
+  // d2 basis for SS
+  const auto* d2basis_xx_eval_device = task.d2bfxx;
+  const auto* d2basis_xy_eval_device = task.d2bfxy;
+  const auto* d2basis_xz_eval_device = task.d2bfxz;
+  const auto* d2basis_yy_eval_device = task.d2bfyy;
+  const auto* d2basis_yz_eval_device = task.d2bfyz;
+  const auto* d2basis_zz_eval_device = task.d2bfzz;
+
+  // const auto* den_basis_prod_device = task.zmat;
+  const auto* den_basis_LL_prod_device = task.zmat;
+  const auto* den_basis_SS_xx_prod_device  = task.xmat_x;
+  const auto* den_basis_SS_yy_prod_device  = task.xmat_y;
+  const auto* den_basis_SS_zz_prod_device  = task.xmat_z;
+  const auto* den_basis_SS_kxy_prod_device = task.xmat_k_ij;
+  const auto* den_basis_SS_kyx_prod_device = task.xmat_k_ji;
+  const auto* den_basis_SS_jzx_prod_device = task.xmat_j_ik;
+  const auto* den_basis_SS_jxz_prod_device = task.xmat_j_ki;
+  const auto* den_basis_SS_iyz_prod_device = task.xmat_i_jk;
+  const auto* den_basis_SS_izy_prod_device = task.xmat_i_kj;
   
   __shared__ double den_shared[4][warp_size][VVAR_KERNEL_SM_BLOCK+1];
 
@@ -251,16 +310,105 @@ __global__ void eval_vvar_gga_dks_kern( size_t        ntasks,
         den_shared[3][threadIdx.x][sm_y] = 0.;
 
         if (bid_y + threadIdx.x < npts and bid_x + sm_y < nbf) { 
-          const double* db_col   = den_basis_prod_device + (bid_x + sm_y)*npts;
-          const double* bf_col   = basis_eval_device     + (bid_x + sm_y)*npts;
-          const double* bf_x_col = dbasis_x_eval_device  + (bid_x + sm_y)*npts;
-          const double* bf_y_col = dbasis_y_eval_device  + (bid_x + sm_y)*npts;
-          const double* bf_z_col = dbasis_z_eval_device  + (bid_x + sm_y)*npts;
+          const double* bf_col    = basis_eval_device      + (bid_x + sm_y)*npts;
+          const double* bf_x_col  = dbasis_x_eval_device   + (bid_x + sm_y)*npts;
+          const double* bf_y_col  = dbasis_y_eval_device   + (bid_x + sm_y)*npts;
+          const double* bf_z_col  = dbasis_z_eval_device   + (bid_x + sm_y)*npts;
+          const double* bf_xx_col = d2basis_xx_eval_device + (bid_x + sm_y)*npts;
+          const double* bf_xy_col = d2basis_xy_eval_device + (bid_x + sm_y)*npts;
+          const double* bf_xz_col = d2basis_xz_eval_device + (bid_x + sm_y)*npts;
+          const double* bf_yy_col = d2basis_yy_eval_device + (bid_x + sm_y)*npts;
+          const double* bf_yz_col = d2basis_yz_eval_device + (bid_x + sm_y)*npts;
+          const double* bf_zz_col = d2basis_zz_eval_device + (bid_x + sm_y)*npts;
 
+          const double* db_col   = den_basis_LL_prod_device + (bid_x + sm_y)*npts;
+
+          // LL contribution
           den_shared[0][threadIdx.x][sm_y] = bf_col  [ bid_y + threadIdx.x ] * db_col[ bid_y + threadIdx.x ];
           den_shared[1][threadIdx.x][sm_y] = bf_x_col[ bid_y + threadIdx.x ] * db_col[ bid_y + threadIdx.x ];
           den_shared[2][threadIdx.x][sm_y] = bf_y_col[ bid_y + threadIdx.x ] * db_col[ bid_y + threadIdx.x ];
           den_shared[3][threadIdx.x][sm_y] = bf_z_col[ bid_y + threadIdx.x ] * db_col[ bid_y + threadIdx.x ];
+
+          // SS contribution
+          // rho SS
+          db_col   = den_basis_SS_xx_prod_device  + (bid_x + sm_y)*npts;
+          den_shared[0][threadIdx.x][sm_y] += xx*RKB_factor*(bf_x_col[ bid_y + threadIdx.x ]   * db_col[ bid_y + threadIdx.x ]);
+          db_col   = den_basis_SS_yy_prod_device  + (bid_x + sm_y)*npts;
+          den_shared[0][threadIdx.x][sm_y] += yy*RKB_factor*(bf_y_col[ bid_y + threadIdx.x ]   * db_col[ bid_y + threadIdx.x ]);
+          db_col   = den_basis_SS_zz_prod_device  + (bid_x + sm_y)*npts;
+          den_shared[0][threadIdx.x][sm_y] += zz*RKB_factor*(bf_z_col[ bid_y + threadIdx.x ]   * db_col[ bid_y + threadIdx.x ]);
+          db_col   = den_basis_SS_kxy_prod_device + (bid_x + sm_y)*npts;
+          den_shared[0][threadIdx.x][sm_y] += mkxy*RKB_factor*(bf_y_col[ bid_y + threadIdx.x ]   * db_col[ bid_y + threadIdx.x ]);
+          db_col   = den_basis_SS_kyx_prod_device + (bid_x + sm_y)*npts;
+          den_shared[0][threadIdx.x][sm_y] += mkyx*RKB_factor*(bf_x_col[ bid_y + threadIdx.x ]   * db_col[ bid_y + threadIdx.x ]);
+          db_col   = den_basis_SS_jzx_prod_device + (bid_x + sm_y)*npts;
+          den_shared[0][threadIdx.x][sm_y] += mjzx*RKB_factor*(bf_x_col[ bid_y + threadIdx.x ]   * db_col[ bid_y + threadIdx.x ]);
+          db_col   = den_basis_SS_jxz_prod_device + (bid_x + sm_y)*npts;
+          den_shared[0][threadIdx.x][sm_y] += mjxz*RKB_factor*(bf_z_col[ bid_y + threadIdx.x ]   * db_col[ bid_y + threadIdx.x ]);
+          db_col   = den_basis_SS_iyz_prod_device + (bid_x + sm_y)*npts;
+          den_shared[0][threadIdx.x][sm_y] += miyz*RKB_factor*(bf_z_col[ bid_y + threadIdx.x ]   * db_col[ bid_y + threadIdx.x ]);
+          db_col   = den_basis_SS_izy_prod_device + (bid_x + sm_y)*npts;
+          den_shared[0][threadIdx.x][sm_y] += mizy*RKB_factor*(bf_y_col[ bid_y + threadIdx.x ]   * db_col[ bid_y + threadIdx.x ]);
+
+          // d rho / dx  SS
+          db_col   = den_basis_SS_xx_prod_device  + (bid_x + sm_y)*npts;
+          den_shared[1][threadIdx.x][sm_y] += xx*RKB_factor*(bf_xx_col[ bid_y + threadIdx.x ]   * db_col[ bid_y + threadIdx.x ]);
+          db_col   = den_basis_SS_yy_prod_device  + (bid_x + sm_y)*npts;
+          den_shared[1][threadIdx.x][sm_y] += yy*RKB_factor*(bf_xy_col[ bid_y + threadIdx.x ]   * db_col[ bid_y + threadIdx.x ]);
+          db_col   = den_basis_SS_zz_prod_device  + (bid_x + sm_y)*npts;
+          den_shared[1][threadIdx.x][sm_y] += zz*RKB_factor*(bf_xz_col[ bid_y + threadIdx.x ]   * db_col[ bid_y + threadIdx.x ]);
+          db_col   = den_basis_SS_kxy_prod_device + (bid_x + sm_y)*npts;
+          den_shared[1][threadIdx.x][sm_y] += mkxy*RKB_factor*(bf_xy_col[ bid_y + threadIdx.x ]   * db_col[ bid_y + threadIdx.x ]);
+          db_col   = den_basis_SS_kyx_prod_device + (bid_x + sm_y)*npts;
+          den_shared[1][threadIdx.x][sm_y] += mkyx*RKB_factor*(bf_xx_col[ bid_y + threadIdx.x ]   * db_col[ bid_y + threadIdx.x ]);
+          db_col   = den_basis_SS_jzx_prod_device + (bid_x + sm_y)*npts;
+          den_shared[1][threadIdx.x][sm_y] += mjzx*RKB_factor*(bf_xx_col[ bid_y + threadIdx.x ]   * db_col[ bid_y + threadIdx.x ]);
+          db_col   = den_basis_SS_jxz_prod_device + (bid_x + sm_y)*npts;
+          den_shared[1][threadIdx.x][sm_y] += mjxz*RKB_factor*(bf_xz_col[ bid_y + threadIdx.x ]   * db_col[ bid_y + threadIdx.x ]);
+          db_col   = den_basis_SS_iyz_prod_device + (bid_x + sm_y)*npts;
+          den_shared[1][threadIdx.x][sm_y] += miyz*RKB_factor*(bf_xz_col[ bid_y + threadIdx.x ]   * db_col[ bid_y + threadIdx.x ]);
+          db_col   = den_basis_SS_izy_prod_device + (bid_x + sm_y)*npts;
+          den_shared[1][threadIdx.x][sm_y] += mizy*RKB_factor*(bf_xy_col[ bid_y + threadIdx.x ]   * db_col[ bid_y + threadIdx.x ]);
+
+          // d rho / dy  SS
+          db_col   = den_basis_SS_xx_prod_device  + (bid_x + sm_y)*npts;
+          den_shared[2][threadIdx.x][sm_y] += xx*RKB_factor*(bf_xy_col[ bid_y + threadIdx.x ]   * db_col[ bid_y + threadIdx.x ]);
+          db_col   = den_basis_SS_yy_prod_device  + (bid_x + sm_y)*npts;
+          den_shared[2][threadIdx.x][sm_y] += yy*RKB_factor*(bf_yy_col[ bid_y + threadIdx.x ]   * db_col[ bid_y + threadIdx.x ]);
+          db_col   = den_basis_SS_zz_prod_device  + (bid_x + sm_y)*npts;
+          den_shared[2][threadIdx.x][sm_y] += zz*RKB_factor*(bf_yz_col[ bid_y + threadIdx.x ]   * db_col[ bid_y + threadIdx.x ]);
+          db_col   = den_basis_SS_kxy_prod_device + (bid_x + sm_y)*npts;
+          den_shared[2][threadIdx.x][sm_y] += mkxy*RKB_factor*(bf_yy_col[ bid_y + threadIdx.x ]   * db_col[ bid_y + threadIdx.x ]);
+          db_col   = den_basis_SS_kyx_prod_device + (bid_x + sm_y)*npts;
+          den_shared[2][threadIdx.x][sm_y] += mkyx*RKB_factor*(bf_xy_col[ bid_y + threadIdx.x ]   * db_col[ bid_y + threadIdx.x ]);
+          db_col   = den_basis_SS_jzx_prod_device + (bid_x + sm_y)*npts;
+          den_shared[2][threadIdx.x][sm_y] += mjzx*RKB_factor*(bf_xy_col[ bid_y + threadIdx.x ]   * db_col[ bid_y + threadIdx.x ]);
+          db_col   = den_basis_SS_jxz_prod_device + (bid_x + sm_y)*npts;
+          den_shared[2][threadIdx.x][sm_y] += mjxz*RKB_factor*(bf_yz_col[ bid_y + threadIdx.x ]   * db_col[ bid_y + threadIdx.x ]);
+          db_col   = den_basis_SS_iyz_prod_device + (bid_x + sm_y)*npts;
+          den_shared[2][threadIdx.x][sm_y] += miyz*RKB_factor*(bf_yz_col[ bid_y + threadIdx.x ]   * db_col[ bid_y + threadIdx.x ]);
+          db_col   = den_basis_SS_izy_prod_device + (bid_x + sm_y)*npts;
+          den_shared[2][threadIdx.x][sm_y] += mizy*RKB_factor*(bf_yy_col[ bid_y + threadIdx.x ]   * db_col[ bid_y + threadIdx.x ]);
+
+          // d rho / dz  SS
+          db_col   = den_basis_SS_xx_prod_device  + (bid_x + sm_y)*npts;
+          den_shared[1][threadIdx.x][sm_y] += xx*RKB_factor*(bf_xz_col[ bid_y + threadIdx.x ]   * db_col[ bid_y + threadIdx.x ]);
+          db_col   = den_basis_SS_yy_prod_device  + (bid_x + sm_y)*npts;
+          den_shared[1][threadIdx.x][sm_y] += yy*RKB_factor*(bf_yz_col[ bid_y + threadIdx.x ]   * db_col[ bid_y + threadIdx.x ]);
+          db_col   = den_basis_SS_zz_prod_device  + (bid_x + sm_y)*npts;
+          den_shared[1][threadIdx.x][sm_y] += zz*RKB_factor*(bf_zz_col[ bid_y + threadIdx.x ]   * db_col[ bid_y + threadIdx.x ]);
+          db_col   = den_basis_SS_kxy_prod_device + (bid_x + sm_y)*npts;
+          den_shared[1][threadIdx.x][sm_y] += mkxy*RKB_factor*(bf_yz_col[ bid_y + threadIdx.x ]   * db_col[ bid_y + threadIdx.x ]);
+          db_col   = den_basis_SS_kyx_prod_device + (bid_x + sm_y)*npts;
+          den_shared[1][threadIdx.x][sm_y] += mkyx*RKB_factor*(bf_xz_col[ bid_y + threadIdx.x ]   * db_col[ bid_y + threadIdx.x ]);
+          db_col   = den_basis_SS_jzx_prod_device + (bid_x + sm_y)*npts;
+          den_shared[1][threadIdx.x][sm_y] += mjzx*RKB_factor*(bf_xz_col[ bid_y + threadIdx.x ]   * db_col[ bid_y + threadIdx.x ]);
+          db_col   = den_basis_SS_jxz_prod_device + (bid_x + sm_y)*npts;
+          den_shared[1][threadIdx.x][sm_y] += mjxz*RKB_factor*(bf_zz_col[ bid_y + threadIdx.x ]   * db_col[ bid_y + threadIdx.x ]);
+          db_col   = den_basis_SS_iyz_prod_device + (bid_x + sm_y)*npts;
+          den_shared[1][threadIdx.x][sm_y] += miyz*RKB_factor*(bf_zz_col[ bid_y + threadIdx.x ]   * db_col[ bid_y + threadIdx.x ]);
+          db_col   = den_basis_SS_izy_prod_device + (bid_x + sm_y)*npts;
+          den_shared[1][threadIdx.x][sm_y] += mizy*RKB_factor*(bf_yz_col[ bid_y + threadIdx.x ]   * db_col[ bid_y + threadIdx.x ]);
         }
       }
       __syncthreads();
