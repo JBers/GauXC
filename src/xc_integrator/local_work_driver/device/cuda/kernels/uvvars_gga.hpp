@@ -392,23 +392,23 @@ __global__ void eval_vvar_gga_dks_kern( size_t        ntasks,
 
           // d rho / dz  SS
           db_col   = den_basis_SS_xx_prod_device  + (bid_x + sm_y)*npts;
-          den_shared[1][threadIdx.x][sm_y] += xx*RKB_factor*(bf_xz_col[ bid_y + threadIdx.x ]   * db_col[ bid_y + threadIdx.x ]);
+          den_shared[3][threadIdx.x][sm_y] += xx*RKB_factor*(bf_xz_col[ bid_y + threadIdx.x ]   * db_col[ bid_y + threadIdx.x ]);
           db_col   = den_basis_SS_yy_prod_device  + (bid_x + sm_y)*npts;
-          den_shared[1][threadIdx.x][sm_y] += yy*RKB_factor*(bf_yz_col[ bid_y + threadIdx.x ]   * db_col[ bid_y + threadIdx.x ]);
+          den_shared[3][threadIdx.x][sm_y] += yy*RKB_factor*(bf_yz_col[ bid_y + threadIdx.x ]   * db_col[ bid_y + threadIdx.x ]);
           db_col   = den_basis_SS_zz_prod_device  + (bid_x + sm_y)*npts;
-          den_shared[1][threadIdx.x][sm_y] += zz*RKB_factor*(bf_zz_col[ bid_y + threadIdx.x ]   * db_col[ bid_y + threadIdx.x ]);
+          den_shared[3][threadIdx.x][sm_y] += zz*RKB_factor*(bf_zz_col[ bid_y + threadIdx.x ]   * db_col[ bid_y + threadIdx.x ]);
           db_col   = den_basis_SS_kxy_prod_device + (bid_x + sm_y)*npts;
-          den_shared[1][threadIdx.x][sm_y] += mkxy*RKB_factor*(bf_yz_col[ bid_y + threadIdx.x ]   * db_col[ bid_y + threadIdx.x ]);
+          den_shared[3][threadIdx.x][sm_y] += mkxy*RKB_factor*(bf_yz_col[ bid_y + threadIdx.x ]   * db_col[ bid_y + threadIdx.x ]);
           db_col   = den_basis_SS_kyx_prod_device + (bid_x + sm_y)*npts;
-          den_shared[1][threadIdx.x][sm_y] += mkyx*RKB_factor*(bf_xz_col[ bid_y + threadIdx.x ]   * db_col[ bid_y + threadIdx.x ]);
+          den_shared[3][threadIdx.x][sm_y] += mkyx*RKB_factor*(bf_xz_col[ bid_y + threadIdx.x ]   * db_col[ bid_y + threadIdx.x ]);
           db_col   = den_basis_SS_jzx_prod_device + (bid_x + sm_y)*npts;
-          den_shared[1][threadIdx.x][sm_y] += mjzx*RKB_factor*(bf_xz_col[ bid_y + threadIdx.x ]   * db_col[ bid_y + threadIdx.x ]);
+          den_shared[3][threadIdx.x][sm_y] += mjzx*RKB_factor*(bf_xz_col[ bid_y + threadIdx.x ]   * db_col[ bid_y + threadIdx.x ]);
           db_col   = den_basis_SS_jxz_prod_device + (bid_x + sm_y)*npts;
-          den_shared[1][threadIdx.x][sm_y] += mjxz*RKB_factor*(bf_zz_col[ bid_y + threadIdx.x ]   * db_col[ bid_y + threadIdx.x ]);
+          den_shared[3][threadIdx.x][sm_y] += mjxz*RKB_factor*(bf_zz_col[ bid_y + threadIdx.x ]   * db_col[ bid_y + threadIdx.x ]);
           db_col   = den_basis_SS_iyz_prod_device + (bid_x + sm_y)*npts;
-          den_shared[1][threadIdx.x][sm_y] += miyz*RKB_factor*(bf_zz_col[ bid_y + threadIdx.x ]   * db_col[ bid_y + threadIdx.x ]);
+          den_shared[3][threadIdx.x][sm_y] += miyz*RKB_factor*(bf_zz_col[ bid_y + threadIdx.x ]   * db_col[ bid_y + threadIdx.x ]);
           db_col   = den_basis_SS_izy_prod_device + (bid_x + sm_y)*npts;
-          den_shared[1][threadIdx.x][sm_y] += mizy*RKB_factor*(bf_yz_col[ bid_y + threadIdx.x ]   * db_col[ bid_y + threadIdx.x ]);
+          den_shared[3][threadIdx.x][sm_y] += mizy*RKB_factor*(bf_yz_col[ bid_y + threadIdx.x ]   * db_col[ bid_y + threadIdx.x ]);
         }
       }
       __syncthreads();
