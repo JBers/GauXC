@@ -103,12 +103,12 @@ __global__ void eval_vvar_lda_dks_kern( size_t        ntasks,
         xx = 1.;
         yy = 1.;
         zz = 1.;
-        mkxy=-1.;
-        mkyx=1.;
-        mjxz=-1.;
-        mjzx=1.;
-        mizy=-1.;
-        miyz=1.;
+        mkxy=1.;
+        mkyx=-1.;
+        mjxz=1.;
+        mjzx=-1.;
+        mizy=1.;
+        miyz=-1.;
       }
       if constexpr (den_select == DEN_Z) {
         den_eval_device = task.den_z; // k: S ; j: X ; i: Y

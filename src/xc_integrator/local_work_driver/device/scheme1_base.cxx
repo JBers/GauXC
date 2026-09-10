@@ -1741,11 +1741,11 @@ void AoSScheme1Base::eval_xmat_dks_impl( double fac, XCDeviceData* _data, bool d
     nbf, submat_block_size, data->device_backend_->queue() );
   sym_pack_submat( ntasks, aos_stack.device_tasks, dmat_ptr_SS_dot, 
     nbf, submat_block_size, data->device_backend_->queue() );
-  sym_pack_submat( ntasks, aos_stack.device_tasks, dmat_ptr_SS_k,
+  asym_pack_submat( ntasks, aos_stack.device_tasks, dmat_ptr_SS_k,
     nbf, submat_block_size, data->device_backend_->queue() );
-  sym_pack_submat( ntasks, aos_stack.device_tasks, dmat_ptr_SS_j, 
+  asym_pack_submat( ntasks, aos_stack.device_tasks, dmat_ptr_SS_j, 
     nbf, submat_block_size, data->device_backend_->queue() );
-  sym_pack_submat( ntasks, aos_stack.device_tasks, dmat_ptr_SS_i, 
+  asym_pack_submat( ntasks, aos_stack.device_tasks, dmat_ptr_SS_i, 
     nbf, submat_block_size, data->device_backend_->queue() );
     
 
