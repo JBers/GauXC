@@ -1999,15 +1999,15 @@ void AoSScheme1Base::inc_potential_dks_impl( XCDeviceData* _data, density_id den
     do_syr2k(handle, task.npts, task.bfn_screening.nbe, task.dbfx, task.xmat_x, 0.0, task.nbe_scr, xx * RKB_factor);
     do_syr2k(handle, task.npts, task.bfn_screening.nbe, task.dbfy, task.xmat_y, 1.0, task.nbe_scr, yy * RKB_factor);
     do_syr2k(handle, task.npts, task.bfn_screening.nbe, task.dbfz, task.xmat_z, 1.0, task.nbe_scr, zz * RKB_factor);
-    if constexpr (mkxy != 0.){
+    if (mkxy != 0.){
     do_syr2k(handle, task.npts, task.bfn_screening.nbe, task.dbfy, task.xmat_k_ij, 1.0, task.nbe_scr, mkxy * RKB_factor);
     do_syr2k(handle, task.npts, task.bfn_screening.nbe, task.dbfx, task.xmat_k_ji, 1.0, task.nbe_scr, mkyx * RKB_factor);
     }
-    if constexpr (mjxz != 0.){
+    if (mjxz != 0.){
     do_syr2k(handle, task.npts, task.bfn_screening.nbe, task.dbfx, task.xmat_j_ik, 1.0, task.nbe_scr, mjxz * RKB_factor);
     do_syr2k(handle, task.npts, task.bfn_screening.nbe, task.dbfz, task.xmat_j_ki, 1.0, task.nbe_scr, mjzx * RKB_factor);
     }
-    if constexpr (mizy != 0.){
+    if (mizy != 0.){
     do_syr2k(handle, task.npts, task.bfn_screening.nbe, task.dbfz, task.xmat_i_jk, 1.0, task.nbe_scr, mizy * RKB_factor);
     do_syr2k(handle, task.npts, task.bfn_screening.nbe, task.dbfy, task.xmat_i_kj, 1.0, task.nbe_scr, miyz * RKB_factor);
     }
