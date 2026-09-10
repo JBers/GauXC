@@ -1738,16 +1738,6 @@ void AoSScheme1Base::eval_xmat_dks_impl( double fac, XCDeviceData* _data, bool d
   // Pack density matrix 
   sym_pack_submat( ntasks, aos_stack.device_tasks, dmat_ptr, 
     nbf, submat_block_size, data->device_backend_->queue() );
-  sym_pack_submat( ntasks, aos_stack.device_tasks, dmat_ptr_SS_dot, 
-    nbf, submat_block_size, data->device_backend_->queue() );
-  sym_pack_submat( ntasks, aos_stack.device_tasks, dmat_ptr_SS_k,
-    nbf, submat_block_size, data->device_backend_->queue() );
-  sym_pack_submat( ntasks, aos_stack.device_tasks, dmat_ptr_SS_j, 
-    nbf, submat_block_size, data->device_backend_->queue() );
-  sym_pack_submat( ntasks, aos_stack.device_tasks, dmat_ptr_SS_i, 
-    nbf, submat_block_size, data->device_backend_->queue() );
-    
-
 
   // Sync blas streams with master stream
   data->device_backend_->sync_blas_pool_with_master();
@@ -1762,20 +1752,29 @@ void AoSScheme1Base::eval_xmat_dks_impl( double fac, XCDeviceData* _data, bool d
   
   std::cout<<"eval_xmat_dks_impl before do_gemm"<<std::endl;
    
-
   //size_t nsingle = 0;
   for( size_t iT = 0; iT < ntasks; ++iT ) {
     auto& task = tasks[iT];
       auto den_ptr_LL = task.bfn_screening.ncut > 1 ? task.nbe_scr : dmat_ptr + task.bfn_screening.ibf_begin*(nbf+1);
-      auto den_ptr_SS_dot = task.bfn_screening.ncut > 1 ? task.nbe_scr : dmat_ptr_SS_dot + task.bfn_screening.ibf_begin*(nbf+1);
-      auto den_ptr_SS_cross_anti_k = task.bfn_screening.ncut > 1 ? task.nbe_scr : dmat_ptr_SS_k + task.bfn_screening.ibf_begin*(nbf+1);
-      auto den_ptr_SS_cross_anti_j = task.bfn_screening.ncut > 1 ? task.nbe_scr : dmat_ptr_SS_j + task.bfn_screening.ibf_begin*(nbf+1);
-      auto den_ptr_SS_cross_anti_i = task.bfn_screening.ncut > 1 ? task.nbe_scr : dmat_ptr_SS_i + task.bfn_screening.ibf_begin*(nbf+1);
 
       int  ldden   = task.bfn_screening.ncut > 1 ? task.bfn_screening.nbe : nbf;
       auto handle = data->device_backend_->blas_pool_handle( iT % n_blas_streams );
       std::cout<<"eval_xmat_dks_impl do_gemm 0"<<std::endl;
       do_gemm( handle, task.npts, task.bfn_screening.nbe, task.bf, den_ptr_LL, ldden, task.zmat );
+        std::cout<<"eval_xmat_dks_impl do_gemm 1"<<std::endl;
+  }
+  data->device_backend_->sync_master_with_blas_pool();
+
+  sym_pack_submat( ntasks, aos_stack.device_tasks, dmat_ptr_SS_dot, 
+    nbf, submat_block_size, data->device_backend_->queue() );
+    data->device_backend_->sync_blas_pool_with_master();
+
+  for( size_t iT = 0; iT < ntasks; ++iT ) {
+    auto& task = tasks[iT];
+      auto den_ptr_SS_dot = task.bfn_screening.ncut > 1 ? task.nbe_scr : dmat_ptr_SS_dot + task.bfn_screening.ibf_begin*(nbf+1);
+
+      int  ldden   = task.bfn_screening.ncut > 1 ? task.bfn_screening.nbe : nbf;
+      auto handle = data->device_backend_->blas_pool_handle( iT % n_blas_streams );
         std::cout<<"eval_xmat_dks_impl do_gemm 1"<<std::endl;
       do_gemm( handle, task.npts, task.bfn_screening.nbe, task.dbfx, den_ptr_SS_dot, ldden, task.xmat_x );
         std::cout<<"eval_xmat_dks_impl do_gemm 2"<<std::endl;
@@ -1783,14 +1782,60 @@ void AoSScheme1Base::eval_xmat_dks_impl( double fac, XCDeviceData* _data, bool d
         std::cout<<"eval_xmat_dks_impl do_gemm 3"<<std::endl;
       do_gemm( handle, task.npts, task.bfn_screening.nbe, task.dbfz, den_ptr_SS_dot, ldden, task.xmat_z );
         std::cout<<"eval_xmat_dks_impl do_gemm 4"<<std::endl;
+  }
+  data->device_backend_->sync_master_with_blas_pool();
+
+  sym_pack_submat( ntasks, aos_stack.device_tasks, dmat_ptr_SS_k,
+    nbf, submat_block_size, data->device_backend_->queue() );
+    data->device_backend_->sync_blas_pool_with_master();
+
+    //size_t nsingle = 0;
+  for( size_t iT = 0; iT < ntasks; ++iT ) {
+    auto& task = tasks[iT];
+      auto den_ptr_SS_cross_anti_k = task.bfn_screening.ncut > 1 ? task.nbe_scr : dmat_ptr_SS_k + task.bfn_screening.ibf_begin*(nbf+1);
+
+      int  ldden   = task.bfn_screening.ncut > 1 ? task.bfn_screening.nbe : nbf;
+      auto handle = data->device_backend_->blas_pool_handle( iT % n_blas_streams );
+
       do_gemm( handle, task.npts, task.bfn_screening.nbe, task.dbfx, den_ptr_SS_cross_anti_k, ldden, task.xmat_k_ij );
         std::cout<<"eval_xmat_dks_impl do_gemm 5"<<std::endl;
       do_gemm( handle, task.npts, task.bfn_screening.nbe, task.dbfy, den_ptr_SS_cross_anti_k, ldden, task.xmat_k_ji );
         std::cout<<"eval_xmat_dks_impl do_gemm 6"<<std::endl;
+  }
+  data->device_backend_->sync_master_with_blas_pool();
+
+
+  sym_pack_submat( ntasks, aos_stack.device_tasks, dmat_ptr_SS_j, 
+    nbf, submat_block_size, data->device_backend_->queue() );
+  data->device_backend_->sync_blas_pool_with_master();
+
+    //size_t nsingle = 0;
+  for( size_t iT = 0; iT < ntasks; ++iT ) {
+    auto& task = tasks[iT];
+      auto den_ptr_SS_cross_anti_j = task.bfn_screening.ncut > 1 ? task.nbe_scr : dmat_ptr_SS_j + task.bfn_screening.ibf_begin*(nbf+1);
+
+      int  ldden   = task.bfn_screening.ncut > 1 ? task.bfn_screening.nbe : nbf;
+      auto handle = data->device_backend_->blas_pool_handle( iT % n_blas_streams );
+
       do_gemm( handle, task.npts, task.bfn_screening.nbe, task.dbfz, den_ptr_SS_cross_anti_j, ldden, task.xmat_j_ik );
         std::cout<<"eval_xmat_dks_impl do_gemm 7"<<std::endl;
       do_gemm( handle, task.npts, task.bfn_screening.nbe, task.dbfx, den_ptr_SS_cross_anti_j, ldden, task.xmat_j_ki );
         std::cout<<"eval_xmat_dks_impl do_gemm 8"<<std::endl;
+  }
+  data->device_backend_->sync_master_with_blas_pool();
+
+  sym_pack_submat( ntasks, aos_stack.device_tasks, dmat_ptr_SS_i, 
+    nbf, submat_block_size, data->device_backend_->queue() );
+  data->device_backend_->sync_blas_pool_with_master();
+
+    //size_t nsingle = 0;
+  for( size_t iT = 0; iT < ntasks; ++iT ) {
+    auto& task = tasks[iT];
+      auto den_ptr_SS_cross_anti_i = task.bfn_screening.ncut > 1 ? task.nbe_scr : dmat_ptr_SS_i + task.bfn_screening.ibf_begin*(nbf+1);
+
+      int  ldden   = task.bfn_screening.ncut > 1 ? task.bfn_screening.nbe : nbf;
+      auto handle = data->device_backend_->blas_pool_handle( iT % n_blas_streams );
+
       do_gemm( handle, task.npts, task.bfn_screening.nbe, task.dbfy, den_ptr_SS_cross_anti_i, ldden, task.xmat_i_jk );
         std::cout<<"eval_xmat_dks_impl do_gemm 9"<<std::endl;
       do_gemm( handle, task.npts, task.bfn_screening.nbe, task.dbfz, den_ptr_SS_cross_anti_i, ldden, task.xmat_i_kj );
