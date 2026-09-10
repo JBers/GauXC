@@ -67,6 +67,9 @@ size_t XCDeviceAoSData::get_mem_req( integrator_term_tracker terms,
     // X Matrix Gradient
     reqt.task_xmat_grad_size( nbe_bfn, npts ) * sizeof(double) +
 
+    // X Matrix DKS
+    reqt.task_xmat_dks_size( nbe_bfn, npts ) * sizeof(double) +
+
     // Persistent X Mat
     reqt.task_xmat_persist_size( nbe_bfn, npts ) * sizeof(double) +
 

@@ -1712,6 +1712,7 @@ void AoSScheme1Base::eval_xmat_dks_impl( double fac, XCDeviceData* _data, bool d
       dmat_ptr_SS_k   = static_stack.den_selector(DEN_Z_SS_IM);
       dmat_ptr_SS_j   = static_stack.den_selector(DEN_Y_SS_IM);
       dmat_ptr_SS_i   = static_stack.den_selector(DEN_X_SS_IM);
+    std::cout<<"den_select == DEN_S"<<std::endl;
   }
   if (den_select == DEN_Z) {
       dmat_ptr_SS_dot = static_stack.den_selector(DEN_Z_SS);
