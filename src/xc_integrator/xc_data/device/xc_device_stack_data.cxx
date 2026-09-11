@@ -418,16 +418,16 @@ void XCDeviceStackData::send_static_data_density_basis( const double* Ps, int32_
         if( ldpz_ss != (int)nbf ) GAUXC_GENERIC_EXCEPTION("LDPx SS must bf NBF");
         if( ldpy_ss != (int)nbf ) GAUXC_GENERIC_EXCEPTION("LDPy SS must bf NBF");
         if( ldpx_ss != (int)nbf ) GAUXC_GENERIC_EXCEPTION("LDPx SS must bf NBF");
-        device_backend_->copy_async( nbf*nbf, Ps_SS, static_stack.dmat_s_ss_device, "P_y SS H2D" );
-        device_backend_->copy_async( nbf*nbf, Pz_SS, static_stack.dmat_z_ss_device, "P_x SS H2D" );
+        device_backend_->copy_async( nbf*nbf, Ps_SS, static_stack.dmat_s_ss_device, "P_s SS H2D" );
+        device_backend_->copy_async( nbf*nbf, Pz_SS, static_stack.dmat_z_ss_device, "P_z SS H2D" );
         device_backend_->copy_async( nbf*nbf, Py_SS, static_stack.dmat_y_ss_device, "P_y SS H2D" );
         device_backend_->copy_async( nbf*nbf, Px_SS, static_stack.dmat_x_ss_device, "P_x SS H2D" );
         if( ldps_ss_im != (int)nbf ) GAUXC_GENERIC_EXCEPTION("LDPy SS im must bf NBF");
         if( ldpz_ss_im != (int)nbf ) GAUXC_GENERIC_EXCEPTION("LDPx SS im must bf NBF");
         if( ldpy_ss_im != (int)nbf ) GAUXC_GENERIC_EXCEPTION("LDPy SS im must bf NBF");
         if( ldpx_ss_im != (int)nbf ) GAUXC_GENERIC_EXCEPTION("LDPx SS im must bf NBF");
-        device_backend_->copy_async( nbf*nbf, Ps_SS_imag, static_stack.dmat_s_ss_im_device, "P_y SS im H2D" );
-        device_backend_->copy_async( nbf*nbf, Pz_SS_imag, static_stack.dmat_z_ss_im_device, "P_x SS im H2D" );
+        device_backend_->copy_async( nbf*nbf, Ps_SS_imag, static_stack.dmat_s_ss_im_device, "P_s SS im H2D" );
+        device_backend_->copy_async( nbf*nbf, Pz_SS_imag, static_stack.dmat_z_ss_im_device, "P_z SS im H2D" );
         device_backend_->copy_async( nbf*nbf, Py_SS_imag, static_stack.dmat_y_ss_im_device, "P_y SS im H2D" );
         device_backend_->copy_async( nbf*nbf, Px_SS_imag, static_stack.dmat_x_ss_im_device, "P_x SS im H2D" );
     }

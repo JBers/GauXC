@@ -442,9 +442,9 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
   device_data.allocate_static_data_exc_vxc( nbf, nshells, enabled_terms, do_vxc );
   
   // device_data.send_static_data_density_basis( Ps, ldps, Pz, ldpz, Px, ldpx, Py, ldpy, basis );
-  device_data.send_static_data_density_basis( Ps, ldps, Pz, ldpz, Px, ldpx, Py, ldpy,
-                                              Ps_SS, ldps, Pz_SS, ldpz, Px_SS, ldpx, Py_SS, ldpy,
-                                              Ps_SS_imag, ldps, Pz_SS_imag, ldpz, Px_SS_imag, ldpx, Py_SS_imag, ldpy, basis );
+  device_data.send_static_data_density_basis( Ps, ldps, Pz, ldpz, Py, ldpy, Px, ldpx,
+                                              Ps_SS, ldps, Pz_SS, ldpz, Py_SS, ldpy, Px_SS, ldpx,
+                                              Ps_SS_imag, ldps, Pz_SS_imag, ldpz, Py_SS_imag, ldpy, Px_SS_imag, ldpx, basis );
 
 
 
