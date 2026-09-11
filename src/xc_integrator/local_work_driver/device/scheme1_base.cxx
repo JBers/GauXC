@@ -1744,7 +1744,7 @@ void AoSScheme1Base::eval_xmat_dks_impl( double fac, XCDeviceData* _data, bool d
   data->device_backend_->sync_blas_pool_with_master();
 
   auto do_gemm = [&]( auto& handle, size_t npts, size_t nbe, auto* bf_ptr, auto* den_ptr, int ldden, auto* x_ptr ) {
-    gemm( handle, DeviceBlasOp::NoTrans, DeviceBlasOp::NoTrans, npts, nbe, nbe, fac, bf_ptr, npts,
+    gemm( handle, DeviceBlasOp::NoTrans, DeviceBlasOp::Trans, npts, nbe, nbe, fac, bf_ptr, npts,
       den_ptr, ldden, 0., x_ptr, npts ); 
   };
 
