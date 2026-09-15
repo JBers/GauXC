@@ -24,7 +24,7 @@ namespace GauXC {
 #define CUT_Y 8
 
 template <typename T, bool skip_single_cut = true>
-__global__ __launch_bounds__(1024, 2)
+__global__ __launch_bounds__(1024, 1)
 void sym_submat_set_combined_kernel( size_t        ntasks,
                                  XCDeviceTask* device_tasks,
                                  T*            A,
@@ -136,7 +136,7 @@ void sym_pack_submat( size_t ntasks, XCDeviceTask* device_tasks, const double* A
 
 
 template <typename T, bool skip_single_cut = false>
-__global__ __launch_bounds__(1024, 2)
+__global__ __launch_bounds__(1024, 1)
 void asym_submat_set_combined_kernel( size_t        ntasks,
                                  XCDeviceTask* device_tasks,
                                  T*            A,
