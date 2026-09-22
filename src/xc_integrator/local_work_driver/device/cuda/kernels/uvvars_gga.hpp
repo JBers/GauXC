@@ -157,8 +157,7 @@ __global__ void eval_vvar_gga_kern( size_t        ntasks,
 }
 
 template <bool trial, density_id den_select>
-__global__ __launch_bounds__(1024, 1)
-void eval_vvar_gga_dks_kern( size_t        ntasks,
+__global__ void eval_vvar_gga_dks_kern( size_t        ntasks,
                                     XCDeviceTask* tasks_device) {
 
   const int batch_idx = blockIdx.z;
