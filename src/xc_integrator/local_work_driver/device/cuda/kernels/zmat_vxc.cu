@@ -138,7 +138,8 @@ __global__ void zmat_lda_vxc_gks_kernel( size_t        ntasks,
 }
 
 template<density_id den_selector>
-__global__ void zmat_lda_vxc_dks_kernel( size_t        ntasks,
+__global__ __launch_bounds__(1024, 1)
+void zmat_lda_vxc_dks_kernel( size_t        ntasks,
                                      XCDeviceTask* tasks_device ) {
 
   const int batch_idx = blockIdx.z;
@@ -487,7 +488,8 @@ __global__ void zmat_gga_vxc_gks_kernel( size_t        ntasks,
 }
 
 template<density_id den_selector>
-__global__ void zmat_gga_vxc_dks_kernel( size_t        ntasks,
+__global__ __launch_bounds__(1024, 1)
+void zmat_gga_vxc_dks_kernel( size_t        ntasks,
                                      XCDeviceTask* tasks_device ) {
 
   const int batch_idx = blockIdx.z;
