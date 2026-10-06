@@ -47,8 +47,26 @@ __global__ void increment_kernel( const T* X, T* Y ) {
 
 template <typename T>
 void increment( const T* X, T* Y, hipStream_t stream ) {
-  hipLaunchKernelGGL(increment_kernel, dim3(1), dim3(1), 0, stream, X,Y);
+  increment_kernel<<<1,1,0,stream>>>(X,Y);
 }
+
+template <typename T>
+__global__ void increment_vec_kernel( const T* X, T* Y, int N ) {
+  const auto tid = blockIdx.x * blockDim.x + threadIdx.x;
+  if( tid < N ) Y[tid] += X[tid];
+}
+
+template <typename T>
+void increment( device_blas_handle generic_handle, const T* X, T* Y, int N) {
+  const int threads = hip::warp_size * hip::max_warps_per_thread_block;
+  const int blocks = util::div_ceil( N, threads );
+  hipblasHandle_t handle = generic_handle.blas_handle_as<util::hipblas_handle>();
+  auto stream = util::get_stream(handle);
+  increment_vec_kernel<<<blocks, threads, 0, stream>>>(X,Y,N);
+}
+
+template
+  void increment( device_blas_handle generic_handle, const double* X, double* Y, int N );
 
 template <>
 void dot( device_blas_handle generic_handle,
@@ -138,7 +156,7 @@ void hadamard_product( device_blas_handle generic_handle,
   dim3 blocks( util::div_ceil( M, threads.x ),
                util::div_ceil( N, threads.y ) );
 
-  hipLaunchKernelGGL(hadamard_product_kernel, dim3(blocks), dim3(threads), 0, stream ,  M, N, A, LDA, B, LDB );
+  hadamard_product_kernel<<< blocks, threads, 0, stream >>>( M, N, A, LDA, B, LDB );
 
 }
  
@@ -185,6 +203,7 @@ void syr2k( device_blas_handle generic_handle,
   GAUXC_HIPBLAS_ERROR("HIPBLAS DSYR2K FAILED", stat);
 
 }
+
 
 }
 
