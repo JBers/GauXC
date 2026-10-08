@@ -153,6 +153,8 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
   auto rt  = detail::as_device_runtime(this->load_balancer_->runtime());
   auto device_data_ptr = lwd->create_device_data(rt);
   std::cout<<"eval_exc_vxc_ 2"<<std::endl;
+  
+  std::cout<<this->load_balancer_->runtime().comm()<<" "<<this->load_balancer_->runtime().comm_size()<<std::endl;
   std::cout<<rt.comm()<<" "<<rt.comm_size()<<std::endl;
   GAUXC_MPI_CODE( MPI_Barrier(rt.comm());) 
   std::cout<<"eval_exc_vxc_ 3"<<std::endl;
