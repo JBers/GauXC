@@ -146,18 +146,22 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
 
   // Get Tasks
   auto& tasks = this->load_balancer_->get_tasks();
+  std::cout<<"eval_exc_vxc_ 1"<<std::endl;
 
   // Allocate Device memory
   auto* lwd = dynamic_cast<LocalDeviceWorkDriver*>(this->local_work_driver_.get() );
   auto rt  = detail::as_device_runtime(this->load_balancer_->runtime());
   auto device_data_ptr = lwd->create_device_data(rt);
+  std::cout<<"eval_exc_vxc_ 2"<<std::endl;
 
   GAUXC_MPI_CODE( MPI_Barrier(rt.comm());) 
+  std::cout<<"eval_exc_vxc_ 3"<<std::endl;
 
   // Temporary electron count to judge integrator accuracy
   value_type N_EL;
   std::cout<<"N_EL "<<N_EL<<std::endl;
   if( this->reduction_driver_->takes_device_memory() ) {
+  std::cout<<"eval_exc_vxc_ 4"<<std::endl;
 
     // If we can do reductions on the device (e.g. NCCL)
     // Don't communicate data back to the host before reduction
@@ -167,6 +171,7 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
                          Ps_SS_imag, Pz_SS_imag, Py_SS_imag, Px_SS_imag, 
                          tasks.begin(), tasks.end(), *device_data_ptr, true );
     });
+  std::cout<<"eval_exc_vxc_ 5"<<std::endl;
 
     GAUXC_MPI_CODE(
     this->timer_.time_op("XCIntegrator.ImbalanceWait_EXC_VXC",[&](){
