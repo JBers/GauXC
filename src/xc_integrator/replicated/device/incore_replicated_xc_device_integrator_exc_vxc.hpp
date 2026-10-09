@@ -131,7 +131,7 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
       GAUXC_GENERIC_EXCEPTION("Invalid LDPz");
     if( ldvxcz < nbf )
       GAUXC_GENERIC_EXCEPTION("Invalid LDVXCz");
-    if( is_gks ) {
+    if( not is_uks ) {
       if( ldpy < nbf )
         GAUXC_GENERIC_EXCEPTION("Invalid LDPy");
       if( ldvxcy < nbf )
@@ -140,6 +140,24 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
         GAUXC_GENERIC_EXCEPTION("Invalid LDPx");
       if( ldvxcx < nbf )
         GAUXC_GENERIC_EXCEPTION("Invalid LDVXCx");
+      if( is_dks ) {
+        if( ldps_ss < nbf )
+          GAUXC_GENERIC_EXCEPTION("Invalid LDPs SS");
+        if( ldvxcs_ss < nbf )
+          GAUXC_GENERIC_EXCEPTION("Invalid LDVXCs SS");
+        if( ldpz_ss < nbf )
+          GAUXC_GENERIC_EXCEPTION("Invalid LDPz SS");
+        if( ldvxcz_ss < nbf )
+          GAUXC_GENERIC_EXCEPTION("Invalid LDVXCs SS");
+        if( ldpx_ss < nbf )
+          GAUXC_GENERIC_EXCEPTION("Invalid LDPx SS");
+        if( ldvxcx_ss < nbf )
+          GAUXC_GENERIC_EXCEPTION("Invalid LDVXCx SS");
+        if( ldpy_ss < nbf )
+          GAUXC_GENERIC_EXCEPTION("Invalid LDPy SS");
+        if( ldvxcy_ss < nbf )
+          GAUXC_GENERIC_EXCEPTION("Invalid LDVXCy SS");
+      }
     }
   }
 
@@ -153,7 +171,11 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
   auto rt  = detail::as_device_runtime(this->load_balancer_->runtime());
   auto device_data_ptr = lwd->create_device_data(rt);
   std::cout<<"eval_exc_vxc_ 2"<<std::endl;
-  
+  GAUXC_MPI_CODE(
+    int rank;
+    MPI_Comm_rank(rt.comm(), &rank);
+    std::cout<<"RANK: "<<rank<<std::endl;
+  )
   std::cout<<this->load_balancer_->runtime().comm()<<" "<<this->load_balancer_->runtime().comm_size()<<std::endl;
   std::cout<<rt.comm()<<" "<<rt.comm_size()<<std::endl;
   GAUXC_MPI_CODE( MPI_Barrier(rt.comm());) 
