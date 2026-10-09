@@ -22,7 +22,7 @@ auto rebalance(TaskIterator begin, TaskIterator end, const CostFunctor& cost, MP
 
   using hrt_t = std::chrono::high_resolution_clock;
   using dur_t = std::chrono::duration<double, std::milli>;
-  std::cout<<"REBALANCE!!"<<std:endl;
+  std::cout<<"REBALANCE!!"<<std::endl;
   int world_rank, world_size;
   MPI_Comm_rank(comm, &world_rank);
   MPI_Comm_size(comm, &world_size);
