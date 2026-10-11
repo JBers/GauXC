@@ -122,7 +122,7 @@ std::vector< XCTask > HostReplicatedLoadBalancer::create_local_tasks_() const  {
         auto min_rank_it = 
           std::min_element( global_workload.begin(), global_workload.end() );
         int64_t min_rank = std::distance( global_workload.begin(), min_rank_it );
-
+        std::cout<<"min_rank "<<min_rank<<std::endl;
         // Compute cost heuristic and increment total work
         global_workload[ min_rank ] += task.cost( n_deriv, natoms );
 

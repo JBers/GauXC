@@ -139,7 +139,7 @@ struct XCTask {
     const size_t nbe = bfn_screenings.empty() ? bfn_screening.nbe :
       std::accumulate( bfn_screenings.begin(), bfn_screenings.end(), size_t{0},
         []( const auto& v, const auto& s ) { return v + s.nbe; } );
-    return (nbe * ( 1 + nbe + n_deriv ) + natoms * natoms) * npts;
+    return (nbe * ( 11 + nbe + n_deriv ) + natoms * natoms) * npts;
   }
   inline size_t cost_exc_vxc(size_t n_deriv) const {
     const size_t nbe = bfn_screenings.empty() ? bfn_screening.nbe :
