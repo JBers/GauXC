@@ -21,10 +21,13 @@ HostReplicatedLoadBalancer::~HostReplicatedLoadBalancer() noexcept = default;
 
 std::vector< XCTask > HostReplicatedLoadBalancer::create_local_tasks_() const  {
 
+  std::cout<<"create_local_tasks"<<std::endl;
   const int32_t n_deriv = 1; // Effects cost heuristic
 
   int32_t world_rank = runtime_.comm_rank();
   int32_t world_size = runtime_.comm_size();
+
+  std::cout<<"create_local_tasks world rank size "<<world_rank<<" "<<world_size<<std::endl;
 
   std::vector< XCTask > local_work;
   std::vector<size_t> global_workload( world_size, 0 );   
