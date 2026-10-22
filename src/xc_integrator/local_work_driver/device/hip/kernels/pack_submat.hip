@@ -88,7 +88,7 @@ void sym_submat_set_combined_kernel( size_t        ntasks,
 #pragma unroll
         for (int k = 0; k < UNROLL_FACTOR; k++) {
 	  // Suggest that the result be evicted first.
-address[k] = val[k];
+*address[k] = val[k];
         }
       }
     }
@@ -199,7 +199,7 @@ void asym_submat_set_combined_kernel( size_t        ntasks,
 #pragma unroll
         for (int k = 0; k < UNROLL_FACTOR; k++) {
 	  // Suggest that the result be evicted first.
-address[k] = val[k];
+*address[k] = val[k];
         }
       }
     }

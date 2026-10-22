@@ -16,7 +16,8 @@
 #include "device_specific/hip_util.hpp"
 #include "hip_extensions.hpp"
 #include "device_specific/hip_device_constants.hpp"
-#include <cub/device/device_scan.cuh>
+// #include <cub/device/device_scan.cuh>
+#include <hipcub/hipcub.hpp>
 #include "buffer_adaptor.hpp"
 #include "device/common/device_blas.hpp"
 //#include <mpi.h>

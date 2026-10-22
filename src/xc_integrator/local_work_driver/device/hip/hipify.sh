@@ -92,5 +92,6 @@ sed -i "" -e "s/CUDA/HIP/g" kernels/*.hip
 sed -i "" -e "s/cublas/hipblas/g" kernels/*.hip
 sed -i "" -e "s/CUBLAS/HIPBLAS/g" kernels/*.hip
 sed -i "" -e "s/register //g" kernels/*.hip
+sed -i "" -e "s/<cub\/device\/device_scan.cuh>/<hipcub\/hipcub.hpp>/g" kernels/*.hip
 
-#sed -i -e "s/Cuda/Hip/g" *.{cxx,hpp}
+sed -i "" -e "s/Cuda/Hip/g" *.{cxx,hpp}
