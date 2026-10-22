@@ -60,7 +60,27 @@ hipify-perl $CUDA_PREFIX/symmetrize_mat.cu > $HIP_PREFIX/symmetrize_mat.hip
 hipify-perl $CUDA_PREFIX/pack_submat.cu > $HIP_PREFIX/pack_submat.hip
 hipify-perl $CUDA_PREFIX/uvvars.cu > $HIP_PREFIX/uvvars.hip
 
-#hipify-perl $CUDA_PREFIX/../cuda_aos_scheme1.cxx > $HIP_PREFIX/../hip_aos_scheme1.cxx
+hipify-perl $CUDA_PREFIX/uvvars_lda.hpp > $HIP_PREFIX/uvvars_lda.hpp
+hipify-perl $CUDA_PREFIX/uvvars_gga.hpp > $HIP_PREFIX/uvvars_gga.hpp
+hipify-perl $CUDA_PREFIX/uvvars_mgga.hpp > $HIP_PREFIX/uvvars_mgga.hpp
+
+hipify-perl $CUDA_PREFIX/cuda_extensions.hpp > $HIP_PREFIX/hip_extensions.hpp
+hipify-perl $CUDA_PREFIX/collocation_shell_to_task_kernels.hpp > $HIP_PREFIX/collocation_shell_to_task_kernels.hpp
+
+hipify-perl $CUDA_PREFIX/cuda_extensions.hpp > $HIP_PREFIX/hip_extensions.hpp
+
+hipify-perl $CUDA_PREFIX/../cuda_aos_scheme1.cxx > $HIP_PREFIX/../hip_aos_scheme1.cxx
+hipify-perl $CUDA_PREFIX/../cuda_aos_scheme1.hpp > $HIP_PREFIX/../hip_aos_scheme1.hpp
+hipify-perl $CUDA_PREFIX/../cuda_aos_scheme1_data.cxx > $HIP_PREFIX/../hip_aos_scheme1_data.cxx
+hipify-perl $CUDA_PREFIX/../cuda_aos_scheme1_weights.cu > $HIP_PREFIX/../hip_aos_scheme1_weights.hip
+hipify-perl $CUDA_PREFIX/../cuda_aos_scheme1_weights.hpp > $HIP_PREFIX/../hip_aos_scheme1_weights.hpp
+hipify-perl $CUDA_PREFIX/../xc_functional_eval_wrapper.cxx > $HIP_PREFIX/../xc_functional_eval_wrapper.cxx
+
+for file in $CUDA_PREFIX/collocation/collocation_shell_to_task_kernels*.hpp; do
+  [ -e "$file" ] || continue
+  bname=$(basename "$file")
+  hipify-perl "$file" > $HIP_PREFIX/collocation/"$bname"
+done
 
 sed -i "" -e "s/cuda/hip/g" kernels/{,*/}*.hpp *.{cxx,hpp}
 sed -i "" -e "s/cuda/hip/g" kernels/*.hip

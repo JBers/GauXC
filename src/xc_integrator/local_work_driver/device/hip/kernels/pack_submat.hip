@@ -88,11 +88,7 @@ void sym_submat_set_combined_kernel( size_t        ntasks,
 #pragma unroll
         for (int k = 0; k < UNROLL_FACTOR; k++) {
 	  // Suggest that the result be evicted first.
-#if (HIPRT_VERSION >= 11000)
-	  __stcs(address[k], val[k]);
-#else
-          asm ("st.global.cs.f64 [%0], %1;" :: "l"(address[k]), "d"(val[k]));
-#endif
+address[k] = val[k];
         }
       }
     }
@@ -203,11 +199,7 @@ void asym_submat_set_combined_kernel( size_t        ntasks,
 #pragma unroll
         for (int k = 0; k < UNROLL_FACTOR; k++) {
 	  // Suggest that the result be evicted first.
-#if (HIPRT_VERSION >= 11000)
-	  __stcs(address[k], val[k]);
-#else
-          asm ("st.global.cs.f64 [%0], %1;" :: "l"(address[k]), "d"(val[k]));
-#endif
+address[k] = val[k];
         }
       }
     }
