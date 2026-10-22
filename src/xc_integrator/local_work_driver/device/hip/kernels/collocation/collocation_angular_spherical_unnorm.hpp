@@ -317,9 +317,7 @@ GPGAUEVAL_INLINE __device__ void collocation_spherical_unnorm_angular(
         collocation_spherical_unnorm_angular_4( npts, bf, x, y, z, eval );
 
     } else {
-
       assert( false && "L < L_MAX" );
-
     }
 
 } // collocation_spherical_unnorm_angular
