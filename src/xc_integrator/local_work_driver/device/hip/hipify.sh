@@ -69,6 +69,10 @@ hipify-perl $CUDA_PREFIX/collocation_shell_to_task_kernels.hpp > $HIP_PREFIX/col
 
 hipify-perl $CUDA_PREFIX/cuda_extensions.hpp > $HIP_PREFIX/hip_extensions.hpp
 
+hipify-perl $CUDA_PREFIX/../scheme1_cutlass_base.cxx> $HIP_PREFIX/../scheme1_cutlass_base.cxx
+hipify-perl $CUDA_PREFIX/../scheme1_cutlass_base.hpp > $HIP_PREFIX/../scheme1_cutlass_base.hpp
+hipify-perl $CUDA_PREFIX/../scheme1_cutlass_data_base.cxx > $HIP_PREFIX/../scheme1_cutlass_data_base.cxx
+
 hipify-perl $CUDA_PREFIX/../cuda_aos_scheme1.cxx > $HIP_PREFIX/../hip_aos_scheme1.cxx
 hipify-perl $CUDA_PREFIX/../cuda_aos_scheme1.hpp > $HIP_PREFIX/../hip_aos_scheme1.hpp
 hipify-perl $CUDA_PREFIX/../cuda_aos_scheme1_data.cxx > $HIP_PREFIX/../hip_aos_scheme1_data.cxx
