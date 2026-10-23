@@ -17,16 +17,16 @@
 namespace GauXC {
 
 template <typename Base>
-std::unique_ptr<XCDeviceData> CudaAoSScheme1<Base>::create_device_data(const DeviceRuntimeEnvironment& rt) {
+std::unique_ptr<XCDeviceData> HipAoSScheme1<Base>::create_device_data(const DeviceRuntimeEnvironment& rt) {
   return std::make_unique<Data>(rt);
 }
 
 template <typename Base> 
-void CudaAoSScheme1<Base>::partition_weights( XCDeviceData* _data ) {
+void HipAoSScheme1<Base>::partition_weights( XCDeviceData* _data ) {
   auto* data = dynamic_cast<Data*>(_data);
   if( !data ) GAUXC_BAD_LWD_DATA_CAST();
 
-  auto device_backend = dynamic_cast<CUDABackend*>(data->device_backend_);
+  auto device_backend = dynamic_cast<HIPBackend*>(data->device_backend_);
   if( !device_backend ) GAUXC_BAD_BACKEND_CAST();
 
 
@@ -43,14 +43,14 @@ void CudaAoSScheme1<Base>::partition_weights( XCDeviceData* _data ) {
 }
 
 template <typename Base> 
-void CudaAoSScheme1<Base>::eval_weight_1st_deriv_contracted( XCDeviceData* _data, XCWeightAlg alg ) {
+void HipAoSScheme1<Base>::eval_weight_1st_deriv_contracted( XCDeviceData* _data, XCWeightAlg alg ) {
   if( alg != XCWeightAlg::SSF ) {
-    GAUXC_GENERIC_EXCEPTION("Weight Algorithm NYI for CUDA AoS Scheme1");
+    GAUXC_GENERIC_EXCEPTION("Weight Algorithm NYI for HIP AoS Scheme1");
   }
   auto* data = dynamic_cast<Data*>(_data);
   if( !data ) GAUXC_BAD_LWD_DATA_CAST();
 
-  auto device_backend = dynamic_cast<CUDABackend*>(data->device_backend_);
+  auto device_backend = dynamic_cast<HIPBackend*>(data->device_backend_);
   if( !device_backend ) GAUXC_BAD_BACKEND_CAST();
 
   // make w times f vector
@@ -79,12 +79,12 @@ void CudaAoSScheme1<Base>::eval_weight_1st_deriv_contracted( XCDeviceData* _data
 }
 
 
-template struct CudaAoSScheme1<AoSScheme1Base>;
+template struct HipAoSScheme1<AoSScheme1Base>;
 #ifdef GAUXC_HAS_MAGMA
-template struct CudaAoSScheme1<AoSScheme1MAGMABase>;
+template struct HipAoSScheme1<AoSScheme1MAGMABase>;
 #endif
 #ifdef GAUXC_HAS_CUTLASS
-template struct CudaAoSScheme1<AoSScheme1CUTLASSBase>;
+template struct HipAoSScheme1<AoSScheme1CUTLASSBase>;
 #endif
 
 

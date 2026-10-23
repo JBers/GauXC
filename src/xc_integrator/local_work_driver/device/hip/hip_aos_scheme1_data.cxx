@@ -18,36 +18,36 @@
 namespace GauXC {
 
 template <typename Base>
-CudaAoSScheme1<Base>::Data::~Data() noexcept = default;
+HipAoSScheme1<Base>::Data::~Data() noexcept = default;
 
 template <typename Base>
-CudaAoSScheme1<Base>::Data::Data(const DeviceRuntimeEnvironment& rt) :
+HipAoSScheme1<Base>::Data::Data(const DeviceRuntimeEnvironment& rt) :
   Base::Data( rt ) { }
 
 template <typename Base>
-size_t CudaAoSScheme1<Base>::Data::get_ldatoms() {
-  constexpr auto weight_unroll = alg_constants::CudaAoSScheme1::weight_unroll;
+size_t HipAoSScheme1<Base>::Data::get_ldatoms() {
+  constexpr auto weight_unroll = alg_constants::HipAoSScheme1::weight_unroll;
   return util::div_ceil( this->global_dims.natoms, weight_unroll ) * weight_unroll;
 }
 
 template <typename Base>
-size_t CudaAoSScheme1<Base>::Data::get_rab_align() {
+size_t HipAoSScheme1<Base>::Data::get_rab_align() {
   return sizeof(double2);
 }
 
 template <typename Base>
-int CudaAoSScheme1<Base>::Data::get_points_per_subtask() {
-  return alg_constants::CudaAoSScheme1::ObaraSaika::points_per_subtask;
+int HipAoSScheme1<Base>::Data::get_points_per_subtask() {
+  return alg_constants::HipAoSScheme1::ObaraSaika::points_per_subtask;
 }
 
 
 
 template <typename Base>
-size_t CudaAoSScheme1<Base>::Data::get_submat_chunk_size(int32_t LDA, 
+size_t HipAoSScheme1<Base>::Data::get_submat_chunk_size(int32_t LDA, 
   int32_t dev_id) {
 
   constexpr auto max_submat_blocks = 
-    alg_constants::CudaAoSScheme1::max_submat_blocks;
+    alg_constants::HipAoSScheme1::max_submat_blocks;
 
   int l2_cache_size;
   hipDeviceGetAttribute(&l2_cache_size, hipDeviceAttributeL2CacheSize, dev_id);
@@ -62,12 +62,12 @@ size_t CudaAoSScheme1<Base>::Data::get_submat_chunk_size(int32_t LDA,
 
 }
 
-template struct CudaAoSScheme1<AoSScheme1Base>::Data;
+template struct HipAoSScheme1<AoSScheme1Base>::Data;
 #ifdef GAUXC_HAS_MAGMA
-template struct CudaAoSScheme1<AoSScheme1MAGMABase>::Data;
+template struct HipAoSScheme1<AoSScheme1MAGMABase>::Data;
 #endif
 #ifdef GAUXC_HAS_CUTLASS
-template struct CudaAoSScheme1<AoSScheme1CUTLASSBase>::Data;
+template struct HipAoSScheme1<AoSScheme1CUTLASSBase>::Data;
 #endif
 
 

@@ -18,7 +18,7 @@ namespace GauXC {
 
 namespace alg_constants {
 
-struct CudaAoSScheme1 {
+struct HipAoSScheme1 {
   static constexpr uint32_t weight_unroll = 4;
   static constexpr uint32_t weight_thread_block = 640;
   static constexpr uint32_t weight_thread_block_per_sm = 2;
@@ -33,7 +33,7 @@ struct CudaAoSScheme1 {
 }
 
 template <typename Base = AoSScheme1Base>
-struct CudaAoSScheme1 : public Base {
+struct HipAoSScheme1 : public Base {
 
   // API Overrides
   void partition_weights( XCDeviceData* ) override final;
@@ -45,16 +45,16 @@ struct CudaAoSScheme1 : public Base {
 
 };
 
-extern template struct CudaAoSScheme1<AoSScheme1Base>;
+extern template struct HipAoSScheme1<AoSScheme1Base>;
 #ifdef GAUXC_HAS_MAGMA
-extern template struct CudaAoSScheme1<AoSScheme1MAGMABase>;
+extern template struct HipAoSScheme1<AoSScheme1MAGMABase>;
 #endif
 #ifdef GAUXC_HAS_CUTLASS
-extern template struct CudaAoSScheme1<AoSScheme1CUTLASSBase>;
+extern template struct HipAoSScheme1<AoSScheme1CUTLASSBase>;
 #endif
 
 template <typename Base>
-struct CudaAoSScheme1<Base>::Data : public Base::Data {
+struct HipAoSScheme1<Base>::Data : public Base::Data {
 
   virtual ~Data() noexcept;
   Data() = delete;
@@ -68,12 +68,12 @@ struct CudaAoSScheme1<Base>::Data : public Base::Data {
 
 };
 
-extern template struct CudaAoSScheme1<AoSScheme1Base>::Data;
+extern template struct HipAoSScheme1<AoSScheme1Base>::Data;
 #ifdef GAUXC_HAS_MAGMA
-extern template struct CudaAoSScheme1<AoSScheme1MAGMABase>::Data;
+extern template struct HipAoSScheme1<AoSScheme1MAGMABase>::Data;
 #endif
 #ifdef GAUXC_HAS_CUTLASS
-extern template struct CudaAoSScheme1<AoSScheme1CUTLASSBase>::Data;
+extern template struct HipAoSScheme1<AoSScheme1CUTLASSBase>::Data;
 #endif
 
 }
