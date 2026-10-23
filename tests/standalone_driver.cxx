@@ -228,11 +228,13 @@ int main(int argc, char** argv) {
     using matrix_type = Eigen::MatrixXd;
     // Read in reference data
     matrix_type P, Pz, Py, Px, VXC_ref, VXCz_ref, VXCy_ref, VXCx_ref, K_ref;
+    matrix_type Ps_SS, Pz_SS, Py_SS, Px_SS, Ps_SS_im, Pz_SS_im, Py_SS_im, Px_SS_im;
+    matrix_type VXCs_SS_ref, VXCz_SS_ref, VXCy_SS_ref, VXCx_SS_ref;
     matrix_type ddX, ddPsi_ref, ddPsi_potential_ref;
     matrix_type FXC_ref, FXCz_ref;
     double EXC_ref = 0.0;
     std::vector<double> EXC_GRAD_ref(3*mol.size());
-    bool rks = true, uks = false, gks = false;
+    bool rks = true, uks = false, gks = false, dks = false;
     size_t N_EL_ref = MolMeta(mol).sum_atomic_charges();
     {
       HighFive::File file( ref_file, HighFive::File::ReadOnly );
@@ -244,7 +246,11 @@ int main(int argc, char** argv) {
         den_str = "/DENSITY_SCALAR";
         vxc_str = "/VXC_SCALAR";
         if (file.exist("/DENSITY_Y") and file.exist("/DENSITY_X")) {
+          if (file.exist("/DENSITY_S_SS")) {
+            dks = true;
+          } else {
           gks = true;
+          }
         } else {
           uks = true;
         }
@@ -257,14 +263,28 @@ int main(int argc, char** argv) {
       VXC_ref = matrix_type( dims[0], dims[1] );
       K_ref   = matrix_type( dims[0], dims[1] );
       if (not rks) {
-        Pz        = matrix_type( dims[0], dims[1] );
-        VXCz_ref  = matrix_type( dims[0], dims[1] );
+        Pz           = matrix_type( dims[0], dims[1] );
+        VXCz_ref     = matrix_type( dims[0], dims[1] );
+      if (not uks) {
+        Py           = matrix_type( dims[0], dims[1] );
+        VXCy_ref     = matrix_type( dims[0], dims[1] );
+        Px           = matrix_type( dims[0], dims[1] );
+        VXCx_ref     = matrix_type( dims[0], dims[1] );
+       }
       }
-      if (gks) {
-        Py        = matrix_type( dims[0], dims[1] );
-        VXCy_ref  = matrix_type( dims[0], dims[1] );
-        Px        = matrix_type( dims[0], dims[1] );
-        VXCx_ref  = matrix_type( dims[0], dims[1] );
+      if (dks) {
+        Ps_SS        = matrix_type( dims[0], dims[1] );
+        Pz_SS        = matrix_type( dims[0], dims[1] );
+        Py_SS        = matrix_type( dims[0], dims[1] );
+        Px_SS        = matrix_type( dims[0], dims[1] );
+        Ps_SS_im     = matrix_type( dims[0], dims[1] );
+        Pz_SS_im     = matrix_type( dims[0], dims[1] );
+        Py_SS_im     = matrix_type( dims[0], dims[1] );
+        Px_SS_im     = matrix_type( dims[0], dims[1] );
+        VXCs_SS_ref  = matrix_type( dims[0], dims[1] );
+        VXCz_SS_ref  = matrix_type( dims[0], dims[1] );
+        VXCy_SS_ref  = matrix_type( dims[0], dims[1] );
+        VXCx_SS_ref  = matrix_type( dims[0], dims[1] );
       }
 
       if( P.rows() != P.cols() ) GAUXC_GENERIC_EXCEPTION("Density Must Be Square");
@@ -273,15 +293,33 @@ int main(int argc, char** argv) {
 
       dset.read( P.data() );
 
-      if( not rks) {
+      if(not rks) {
         dset = file.getDataSet("/DENSITY_Z");
         dset.read( Pz.data() );
-      }
-      if(gks) {
+      if(not uks) {
         dset = file.getDataSet("/DENSITY_Y");
         dset.read( Py.data() );
         dset = file.getDataSet("/DENSITY_X");
         dset.read( Px.data() );
+        }
+      }
+      if(dks) {
+        dset = file.getDataSet("/DENSITY_S_SS");
+        dset.read( Ps_SS.data() );
+        dset = file.getDataSet("/DENSITY_Z_SS");
+        dset.read( Pz_SS.data() );
+        dset = file.getDataSet("/DENSITY_Y_SS");
+        dset.read( Py_SS.data() );
+        dset = file.getDataSet("/DENSITY_X_SS");
+        dset.read( Px_SS.data() );
+        dset = file.getDataSet("/DENSITY_S_SS_IM");
+        dset.read( Ps_SS_im.data() );
+        dset = file.getDataSet("/DENSITY_Z_SS_IM");
+        dset.read( Pz_SS_im.data() );
+        dset = file.getDataSet("/DENSITY_Y_SS_IM");
+        dset.read( Py_SS_im.data() );
+        dset = file.getDataSet("/DENSITY_X_SS_IM");
+        dset.read( Px_SS_im.data() );
       }
         
 
@@ -306,7 +344,7 @@ int main(int argc, char** argv) {
             VXCz_ref.fill(0);
           }
         }
-        if( gks ) {
+        if( not uks ) {
           try {
             dset = file.getDataSet("/VXC_Y");
             dset.read( VXCy_ref.data() );
@@ -318,6 +356,26 @@ int main(int argc, char** argv) {
             }
             VXCy_ref.fill(0);
             VXCx_ref.fill(0);
+          }
+        }
+        if( dks ) {
+          try {
+            dset = file.getDataSet("/VXC_S_SS");
+            dset.read( VXCs_SS_ref.data() );
+            dset = file.getDataSet("/VXC_Z_SS");
+            dset.read( VXCz_SS_ref.data() );
+            dset = file.getDataSet("/VXC_Y_SS");
+            dset.read( VXCy_SS_ref.data() );
+            dset = file.getDataSet("/VXC_X_SS");
+            dset.read( VXCx_SS_ref.data() );
+          } catch(...) {
+            if(world_rank == 0) {
+              std::cout << "** Warning: Could Not Find Reference VXC SS" << std::endl;
+            }
+            VXCs_SS_ref.fill(0);
+            VXCz_SS_ref.fill(0);
+            VXCy_SS_ref.fill(0);
+            VXCx_SS_ref.fill(0);
           }
         }
 
@@ -425,7 +483,7 @@ int main(int argc, char** argv) {
       }
     }
     // Setup XC functional
-    auto polar = (uks or gks) ? Spin::Polarized : Spin::Unpolarized;
+    auto polar = (uks or gks or dks) ? Spin::Polarized : Spin::Unpolarized;
     functional_type func;
     if(functional_map.key_exists(func_spec)) {
       func = functional_type( Backend::builtin, functional_map.value(func_spec), 
@@ -454,6 +512,7 @@ int main(int argc, char** argv) {
     auto xc_int_start = std::chrono::high_resolution_clock::now();
 
     matrix_type VXC, VXCz, VXCy, VXCx, K, FXC, FXCz;
+    matrix_type VXCs_SS, VXCz_SS, VXCy_SS, VXCx_SS, VXCs_SS_im, VXCz_SS_im, VXCy_SS_im, VXCx_SS_im;
     matrix_type ddPsi, ddPsiPotential;
     double EXC = 0.0, N_EL = 0.0;
 
@@ -478,6 +537,10 @@ int main(int argc, char** argv) {
       else if ( gks ) {
         std::tie(EXC, VXC, VXCz, VXCy, VXCx) = integrator.eval_exc_vxc( P, Pz, Py, Px );
       }
+      else if ( dks ) {
+         std::tie(EXC, VXC, VXCz, VXCy, VXCx, VXCs_SS, VXCz_SS, VXCy_SS, VXCx_SS , VXCs_SS_im, VXCz_SS_im, VXCy_SS_im, VXCx_SS_im) 
+                  = integrator.eval_exc_vxc( P, Pz, Py, Px, Ps_SS, Pz_SS, Py_SS, Px_SS, Ps_SS_im, Pz_SS_im, Py_SS_im, Px_SS_im );
+      }
       std::cout << std::scientific << std::setprecision(12);
       if(!world_rank) std::cout << "EXC = " << EXC << std::endl;
     } else {
@@ -485,9 +548,15 @@ int main(int argc, char** argv) {
       VXC = VXC_ref;
       if( not rks ) {
         VXCz = VXCz_ref;
-        if( gks ) {
+        if( not uks ) {
           VXCy = VXCy_ref;
           VXCx = VXCx_ref;
+          if( not gks ) {
+          VXCs_SS = VXCs_SS_ref;
+          VXCz_SS = VXCz_SS_ref;
+          VXCy_SS = VXCy_SS_ref;
+          VXCx_SS = VXCx_SS_ref;
+        }
         }
       }
     }
@@ -503,6 +572,9 @@ int main(int argc, char** argv) {
       else if( gks ) {
         std::cout << "Warning: eval_exc_grad + GKS NYI!" << std::endl;
         //EXC_GRAD = integrator.eval_exc_grad( P, Pz, Py, Px );
+      }
+      else if( dks ) {
+        std::cout << "Warning: eval_exc_grad + DKS NYI!" << std::endl;
       }
       if(!world_rank) {
         std::cout << "EXC Gradient:" << std::endl;
@@ -583,6 +655,8 @@ int main(int argc, char** argv) {
         std::tie(FXC, FXCz) = integrator.eval_fxc_contraction( P, Pz, tP, tPz, IntegratorSettingsXC{} );
       } else if( gks ) {
         std::cout << "Warning: FXC contraction with GKS NYI!" << std::endl;
+      } else if( dks ) {
+        std::cout << "Warning: FXC contraction with DKS NYI!" << std::endl;
       }
 
     }
@@ -705,7 +779,7 @@ int main(int argc, char** argv) {
         std::cout << "RMS VXCz Diff     = " << (VXCz_ref - VXCz).norm() / basis.nbf()
                                            << std::endl;
       }
-      if( gks ) {
+      if( not uks ) {
         std::cout << "| VXCy (ref)  |_F = " << VXCy_ref.norm() << std::endl;
         std::cout << "| VXCy (calc) |_F = " << VXCy.norm() << std::endl;
         std::cout << "RMS VXCy Diff     = " << (VXCy_ref - VXCy).norm() / basis.nbf()
@@ -713,6 +787,24 @@ int main(int argc, char** argv) {
         std::cout << "| VXCx (ref)  |_F = " << VXCx_ref.norm() << std::endl;
         std::cout << "| VXCx (calc) |_F = " << VXCx.norm() << std::endl;
         std::cout << "RMS VXCx Diff     = " << (VXCx_ref - VXCx).norm() / basis.nbf()
+                                           << std::endl;
+      }
+      if( dks ) {
+        std::cout << "| VXCs SS (ref)  |_F = " << VXCs_SS_ref.norm() << std::endl;
+        std::cout << "| VXCs SS (calc) |_F = " << VXCs_SS.norm() << std::endl;
+        std::cout << "RMS VXCs SS Diff     = " << (VXCs_SS_ref - VXCs_SS).norm() / basis.nbf()
+                                           << std::endl;
+        std::cout << "| VXCz SS (ref)  |_F = " << VXCz_SS_ref.norm() << std::endl;
+        std::cout << "| VXCz SS (calc) |_F = " << VXCz_SS.norm() << std::endl;
+        std::cout << "RMS VXCz SS Diff     = " << (VXCz_SS_ref - VXCz_SS).norm() / basis.nbf()
+                                           << std::endl;
+        std::cout << "| VXCy SS (ref)  |_F = " << VXCy_SS_ref.norm() << std::endl;
+        std::cout << "| VXCy SS (calc) |_F = " << VXCy_SS.norm() << std::endl;
+        std::cout << "RMS VXCy SS Diff     = " << (VXCy_SS_ref - VXCy_SS).norm() / basis.nbf()
+                                           << std::endl;
+        std::cout << "| VXCx SS (ref)  |_F = " << VXCx_SS_ref.norm() << std::endl;
+        std::cout << "| VXCx SS (calc) |_F = " << VXCx_SS.norm() << std::endl;
+        std::cout << "RMS VXCx SS Diff     = " << (VXCx_SS_ref - VXCx_SS).norm() / basis.nbf()
                                            << std::endl;
       }
       }
@@ -790,12 +882,30 @@ int main(int argc, char** argv) {
       if( not rks ) {
         dset = file.createDataSet<double>( "/DENSITY_Z", mat_space );
         dset.write_raw( Pz.data() );
-      }
-      if( gks ) {
+        if( not uks ) {
         dset = file.createDataSet<double>( "/DENSITY_Y", mat_space );
         dset.write_raw( Py.data() );
         dset = file.createDataSet<double>( "/DENSITY_X", mat_space );
         dset.write_raw( Px.data() );
+        }
+      }
+      if( dks ){
+        dset = file.createDataSet<double>("/DENSITY_S_SS", mat_space);
+        dset.write_raw( Ps_SS.data() );
+        dset = file.createDataSet<double>("/DENSITY_Z_SS", mat_space);
+        dset.write_raw( Pz_SS.data() );
+        dset = file.createDataSet<double>("/DENSITY_Y_SS", mat_space);
+        dset.write_raw( Py_SS.data() );
+        dset = file.createDataSet<double>("/DENSITY_X_SS", mat_space);
+        dset.write_raw( Px_SS.data() );
+        dset = file.createDataSet<double>("/DENSITY_S_SS_IM", mat_space);
+        dset.write_raw( Ps_SS_im.data() );
+        dset = file.createDataSet<double>("/DENSITY_Z_SS_IM", mat_space);
+        dset.write_raw( Pz_SS_im.data() );
+        dset = file.createDataSet<double>("/DENSITY_Y_SS_IM", mat_space);
+        dset.write_raw( Py_SS_im.data() );
+        dset = file.createDataSet<double>("/DENSITY_X_SS_IM", mat_space);
+        dset.write_raw( Px_SS_im.data() );
       }
 
 
@@ -805,14 +915,23 @@ int main(int argc, char** argv) {
         if( not rks ) {
           dset = file.createDataSet<double>( "/VXC_Z", mat_space );
           dset.write_raw( VXCz.data() );
+          if( not uks ) {
+            dset = file.createDataSet<double>( "/VXC_Y", mat_space );
+            dset.write_raw( VXCy.data() );
+            dset = file.createDataSet<double>( "/VXC_X", mat_space );
+            dset.write_raw( VXCx.data() );
+          }
         }
-        if( gks ) {
-          dset = file.createDataSet<double>( "/VXC_Y", mat_space );
-          dset.write_raw( VXCy.data() );
-          dset = file.createDataSet<double>( "/VXC_X", mat_space );
-          dset.write_raw( VXCx.data() );
+        if( dks ){
+          dset = file.createDataSet<double>("/VXC_S_SS", mat_space);
+          dset.write_raw( VXCs_SS.data() );
+          dset = file.createDataSet<double>("/VXC_Z_SS", mat_space);
+          dset.write_raw( VXCz_SS.data() );
+          dset = file.createDataSet<double>("/VXC_Y_SS", mat_space);
+          dset.write_raw( VXCy_SS.data() );
+          dset = file.createDataSet<double>("/VXC_X_SS", mat_space);
+          dset.write_raw( VXCx_SS.data() );
         }
-
         dset = file.createDataSet<double>( "/EXC", sca_space );
         dset.write_raw( &EXC );
       }
