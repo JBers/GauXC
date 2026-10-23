@@ -546,9 +546,8 @@ void AoSScheme1Base::eval_collocation_lapgrad( XCDeviceData* _data ) {
   eval_collocation_shell_to_task_lapgrad( max_l, 
     data->l_batched_shell_to_task.data(), aos_stack.device_tasks,
     data->device_backend_->queue() );
-#endif
-  
   data->device_backend_->check_error("collocation lap grad " __FILE__ ": " + std::to_string(__LINE__));
+#endif
 }
 
 
