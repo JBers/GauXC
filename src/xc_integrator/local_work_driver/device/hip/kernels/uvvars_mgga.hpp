@@ -25,7 +25,7 @@ template <bool trial, density_id den_select, bool need_lapl>
 __global__ void eval_vvar_mgga_kern( size_t           ntasks,
                                      XCDeviceTask* tasks_device) {
 
-  constexpr auto warp_size = hip::warp_size;
+  constexpr auto warp_size = 32;
   //constexpr auto max_warps_per_thread_block = hip::max_warps_per_thread_block;
 
   const int batch_idx = blockIdx.z;

@@ -64,7 +64,7 @@ __global__ void eval_vvar_lda_kern( size_t        ntasks,
   }
 
   // Warp blocks are stored col major
-  constexpr auto warp_size = hip::warp_size;
+  constexpr auto warp_size = 32;
   //constexpr auto max_warps_per_thread_block = hip::max_warps_per_thread_block;
   den_reg = hip::warp_reduce_sum<warp_size>( den_reg );
 
@@ -212,7 +212,7 @@ void eval_vvar_lda_dks_kern( size_t        ntasks,
   }
 
   // Warp blocks are stored col major
-  constexpr auto warp_size = hip::warp_size;
+  constexpr auto warp_size = 32;
   //constexpr auto max_warps_per_thread_block = hip::max_warps_per_thread_block;
   den_reg = hip::warp_reduce_sum<warp_size>( den_reg );
 

@@ -37,7 +37,7 @@ __global__ void eval_vvar_gga_kern( size_t        ntasks,
   double* den_y_eval_device = nullptr;
   double* den_z_eval_device = nullptr;
 
-  constexpr auto warp_size = hip::warp_size;
+  constexpr auto warp_size = 32;
 
   if constexpr (trial){
     if constexpr (den_select == DEN_S) {
@@ -175,7 +175,7 @@ void eval_vvar_gga_dks_kern( size_t        ntasks,
   double* den_y_eval_device = nullptr;
   double* den_z_eval_device = nullptr;
 
-  constexpr auto warp_size = hip::warp_size;
+  constexpr auto warp_size = 32;
 
   double xx, yy ,zz, mkxy ,mkyx, mjxz, mjzx, mizy, miyz;
   
