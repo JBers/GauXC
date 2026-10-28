@@ -312,7 +312,7 @@ __global__ void bitvector_to_position_list_shellpair(
   uint32_t*       position_list
 ) {
 
-  constexpr auto warp_size = cuda::warp_size;
+  constexpr auto warp_size = 32;
   constexpr auto element_size = CHAR_BIT * sizeof(buffer_type);
   constexpr auto buffer_size_bits = element_size * buffer_size;
   __shared__ buffer_type collisions_buffer[warp_size][warp_size][buffer_size];
@@ -375,7 +375,7 @@ __global__ void bitvector_to_position_list_shells(
           uint32_t* position_list, 
            size_t* nbe_list
 ) {
-  constexpr auto warp_size = cuda::warp_size;
+  constexpr auto warp_size = 32;
   constexpr auto element_size = CHAR_BIT * sizeof(buffer_type);
   constexpr auto buffer_size_bits = element_size * buffer_size;
   __shared__ buffer_type collisions_buffer[warp_size][warp_size][buffer_size];

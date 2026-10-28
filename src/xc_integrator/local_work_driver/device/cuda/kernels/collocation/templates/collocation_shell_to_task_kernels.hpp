@@ -30,8 +30,8 @@ __global__ __launch_bounds__($(nt),2) void collocation_device_shell_to_task_kern
 ) {
 
 
-  __shared__ double alpha[$(nt)/cuda::warp_size)][detail::shell_nprim_max + 1]; 
-  __shared__ double coeff[$(nt)/cuda::warp_size)][detail::shell_nprim_max + 1];
+  __shared__ double alpha[$(nt)/cuda::warp_size][detail::shell_nprim_max + 1]; 
+  __shared__ double coeff[$(nt)/cuda::warp_size][detail::shell_nprim_max + 1];
   double* my_alpha = alpha[threadIdx.x/cuda::warp_size];
   double* my_coeff = coeff[threadIdx.x/cuda::warp_size];
 
