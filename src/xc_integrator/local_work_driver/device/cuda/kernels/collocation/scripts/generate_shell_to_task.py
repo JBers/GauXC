@@ -8,7 +8,7 @@ from sympy.codegen.rewriting import create_expand_pow_optimization
 
 from io import StringIO
 
-L_max = 4
+L_max = 6
 if len(sys.argv) > 1: L_max = int(sys.argv[1])
 
 def generate_shell_to_task_lines( ang, deriv_order = 0 ):
@@ -432,22 +432,22 @@ def generate_code_lapgrad( eval_lines, eval_lines_dx, eval_lines_dy, eval_lines_
 
 # Generate kernels
 for L in range( L_max + 1 ):
-  template_fname = 'templates/collocation_shell_to_task_kernels.hpp'
-  cart_header_fname = "collocation_shell_to_task_kernels_cartesian_l" + str(L) + ".hpp"
-  sph_header_fname  = "collocation_shell_to_task_kernels_spherical_l" + str(L) + ".hpp"
+  template_fname = '../templates/collocation_shell_to_task_kernels.hpp'
+  cart_header_fname = "../collocation_shell_to_task_kernels_cartesian_l" + str(L) + ".hpp"
+  sph_header_fname  = "../collocation_shell_to_task_kernels_spherical_l" + str(L) + ".hpp"
   
   generate_code( cart_bf_lines[L], L, 'cartesian', template_fname, cart_header_fname )
   generate_code( sph_bf_lines[L], L, 'spherical', template_fname, sph_header_fname )
 
-  cart_header_fname = "collocation_shell_to_task_kernels_cartesian_l" + str(L) + "_gradient.hpp"
-  sph_header_fname  = "collocation_shell_to_task_kernels_spherical_l" + str(L) + "_gradient.hpp"
+  cart_header_fname = "../collocation_shell_to_task_kernels_cartesian_l" + str(L) + "_gradient.hpp"
+  sph_header_fname  = "../collocation_shell_to_task_kernels_spherical_l" + str(L) + "_gradient.hpp"
   generate_code_gradient( cart_bf_lines[L], cart_bfx_lines[L], cart_bfy_lines[L], cart_bfz_lines[L],
     L, 'cartesian_gradient', template_fname, cart_header_fname )
   generate_code_gradient( sph_bf_lines[L], sph_bfx_lines[L], sph_bfy_lines[L], sph_bfz_lines[L],
     L, 'spherical_gradient', template_fname, sph_header_fname )
 
-  cart_header_fname = "collocation_shell_to_task_kernels_cartesian_l" + str(L) + "_hessian.hpp"
-  sph_header_fname  = "collocation_shell_to_task_kernels_spherical_l" + str(L) + "_hessian.hpp"
+  cart_header_fname = "../collocation_shell_to_task_kernels_cartesian_l" + str(L) + "_hessian.hpp"
+  sph_header_fname  = "../collocation_shell_to_task_kernels_spherical_l" + str(L) + "_hessian.hpp"
   generate_code_hessian( cart_bf_lines[L], cart_bfx_lines[L], cart_bfy_lines[L], cart_bfz_lines[L],
     cart_bfxx_lines[L], cart_bfxy_lines[L], cart_bfxz_lines[L], cart_bfyy_lines[L], cart_bfyz_lines[L],
     cart_bfzz_lines[L], cart_bflap_lines[L], L, 'cartesian_hessian', template_fname, cart_header_fname )
@@ -455,8 +455,8 @@ for L in range( L_max + 1 ):
     sph_bfxx_lines[L], sph_bfxy_lines[L], sph_bfxz_lines[L], sph_bfyy_lines[L], sph_bfyz_lines[L],
     sph_bfzz_lines[L], sph_bflap_lines[L], L, 'spherical_hessian', template_fname, sph_header_fname )
 
-  cart_header_fname = "collocation_shell_to_task_kernels_cartesian_l" + str(L) + "_laplacian.hpp"
-  sph_header_fname  = "collocation_shell_to_task_kernels_spherical_l" + str(L) + "_laplacian.hpp"
+  cart_header_fname = "../collocation_shell_to_task_kernels_cartesian_l" + str(L) + "_laplacian.hpp"
+  sph_header_fname  = "../collocation_shell_to_task_kernels_spherical_l" + str(L) + "_laplacian.hpp"
   generate_code_hessian( cart_bf_lines[L], cart_bfx_lines[L], cart_bfy_lines[L], cart_bfz_lines[L],
     cart_bfxx_lines[L], cart_bfxy_lines[L], cart_bfxz_lines[L], cart_bfyy_lines[L], cart_bfyz_lines[L],
     cart_bfzz_lines[L], cart_bflap_lines[L], L, 'cartesian_laplacian', template_fname, cart_header_fname )
@@ -464,8 +464,8 @@ for L in range( L_max + 1 ):
     sph_bfxx_lines[L], sph_bfxy_lines[L], sph_bfxz_lines[L], sph_bfyy_lines[L], sph_bfyz_lines[L],
     sph_bfzz_lines[L], sph_bflap_lines[L], L, 'spherical_laplacian', template_fname, sph_header_fname )
 
-  cart_header_fname = "collocation_shell_to_task_kernels_cartesian_l" + str(L) + "_lapgrad.hpp"
-  sph_header_fname  = "collocation_shell_to_task_kernels_spherical_l" + str(L) + "_lapgrad.hpp"
+  cart_header_fname = "../collocation_shell_to_task_kernels_cartesian_l" + str(L) + "_lapgrad.hpp"
+  sph_header_fname  = "../collocation_shell_to_task_kernels_spherical_l" + str(L) + "_lapgrad.hpp"
   generate_code_lapgrad( cart_bf_lines[L], cart_bfx_lines[L], cart_bfy_lines[L], cart_bfz_lines[L],
     cart_bfxx_lines[L], cart_bfxy_lines[L], cart_bfxz_lines[L], cart_bfyy_lines[L], cart_bfyz_lines[L],
     cart_bfzz_lines[L], cart_bflap_lines[L], cart_bflap_x_lines[L], cart_bflap_y_lines[L], cart_bflap_z_lines[L], 

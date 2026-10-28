@@ -26,10 +26,10 @@ __global__ __launch_bounds__(256,2) void collocation_device_shell_to_task_kernel
 ) {
 
 
-  __shared__ double alpha[8][detail::shell_nprim_max + 1]; 
-  __shared__ double coeff[8][detail::shell_nprim_max + 1];
-  double* my_alpha = alpha[threadIdx.x/32];
-  double* my_coeff = coeff[threadIdx.x/32];
+  __shared__ double alpha[256/cuda::warp_size)][detail::shell_nprim_max + 1]; 
+  __shared__ double coeff[256/cuda::warp_size)][detail::shell_nprim_max + 1];
+  double* my_alpha = alpha[threadIdx.x/cuda::warp_size];
+  double* my_coeff = coeff[threadIdx.x/cuda::warp_size];
 
   for( auto ish = blockIdx.z; ish < nshell; ish += gridDim.z ) {
   const uint32_t ntasks      = shell_to_task[ish].ntask;
@@ -49,10 +49,12 @@ __global__ __launch_bounds__(256,2) void collocation_device_shell_to_task_kernel
   {
     auto* coeff_gm = shell->coeff_data();
     auto* alpha_gm = shell->alpha_data();
-    static_assert( detail::shell_nprim_max == cuda::warp_size );
+    static_assert( detail::shell_nprim_max <= cuda::warp_size );
     const int warp_rank = threadIdx.x % cuda::warp_size;
-    my_alpha[warp_rank] = alpha_gm[warp_rank];
-    my_coeff[warp_rank] = coeff_gm[warp_rank];
+    if( warp_rank < detail::shell_nprim_max ) {
+      my_alpha[warp_rank] = alpha_gm[warp_rank];
+      my_coeff[warp_rank] = coeff_gm[warp_rank];
+    }
   }
 
   // Loop over tasks assigned to shells
