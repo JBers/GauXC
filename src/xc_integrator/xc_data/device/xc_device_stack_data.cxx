@@ -108,7 +108,6 @@ void XCDeviceStackData::allocate_static_data_exc_vxc( int32_t nbf, int32_t nshel
     GAUXC_GENERIC_EXCEPTION("Attempting to reallocate Stack EXC VXC");
   if( enabled_terms.ks_scheme == _UNDEF_SCHEME )
     GAUXC_GENERIC_EXCEPTION("Must have a KS Scheme set to allocate Stack EXC VXC");
-  std::cout<<"allocate_static_data_exc_vxc"<<std::endl;
   // Save state
   global_dims.nshells = nshells;
   global_dims.nbf     = nbf; 
@@ -129,7 +128,6 @@ void XCDeviceStackData::allocate_static_data_exc_vxc( int32_t nbf, int32_t nshel
         static_stack.dmat_y_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
         static_stack.dmat_x_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
         if( allocated_terms.ks_scheme == DKS ) {
-          std::cout<<"dmat allocated_terms.ks_scheme == DKS"<<std::endl;
           static_stack.dmat_s_ss_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
           static_stack.dmat_z_ss_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
           static_stack.dmat_y_ss_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
@@ -150,7 +148,6 @@ void XCDeviceStackData::allocate_static_data_exc_vxc( int32_t nbf, int32_t nshel
         static_stack.vxc_y_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
         static_stack.vxc_x_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
         if( allocated_terms.ks_scheme == DKS ) {
-          std::cout<<"do_vxc allocated_terms.ks_scheme == DKS"<<std::endl;
           static_stack.vxc_s_ss_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
           static_stack.vxc_z_ss_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
           static_stack.vxc_y_ss_device  = mem.aligned_alloc<double>( nbf * nbf , csl );
@@ -398,7 +395,6 @@ void XCDeviceStackData::send_static_data_density_basis( const double* Ps, int32_
 
   if( not device_backend_ ) GAUXC_GENERIC_EXCEPTION("Invalid Device Backend");
 
-  std::cout<<"send_static_data_density_basis"<<std::endl;
 
   const auto nbf    = global_dims.nbf;
   // Check dimensions and copy density
@@ -413,7 +409,6 @@ void XCDeviceStackData::send_static_data_density_basis( const double* Ps, int32_
       device_backend_->copy_async( nbf*nbf, Py, static_stack.dmat_y_device, "P_y H2D" );
       device_backend_->copy_async( nbf*nbf, Px, static_stack.dmat_x_device, "P_x H2D" );
       if( not is_gks ) {
-        std::cout<<"send_static_data_density_basis dks"<<std::endl;
         if( ldps_ss != (int)nbf ) GAUXC_GENERIC_EXCEPTION("LDPy SS must bf NBF");
         if( ldpz_ss != (int)nbf ) GAUXC_GENERIC_EXCEPTION("LDPx SS must bf NBF");
         if( ldpy_ss != (int)nbf ) GAUXC_GENERIC_EXCEPTION("LDPy SS must bf NBF");
@@ -617,7 +612,6 @@ void XCDeviceStackData::zero_den_integrands() {
 void XCDeviceStackData::zero_exc_vxc_integrands(integrator_term_tracker enabled_terms) {
 
   if( not device_backend_ ) GAUXC_GENERIC_EXCEPTION("Invalid Device Backend");
-  std::cout<<"zero_exc_vxc_integrands"<<std::endl;
   const auto nbf = global_dims.nbf;
   if(static_stack.vxc_s_device) device_backend_->set_zero( nbf*nbf, static_stack.vxc_s_device, "VXCs Zero" );
   if(static_stack.vxc_z_device) device_backend_->set_zero( nbf*nbf, static_stack.vxc_z_device, "VXCz Zero" );
@@ -691,11 +685,8 @@ void XCDeviceStackData::retrieve_exc_vxc_integrands( double* EXC, double* N_EL,
   double* VXCy_ss_im, int32_t ldvxcy_ss_im, double* VXCx_ss_im, int32_t ldvxcx_ss_im  ) {
 
   const auto nbf = global_dims.nbf;
-  std::cout<<"retrieve_exc_vxc_integrands"<<std::endl;
   device_backend_->copy_async( 1,       static_stack.nel_device, N_EL, "NEL D2H" );
   device_backend_->copy_async( 1,       static_stack.exc_device, EXC,  "EXC D2H" );
-  std::cout<<"N_EL "<<*N_EL<<std::endl;
-  std::cout<<"EXC "<<*EXC<<std::endl;
 
   if( ldvxcs and (ldvxcs != (int)nbf) ) GAUXC_GENERIC_EXCEPTION("LDVXCs must be NBF");
   if( VXCs )

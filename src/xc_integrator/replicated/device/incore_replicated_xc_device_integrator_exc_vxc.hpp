@@ -114,7 +114,7 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
   const bool is_rks = (Ps != nullptr) and (not is_uks and not is_gks and not is_dks);
 
   const auto& basis = this->load_balancer_->basis();
-  std::cout<<"eval_exc_vxc_"<<std::endl;
+  // std::cout<<"eval_exc_vxc_"<<std::endl;
   // Check that P / VXC are sane
   const int64_t nbf = basis.nbf();
   if( m != n ) 
@@ -156,7 +156,7 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
 
   // Temporary electron count to judge integrator accuracy
   value_type N_EL;
-  std::cout<<"N_EL "<<N_EL<<std::endl;
+  // std::cout<<"N_EL "<<N_EL<<std::endl;
   if( this->reduction_driver_->takes_device_memory() ) {
 
     // If we can do reductions on the device (e.g. NCCL)
@@ -198,7 +198,7 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
       vxc_z_device = device_data_ptr->vxc_z_device_data();
       if( is_dks ) {
         // DKS
-        std::cout<<"DKS reduction"<<std::endl;
+        // std::cout<<"DKS reduction"<<std::endl;
         vxc_y_device = device_data_ptr->vxc_y_device_data();
         vxc_x_device = device_data_ptr->vxc_x_device_data();
 
@@ -262,7 +262,7 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
         this->reduction_driver_->allreduce_inplace( nel_device, 1,       ReductionOp::Sum, queue );
       });
     }
-    std::cout<<"about to retrieve data to host"<<std::endl;
+    // std::cout<<"about to retrieve data to host"<<std::endl;
     // Retrieve data to host
     this->timer_.time_op("XCIntegrator.DeviceToHostCopy_EXC_VXC",[&](){
       device_data_ptr->retrieve_exc_vxc_integrands( EXC, &N_EL, VXCs, ldvxcs, VXCz, ldvxcz,
@@ -275,7 +275,7 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
 
     
   } else {
-    std::cout<<"// Compute local contributions to EXC/VXC and retrieve data from device "<<std::endl;
+    // std::cout<<"// Compute local contributions to EXC/VXC and retrieve data from device "<<std::endl;
     // Compute local contributions to EXC/VXC and retrieve
     // data from device 
     this->timer_.time_op("XCIntegrator.LocalWork_EXC_VXC", [&](){
@@ -311,7 +311,7 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
       });
     } else {
       if( is_dks ) {
-        std::cout<<"DKS reduction"<<std::endl;
+        // std::cout<<"DKS reduction"<<std::endl;
         this->timer_.time_op("XCIntegrator.Allreduce_EXC_VXC", [&](){
           this->reduction_driver_->allreduce_inplace( VXCs, nbf*nbf, ReductionOp::Sum );
           this->reduction_driver_->allreduce_inplace( VXCz, nbf*nbf, ReductionOp::Sum );
@@ -384,15 +384,15 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
   if (not is_rks and not is_uks and not is_gks and not is_dks) {
     GAUXC_GENERIC_EXCEPTION("MUST BE EITHER RKS, UKS, GKS, or DKS!");
   }
-  std::cout<<"exc_vxc_local_work_"<<std::endl;
-  std::cout<<"rks uks gks dks "<<is_rks<<" "<<is_uks<<" "<<is_gks<<" "<<is_dks<<std::endl;
+  // std::cout<<"exc_vxc_local_work_"<<std::endl;
+  // std::cout<<"rks uks gks dks "<<is_rks<<" "<<is_uks<<" "<<is_gks<<" "<<is_dks<<std::endl;
   // Cast LWD to LocalDeviceWorkDriver
   auto* lwd = dynamic_cast<LocalDeviceWorkDriver*>(this->local_work_driver_.get() );
 
   // Setup Aliases
   const auto& func  = *this->func_;
   const auto& mol   = this->load_balancer_->molecule();
-  std::cout<<"lda gga mgga "<<func.is_lda()<<" "<<func.is_gga()<<" "<<func.is_mgga()<<std::endl;
+  // std::cout<<"lda gga mgga "<<func.is_lda()<<" "<<func.is_gga()<<" "<<func.is_mgga()<<std::endl;
 
   if( func.is_mgga() and is_gks ) GAUXC_GENERIC_EXCEPTION("GKS mGGAs NYI!");
   if( func.is_mgga() and is_dks ) GAUXC_GENERIC_EXCEPTION("DKS mGGAs NYI!");
@@ -460,7 +460,7 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
       device_data.generate_buffers( enabled_terms, basis_map, task_it, task_end );
 
     /*** Process the batches ***/
-    std::cout<<"exc_vxc_local_work_"<<std::endl;
+    // std::cout<<"exc_vxc_local_work_"<<std::endl;
     const bool need_lapl = func.needs_laplacian();
     // Evaluate collocation
     if( is_dks ){
@@ -508,19 +508,19 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
         do_xmat_vvar_dks(DEN_X);
     }
 
-    std::cout<<"// Evaluate U variables"<<std::endl;
+    // std::cout<<"// Evaluate U variables"<<std::endl;
     // Evaluate U variables
     if( func.is_mgga() )      lwd->eval_uvars_mgga( &device_data, enabled_terms.ks_scheme, need_lapl );
     else if( func.is_gga() )  lwd->eval_uvars_gga ( &device_data, enabled_terms.ks_scheme );
     else                      lwd->eval_uvars_lda ( &device_data, enabled_terms.ks_scheme );
 
-    std::cout<<"// Evaluate XC functional"<<std::endl;
+    // std::cout<<"// Evaluate XC functional"<<std::endl;
     // Evaluate XC functional
     if( func.is_mgga() )     lwd->eval_kern_exc_vxc_mgga( func, &device_data );
     else if( func.is_gga() ) lwd->eval_kern_exc_vxc_gga ( func, &device_data );
     else                     lwd->eval_kern_exc_vxc_lda ( func, &device_data );
     
-    std::cout<<"// Do scalar EXC/N_EL integrations"<<std::endl;
+    // std::cout<<"// Do scalar EXC/N_EL integrations"<<std::endl;
     // Do scalar EXC/N_EL integrations
     lwd->inc_exc( &device_data );
     lwd->inc_nel( &device_data );
@@ -543,23 +543,23 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
        lwd->inc_vxc_dks( &device_data, den_id, func.is_mgga() );
      } 
   };
-  std::cout<<"do_zmat_vxc(DEN_S);"<<std::endl;
+  // std::cout<<"do_zmat_vxc(DEN_S);"<<std::endl;
   do_zmat_vxc(DEN_S);
-  std::cout<<"do_vxc_ss(DEN_S_SS);"<<std::endl;
+  // std::cout<<"do_vxc_ss(DEN_S_SS);"<<std::endl;
   if(is_dks){do_vxc_ss(DEN_S_SS);}
   if(not is_rks) {
-    std::cout<<"do_zmat_vxc(DEN_Z);"<<std::endl;
+    // std::cout<<"do_zmat_vxc(DEN_Z);"<<std::endl;
     do_zmat_vxc(DEN_Z);
-    std::cout<<"do_vxc_ss(DEN_Z_SS);"<<std::endl;
+    // std::cout<<"do_vxc_ss(DEN_Z_SS);"<<std::endl;
     if(is_dks){do_vxc_ss(DEN_Z_SS);}
     if(not is_uks) {
-      std::cout<<"do_zmat_vxc(DEN_Y);"<<std::endl;
+      // std::cout<<"do_zmat_vxc(DEN_Y);"<<std::endl;
       do_zmat_vxc(DEN_Y);
-      std::cout<<"do_vxc_ss(DEN_Y_SS);"<<std::endl;
+      // std::cout<<"do_vxc_ss(DEN_Y_SS);"<<std::endl;
       if(is_dks){do_vxc_ss(DEN_Y_SS);}
-      std::cout<<"do_zmat_vxc(DEN_X);"<<std::endl;
+      // std::cout<<"do_zmat_vxc(DEN_X);"<<std::endl;
       do_zmat_vxc(DEN_X);
-      std::cout<<"do_vxc_ss(DEN_X_SS);"<<std::endl;
+      // std::cout<<"do_vxc_ss(DEN_X_SS);"<<std::endl;
       if(is_dks){do_vxc_ss(DEN_X_SS);}
     }
   } 
@@ -613,7 +613,7 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
                             value_type* VXCx_SS_im, int64_t ldvxcx_ss_im, value_type* EXC, value_type *N_EL,
                             host_task_iterator task_begin, host_task_iterator task_end,
                             XCDeviceData& device_data ) {
-  std::cout<<"exc_vxc_local_work_ with VXCsss"<<std::endl;
+  // std::cout<<"exc_vxc_local_work_ with VXCsss"<<std::endl;
   // Get integrate and keep data on device
   const bool do_vxc = VXCs;
   exc_vxc_local_work_( basis, Ps, ldps, Pz, ldpz, Py, ldpy, Px, ldpx, 
@@ -622,7 +622,7 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
                             task_begin, task_end, device_data, do_vxc );
   auto rt  = detail::as_device_runtime(this->load_balancer_->runtime());
   rt.device_backend()->master_queue_synchronize();
-    std::cout<<"about to // Receive XC terms from host"<<std::endl;
+    // std::cout<<"about to // Receive XC terms from host"<<std::endl;
   // Receive XC terms from host
   this->timer_.time_op("XCIntegrator.DeviceToHostCopy_EXC_VXC",[&](){
     device_data.retrieve_exc_vxc_integrands( EXC, N_EL, VXCs, ldvxcs, VXCz, ldvxcz, VXCy, ldvxcy, VXCx, ldvxcx,
