@@ -21,25 +21,59 @@ namespace detail {
 
 template <typename ValueType>
 void IncoreReplicatedXCDeviceIntegrator<ValueType>::
-  eval_exc_vxc_( int64_t m, int64_t n, const value_type* P,
-                 int64_t ldp, value_type* VXC, int64_t ldvxc,
-                 value_type* EXC, const IntegratorSettingsXC& settings ) {
-  eval_exc_vxc_( m, n, P, ldp, nullptr, 0, nullptr, 0, nullptr, 0, 
-                      VXC, ldvxc, nullptr, 0, nullptr, 0, nullptr, 0, EXC, settings );
+  eval_exc_vxc_( int64_t m, int64_t n, 
+                 const value_type* P, int64_t ldp,
+                 value_type* VXC, int64_t ldvxc,
+                 value_type* EXC, const IntegratorSettingsXC& ks_settings) {
+
+  eval_exc_vxc_(m, n, P, ldp, nullptr, 0, nullptr, 0, nullptr, 0,
+    nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0,
+    nullptr, nullptr, nullptr, nullptr, 
+    VXC, ldvxc, nullptr, 0, nullptr, 0, nullptr, 0,
+    nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0,
+    nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0,
+    EXC, ks_settings );
 }
 
 
 template <typename ValueType>
 void IncoreReplicatedXCDeviceIntegrator<ValueType>::
-  eval_exc_vxc_( int64_t m, int64_t n, const value_type* Ps,
-                      int64_t ldps,
-                      const value_type* Pz,
-                      int64_t ldpz,
-                      value_type* VXCs, int64_t ldvxcs,
-                      value_type* VXCz, int64_t ldvxcz,
-                      value_type* EXC, const IntegratorSettingsXC& settings ) { 
-  eval_exc_vxc_( m, n, Ps, ldps, Pz, ldpz, nullptr, 0, nullptr, 0, 
-                VXCs, ldvxcs, VXCz, ldvxcz, nullptr, 0, nullptr, 0, EXC, settings );
+  eval_exc_vxc_( int64_t m, int64_t n, 
+                 const value_type* Ps, int64_t ldps,
+                 const value_type* Pz, int64_t ldpz,
+                 value_type* VXCs, int64_t ldvxcs,
+                 value_type* VXCz, int64_t ldvxcz,
+                 value_type* EXC, const IntegratorSettingsXC& ks_settings) {
+
+  eval_exc_vxc_(m, n, Ps, ldps, Pz, ldpz, nullptr, 0, nullptr, 0,
+    nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0,
+    nullptr, nullptr, nullptr, nullptr, 
+    VXCs, ldvxcs, VXCz, ldvxcz, nullptr, 0, nullptr, 0,
+    nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0,
+    nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0,
+    EXC, ks_settings );
+}
+
+template <typename ValueType>
+void IncoreReplicatedXCDeviceIntegrator<ValueType>::
+  eval_exc_vxc_( int64_t m, int64_t n, 
+                 const value_type* Ps, int64_t ldps,
+                 const value_type* Pz, int64_t ldpz,
+                 const value_type* Py, int64_t ldpy,
+                 const value_type* Px, int64_t ldpx,
+                 value_type* VXCs, int64_t ldvxcs,
+                 value_type* VXCz, int64_t ldvxcz,
+                 value_type* VXCy, int64_t ldvxcy,
+                 value_type* VXCx, int64_t ldvxcx,
+                 value_type* EXC, const IntegratorSettingsXC& ks_settings ) {
+
+  eval_exc_vxc_(m, n, Ps, ldps, Pz, ldpz, Py, ldpy, Px, ldpx,
+    nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0,
+    nullptr, nullptr, nullptr, nullptr, 
+    VXCs, ldvxcs, VXCz, ldvxcz, VXCy, ldvxcy, VXCx, ldvxcx,
+    nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0,
+    nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0,
+    EXC, ks_settings );
 }
 
 template <typename ValueType>
@@ -52,17 +86,35 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
                       int64_t ldpy,
                       const value_type* Px,
                       int64_t ldpx,
+                      const value_type* Ps_SS, int64_t ldps_ss,
+                      const value_type* Pz_SS, int64_t ldpz_ss,
+                      const value_type* Py_SS, int64_t ldpy_ss,
+                      const value_type* Px_SS, int64_t ldpx_ss,
+                      const value_type* Ps_SS_imag,
+                      const value_type* Pz_SS_imag,
+                      const value_type* Py_SS_imag,
+                      const value_type* Px_SS_imag,
                       value_type* VXCs, int64_t ldvxcs,
                       value_type* VXCz, int64_t ldvxcz,
                       value_type* VXCy, int64_t ldvxcy,
                       value_type* VXCx, int64_t ldvxcx,
+                      value_type* VXCs_SS, int64_t ldvxcs_ss,
+                      value_type* VXCz_SS, int64_t ldvxcz_ss,
+                      value_type* VXCy_SS, int64_t ldvxcy_ss,
+                      value_type* VXCx_SS, int64_t ldvxcx_ss,
+                      value_type* VXCs_SS_im, int64_t ldvxcs_ss_im,
+                      value_type* VXCz_SS_im, int64_t ldvxcz_ss_im,
+                      value_type* VXCy_SS_im, int64_t ldvxcy_ss_im,
+                      value_type* VXCx_SS_im, int64_t ldvxcx_ss_im,
                       value_type* EXC, const IntegratorSettingsXC& settings ) {
-  const bool is_gks = (Pz != nullptr) and (Py != nullptr) and (Px != nullptr);
-  const bool is_uks = (Pz != nullptr) and (Py == nullptr) and (Px == nullptr);
-  const bool is_rks = (Ps != nullptr) and (not is_uks and not is_gks);
+
+  const bool is_dks = (Pz != nullptr) and (Py != nullptr) and (Px != nullptr) and (Ps_SS != nullptr);
+  const bool is_gks = (Pz != nullptr) and (Py != nullptr) and (Px != nullptr) and (Ps_SS == nullptr);
+  const bool is_uks = (Pz != nullptr) and (Py == nullptr) and (Px == nullptr) and (Ps_SS == nullptr);
+  const bool is_rks = (Ps != nullptr) and (not is_uks and not is_gks and not is_dks);
 
   const auto& basis = this->load_balancer_->basis();
-
+  std::cout<<"eval_exc_vxc_"<<std::endl;
   // Check that P / VXC are sane
   const int64_t nbf = basis.nbf();
   if( m != n ) 
@@ -104,14 +156,16 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
 
   // Temporary electron count to judge integrator accuracy
   value_type N_EL;
-
+  std::cout<<"N_EL "<<N_EL<<std::endl;
   if( this->reduction_driver_->takes_device_memory() ) {
 
     // If we can do reductions on the device (e.g. NCCL)
     // Don't communicate data back to the host before reduction
     this->timer_.time_op("XCIntegrator.LocalWork_EXC_VXC", [&](){
-      exc_vxc_local_work_( basis, Ps, ldps, Pz, ldpz, Py, ldpy, Px, ldpx, tasks.begin(), tasks.end(), 
-        *device_data_ptr, true);
+      exc_vxc_local_work_( basis, Ps, ldps, Pz, ldpz, Py, ldpy, Px, ldpx, 
+                         Ps_SS, ldps_ss, Pz_SS, ldpz_ss, Py_SS, ldpy_ss, Px_SS, ldpx_ss, 
+                         Ps_SS_imag, Pz_SS_imag, Py_SS_imag, Px_SS_imag, 
+                         tasks.begin(), tasks.end(), *device_data_ptr, true );
     });
 
     GAUXC_MPI_CODE(
@@ -125,13 +179,60 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
     double* vxc_z_device;
     double* vxc_y_device;
     double* vxc_x_device;
+
+    double* vxc_s_ss_device;
+    double* vxc_z_ss_device;
+    double* vxc_y_ss_device;
+    double* vxc_x_ss_device;
+
+    double* vxc_s_ss_im_device;
+    double* vxc_z_ss_im_device;
+    double* vxc_y_ss_im_device;
+    double* vxc_x_ss_im_device;
+
     auto exc_device = device_data_ptr->exc_device_data();
     auto nel_device = device_data_ptr->nel_device_data();
     auto queue      = device_data_ptr->queue();
     
     if( not is_rks ) {
       vxc_z_device = device_data_ptr->vxc_z_device_data();
-      if( is_gks ) {
+      if( is_dks ) {
+        // DKS
+        std::cout<<"DKS reduction"<<std::endl;
+        vxc_y_device = device_data_ptr->vxc_y_device_data();
+        vxc_x_device = device_data_ptr->vxc_x_device_data();
+
+        vxc_s_ss_device = device_data_ptr->vxc_s_ss_device_data();
+        vxc_z_ss_device = device_data_ptr->vxc_z_ss_device_data();
+        vxc_y_ss_device = device_data_ptr->vxc_y_ss_device_data();
+        vxc_x_ss_device = device_data_ptr->vxc_x_ss_device_data();
+
+        vxc_s_ss_im_device = device_data_ptr->vxc_s_ss_im_device_data();
+        vxc_z_ss_im_device = device_data_ptr->vxc_z_ss_im_device_data();
+        vxc_y_ss_im_device = device_data_ptr->vxc_y_ss_im_device_data();
+        vxc_x_ss_im_device = device_data_ptr->vxc_x_ss_im_device_data();
+
+        this->timer_.time_op("XCIntegrator.Allreduce_EXC_VXC", [&](){
+          this->reduction_driver_->allreduce_inplace( vxc_s_device, nbf*nbf, ReductionOp::Sum, queue );
+          this->reduction_driver_->allreduce_inplace( vxc_z_device, nbf*nbf, ReductionOp::Sum, queue );
+          this->reduction_driver_->allreduce_inplace( vxc_y_device, nbf*nbf, ReductionOp::Sum, queue );
+          this->reduction_driver_->allreduce_inplace( vxc_x_device, nbf*nbf, ReductionOp::Sum, queue );
+
+          this->reduction_driver_->allreduce_inplace( vxc_s_ss_device, nbf*nbf, ReductionOp::Sum, queue );
+          this->reduction_driver_->allreduce_inplace( vxc_z_ss_device, nbf*nbf, ReductionOp::Sum, queue );
+          this->reduction_driver_->allreduce_inplace( vxc_y_ss_device, nbf*nbf, ReductionOp::Sum, queue );
+          this->reduction_driver_->allreduce_inplace( vxc_x_ss_device, nbf*nbf, ReductionOp::Sum, queue );
+
+          this->reduction_driver_->allreduce_inplace( vxc_s_ss_im_device, nbf*nbf, ReductionOp::Sum, queue );
+          this->reduction_driver_->allreduce_inplace( vxc_z_ss_im_device, nbf*nbf, ReductionOp::Sum, queue );
+          this->reduction_driver_->allreduce_inplace( vxc_y_ss_im_device, nbf*nbf, ReductionOp::Sum, queue );
+          this->reduction_driver_->allreduce_inplace( vxc_x_ss_im_device, nbf*nbf, ReductionOp::Sum, queue );
+
+          this->reduction_driver_->allreduce_inplace( exc_device, 1,       ReductionOp::Sum, queue );
+          this->reduction_driver_->allreduce_inplace( nel_device, 1,       ReductionOp::Sum, queue );
+        });
+      }
+      else if( is_gks ) {
         // GKS
         vxc_y_device = device_data_ptr->vxc_y_device_data();
         vxc_x_device = device_data_ptr->vxc_x_device_data();
@@ -161,23 +262,38 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
         this->reduction_driver_->allreduce_inplace( nel_device, 1,       ReductionOp::Sum, queue );
       });
     }
-
-
+    std::cout<<"about to retrieve data to host"<<std::endl;
     // Retrieve data to host
     this->timer_.time_op("XCIntegrator.DeviceToHostCopy_EXC_VXC",[&](){
       device_data_ptr->retrieve_exc_vxc_integrands( EXC, &N_EL, VXCs, ldvxcs, VXCz, ldvxcz,
-                                                                VXCy, ldvxcy, VXCx, ldvxcx );
+                                                                VXCy, ldvxcy, VXCx, ldvxcx,
+                                                                VXCs_SS, ldvxcs_ss, VXCz_SS, ldvxcz_ss,
+                                                                VXCy_SS, ldvxcy_ss, VXCx_SS, ldvxcx_ss,
+                                                                VXCs_SS_im, ldvxcs_ss_im, VXCz_SS_im, ldvxcz_ss_im,
+                                                                VXCy_SS_im, ldvxcy_ss_im, VXCx_SS_im, ldvxcx_ss_im   );
     });
 
-
+    
   } else {
-
+    std::cout<<"// Compute local contributions to EXC/VXC and retrieve data from device "<<std::endl;
     // Compute local contributions to EXC/VXC and retrieve
     // data from device 
     this->timer_.time_op("XCIntegrator.LocalWork_EXC_VXC", [&](){
-      exc_vxc_local_work_( basis, Ps, ldps, Pz, ldpz, Py, ldpy, Px, ldpx,
-                                VXCs, ldvxcs, VXCz, ldvxcz, VXCy, ldvxcy, VXCx, ldvxcx, EXC, 
-                              &N_EL, tasks.begin(), tasks.end(), *device_data_ptr);
+      // exc_vxc_local_work_( basis, Ps, ldps, Pz, ldpz, Py, ldpy, Px, ldpx,
+      //                           VXCs, ldvxcs, VXCz, ldvxcz, VXCy, ldvxcy, VXCx, ldvxcx, EXC, 
+      //                         &N_EL, tasks.begin(), tasks.end(), *device_data_ptr);
+
+      exc_vxc_local_work_( basis, Ps, ldps, Pz, ldpz, Py, ldpy, Px, ldpx, 
+                         Ps_SS, ldps_ss, Pz_SS, ldpz_ss, Py_SS, ldpy_ss, Px_SS, ldpx_ss, 
+                         Ps_SS_imag, Pz_SS_imag, Py_SS_imag, Px_SS_imag, 
+                         VXCs, ldvxcs, VXCz, ldvxcz,
+                         VXCy, ldvxcy, VXCx, ldvxcx,
+                         VXCs_SS, ldvxcs_ss, VXCz_SS, ldvxcz_ss,
+                         VXCy_SS, ldvxcy_ss, VXCx_SS, ldvxcx_ss,
+                         VXCs_SS_im, ldvxcs_ss_im, VXCz_SS_im, ldvxcz_ss_im,
+                         VXCy_SS_im, ldvxcy_ss_im, VXCx_SS_im, ldvxcx_ss_im,
+                         EXC, &N_EL,
+                         tasks.begin(), tasks.end(), *device_data_ptr );
     });
 
     GAUXC_MPI_CODE(
@@ -194,7 +310,29 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
         this->reduction_driver_->allreduce_inplace( &N_EL, 1,       ReductionOp::Sum );
       });
     } else {
-      if( is_gks ) {
+      if( is_dks ) {
+        std::cout<<"DKS reduction"<<std::endl;
+        this->timer_.time_op("XCIntegrator.Allreduce_EXC_VXC", [&](){
+          this->reduction_driver_->allreduce_inplace( VXCs, nbf*nbf, ReductionOp::Sum );
+          this->reduction_driver_->allreduce_inplace( VXCz, nbf*nbf, ReductionOp::Sum );
+          this->reduction_driver_->allreduce_inplace( VXCy, nbf*nbf, ReductionOp::Sum );
+          this->reduction_driver_->allreduce_inplace( VXCx, nbf*nbf, ReductionOp::Sum );
+
+          this->reduction_driver_->allreduce_inplace( VXCs_SS, nbf*nbf, ReductionOp::Sum );
+          this->reduction_driver_->allreduce_inplace( VXCz_SS, nbf*nbf, ReductionOp::Sum );
+          this->reduction_driver_->allreduce_inplace( VXCy_SS, nbf*nbf, ReductionOp::Sum );
+          this->reduction_driver_->allreduce_inplace( VXCx_SS, nbf*nbf, ReductionOp::Sum );
+
+          this->reduction_driver_->allreduce_inplace( VXCs_SS_im, nbf*nbf, ReductionOp::Sum );
+          this->reduction_driver_->allreduce_inplace( VXCz_SS_im, nbf*nbf, ReductionOp::Sum );
+          this->reduction_driver_->allreduce_inplace( VXCy_SS_im, nbf*nbf, ReductionOp::Sum );
+          this->reduction_driver_->allreduce_inplace( VXCx_SS_im, nbf*nbf, ReductionOp::Sum );
+
+          this->reduction_driver_->allreduce_inplace( EXC, 1,       ReductionOp::Sum );
+          this->reduction_driver_->allreduce_inplace( &N_EL, 1,       ReductionOp::Sum );
+        });
+      }
+      else if( is_gks ) {
         this->timer_.time_op("XCIntegrator.Allreduce_EXC_VXC", [&](){
           this->reduction_driver_->allreduce_inplace( VXCs, nbf*nbf, ReductionOp::Sum );
           this->reduction_driver_->allreduce_inplace( VXCz, nbf*nbf, ReductionOp::Sum );
@@ -224,24 +362,40 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
                             const value_type* Pz, int64_t ldpz,
                             const value_type* Py, int64_t ldpy,
                             const value_type* Px, int64_t ldpx,
+                            const value_type* Ps_SS, int64_t ldps_ss,
+                            const value_type* Pz_SS, int64_t ldpz_ss,
+                            const value_type* Py_SS, int64_t ldpy_ss,
+                            const value_type* Px_SS, int64_t ldpx_ss,
+                            const value_type* Ps_SS_imag, 
+                            const value_type* Pz_SS_imag, 
+                            const value_type* Py_SS_imag,
+                            const value_type* Px_SS_imag,
                             host_task_iterator task_begin, host_task_iterator task_end,
                             XCDeviceData& device_data, bool do_vxc ) {
-  const bool is_gks = (Pz != nullptr) and (Py != nullptr) and (Px != nullptr);
-  const bool is_uks = (Pz != nullptr) and (Py == nullptr) and (Px == nullptr);
-  const bool is_rks = (Ps != nullptr) and (not is_uks and not is_gks);
-  if (not is_rks and not is_uks and not is_gks) {
-    GAUXC_GENERIC_EXCEPTION("MUST BE EITHER RKS, UKS, or GKS!");
-  }
-  
 
+  const bool is_dks = (Pz != nullptr) and (Py != nullptr) and (Px != nullptr) and (Ps_SS != nullptr);
+  const bool is_gks = (Pz != nullptr) and (Py != nullptr) and (Px != nullptr) and (Ps_SS == nullptr);
+  const bool is_uks = (Pz != nullptr) and (Py == nullptr) and (Px == nullptr) and (Ps_SS == nullptr);
+  const bool is_rks = (Ps != nullptr) and (not is_uks and not is_gks and not is_dks);
+
+  // const bool is_gks = (Pz != nullptr) and (Py != nullptr) and (Px != nullptr);
+  // const bool is_uks = (Pz != nullptr) and (Py == nullptr) and (Px == nullptr);
+  // const bool is_rks = (Ps != nullptr) and (not is_uks and not is_gks);
+  if (not is_rks and not is_uks and not is_gks and not is_dks) {
+    GAUXC_GENERIC_EXCEPTION("MUST BE EITHER RKS, UKS, GKS, or DKS!");
+  }
+  std::cout<<"exc_vxc_local_work_"<<std::endl;
+  std::cout<<"rks uks gks dks "<<is_rks<<" "<<is_uks<<" "<<is_gks<<" "<<is_dks<<std::endl;
   // Cast LWD to LocalDeviceWorkDriver
   auto* lwd = dynamic_cast<LocalDeviceWorkDriver*>(this->local_work_driver_.get() );
 
   // Setup Aliases
   const auto& func  = *this->func_;
   const auto& mol   = this->load_balancer_->molecule();
+  std::cout<<"lda gga mgga "<<func.is_lda()<<" "<<func.is_gga()<<" "<<func.is_mgga()<<std::endl;
 
   if( func.is_mgga() and is_gks ) GAUXC_GENERIC_EXCEPTION("GKS mGGAs NYI!");
+  if( func.is_mgga() and is_dks ) GAUXC_GENERIC_EXCEPTION("DKS mGGAs NYI!");
 
   // Get basis map
   BasisSetMap basis_map(basis,mol);
@@ -270,6 +424,7 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
   if (is_rks) enabled_terms.ks_scheme = RKS;
   else if (is_uks) enabled_terms.ks_scheme = UKS;
   else if (is_gks) enabled_terms.ks_scheme = GKS;
+  else if (is_dks) enabled_terms.ks_scheme = DKS;
 
   if( func.is_lda() )      
     enabled_terms.xc_approx = integrator_xc_approx::LDA; 
@@ -286,7 +441,10 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
   device_data.reset_allocations();
   device_data.allocate_static_data_exc_vxc( nbf, nshells, enabled_terms, do_vxc );
   
-  device_data.send_static_data_density_basis( Ps, ldps, Pz, ldpz, Px, ldpx, Py, ldpy, basis );
+  // device_data.send_static_data_density_basis( Ps, ldps, Pz, ldpz, Px, ldpx, Py, ldpy, basis );
+  device_data.send_static_data_density_basis( Ps, ldps, Pz, ldpz, Py, ldpy, Px, ldpx,
+                                              Ps_SS, ldps, Pz_SS, ldpz, Py_SS, ldpy, Px_SS, ldpx,
+                                              Ps_SS_imag, ldps, Pz_SS_imag, ldpz, Py_SS_imag, ldpy, Px_SS_imag, ldpx, basis );
 
 
 
@@ -302,48 +460,67 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
       device_data.generate_buffers( enabled_terms, basis_map, task_it, task_end );
 
     /*** Process the batches ***/
-    
+    std::cout<<"exc_vxc_local_work_"<<std::endl;
     const bool need_lapl = func.needs_laplacian();
     // Evaluate collocation
-    if( func.is_mgga() ) {
-      if(need_lapl) lwd->eval_collocation_laplacian( &device_data );
-      else          lwd->eval_collocation_gradient( &device_data );
+    if( is_dks ){
+      if( func.is_gga() ) lwd->eval_collocation_hessian( &device_data );
+      else                lwd->eval_collocation_gradient( &device_data );
+    } else {
+      if( func.is_mgga() ) {
+        if(need_lapl) lwd->eval_collocation_laplacian( &device_data );
+        else          lwd->eval_collocation_gradient( &device_data );
+      }
+      else if( func.is_gga() ) lwd->eval_collocation_gradient( &device_data );
+      else                     lwd->eval_collocation( &device_data );
     }
-    else if( func.is_gga() ) lwd->eval_collocation_gradient( &device_data );
-    else                     lwd->eval_collocation( &device_data );
-      
     const double xmat_fac = is_rks ? 2.0 : 1.0;
     const bool need_xmat_grad = func.is_mgga();
 
     // Evaluate X matrix and V vars
     auto do_xmat_vvar = [&](density_id den_id) {
       lwd->eval_xmat( xmat_fac, &device_data, need_xmat_grad, den_id );
-      if(func.is_lda())      lwd->eval_vvars_lda( &device_data, den_id );
-      else if(func.is_gga()) lwd->eval_vvars_gga( &device_data, den_id ); 
-      else                   lwd->eval_vvars_mgga( &device_data, den_id, need_lapl );
+      if(func.is_lda())      lwd->eval_vvars_lda( &device_data, enabled_terms.ks_scheme, den_id );
+      else if(func.is_gga()) lwd->eval_vvars_gga( &device_data, enabled_terms.ks_scheme, den_id ); 
+      else                   lwd->eval_vvars_mgga( &device_data, enabled_terms.ks_scheme, den_id, need_lapl );
     };
 
-    do_xmat_vvar(DEN_S);
-    if (not is_rks) {
-      do_xmat_vvar(DEN_Z);
-      if (not is_uks) {
-        do_xmat_vvar(DEN_Y);
-        do_xmat_vvar(DEN_X);
-      }
+    auto do_xmat_vvar_dks = [&](density_id den_id) {
+      lwd->eval_xmat_dks( xmat_fac, &device_data, need_xmat_grad, den_id );
+      if(func.is_lda())      lwd->eval_vvars_lda( &device_data, enabled_terms.ks_scheme, den_id );
+      else if(func.is_gga()) lwd->eval_vvars_gga( &device_data, enabled_terms.ks_scheme, den_id ); 
+      else                   lwd->eval_vvars_mgga( &device_data, enabled_terms.ks_scheme, den_id, need_lapl );
+    };
+
+    if (not is_dks) {
+      do_xmat_vvar(DEN_S);
+      if (not is_rks) {
+        do_xmat_vvar(DEN_Z);
+        if (not is_uks) {
+          do_xmat_vvar(DEN_Y);
+          do_xmat_vvar(DEN_X);
+        }
+      } 
+    } else {
+        do_xmat_vvar_dks(DEN_S);
+        do_xmat_vvar_dks(DEN_Z);
+        do_xmat_vvar_dks(DEN_Y);
+        do_xmat_vvar_dks(DEN_X);
     }
 
-
+    std::cout<<"// Evaluate U variables"<<std::endl;
     // Evaluate U variables
     if( func.is_mgga() )      lwd->eval_uvars_mgga( &device_data, enabled_terms.ks_scheme, need_lapl );
     else if( func.is_gga() )  lwd->eval_uvars_gga ( &device_data, enabled_terms.ks_scheme );
     else                      lwd->eval_uvars_lda ( &device_data, enabled_terms.ks_scheme );
 
+    std::cout<<"// Evaluate XC functional"<<std::endl;
     // Evaluate XC functional
     if( func.is_mgga() )     lwd->eval_kern_exc_vxc_mgga( func, &device_data );
     else if( func.is_gga() ) lwd->eval_kern_exc_vxc_gga ( func, &device_data );
     else                     lwd->eval_kern_exc_vxc_lda ( func, &device_data );
     
-
+    std::cout<<"// Do scalar EXC/N_EL integrations"<<std::endl;
     // Do scalar EXC/N_EL integrations
     lwd->inc_exc( &device_data );
     lwd->inc_nel( &device_data );
@@ -358,15 +535,32 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
        lwd->eval_zmat_gga_vxc( &device_data, enabled_terms.ks_scheme, den_id );
      else 
        lwd->eval_zmat_lda_vxc( &device_data, enabled_terms.ks_scheme, den_id );
-     lwd->inc_vxc( &device_data, den_id, func.is_mgga() );
+       
+      lwd->inc_vxc( &device_data, den_id, func.is_mgga() );
   };
-
+  auto do_vxc_ss = [&](density_id den_id) {
+    if( is_dks ){
+       lwd->inc_vxc_dks( &device_data, den_id, func.is_mgga() );
+     } 
+  };
+  std::cout<<"do_zmat_vxc(DEN_S);"<<std::endl;
   do_zmat_vxc(DEN_S);
+  std::cout<<"do_vxc_ss(DEN_S_SS);"<<std::endl;
+  if(is_dks){do_vxc_ss(DEN_S_SS);}
   if(not is_rks) {
+    std::cout<<"do_zmat_vxc(DEN_Z);"<<std::endl;
     do_zmat_vxc(DEN_Z);
+    std::cout<<"do_vxc_ss(DEN_Z_SS);"<<std::endl;
+    if(is_dks){do_vxc_ss(DEN_Z_SS);}
     if(not is_uks) {
+      std::cout<<"do_zmat_vxc(DEN_Y);"<<std::endl;
       do_zmat_vxc(DEN_Y);
+      std::cout<<"do_vxc_ss(DEN_Y_SS);"<<std::endl;
+      if(is_dks){do_vxc_ss(DEN_Y_SS);}
+      std::cout<<"do_zmat_vxc(DEN_X);"<<std::endl;
       do_zmat_vxc(DEN_X);
+      std::cout<<"do_vxc_ss(DEN_X_SS);"<<std::endl;
+      if(is_dks){do_vxc_ss(DEN_X_SS);}
     }
   } 
 
@@ -380,6 +574,12 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
       if (not is_uks) {
         lwd->symmetrize_vxc( &device_data, DEN_Y );
         lwd->symmetrize_vxc( &device_data, DEN_X );
+        if (not is_gks) {
+          lwd->symmetrize_vxc( &device_data, DEN_S_SS );
+          lwd->symmetrize_vxc( &device_data, DEN_Z_SS );
+          lwd->symmetrize_vxc( &device_data, DEN_Y_SS );
+          lwd->symmetrize_vxc( &device_data, DEN_X_SS );
+        }
       }
     }
   }
@@ -390,23 +590,46 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
   exc_vxc_local_work_( const basis_type& basis, const value_type* Ps, int64_t ldps,
                             const value_type* Pz, int64_t ldpz,
                             const value_type* Py, int64_t ldpy,
-                            const value_type* Px, int64_t ldpx,   
+                            const value_type* Px, int64_t ldpx,
+                            const value_type* Ps_SS, int64_t ldps_ss,
+                            const value_type* Pz_SS, int64_t ldpz_ss,
+                            const value_type* Py_SS, int64_t ldpy_ss,
+                            const value_type* Px_SS, int64_t ldpx_ss,
+                            const value_type* Ps_SS_imag, 
+                            const value_type* Pz_SS_imag, 
+                            const value_type* Py_SS_imag,
+                            const value_type* Px_SS_imag,  
                             value_type* VXCs, int64_t ldvxcs,
                             value_type* VXCz, int64_t ldvxcz,
                             value_type* VXCy, int64_t ldvxcy,
-                            value_type* VXCx, int64_t ldvxcx, value_type* EXC, value_type *N_EL,
+                            value_type* VXCx, int64_t ldvxcx,
+                            value_type* VXCs_SS, int64_t ldvxcs_ss,
+                            value_type* VXCz_SS, int64_t ldvxcz_ss,
+                            value_type* VXCy_SS, int64_t ldvxcy_ss,
+                            value_type* VXCx_SS, int64_t ldvxcx_ss,
+                            value_type* VXCs_SS_im, int64_t ldvxcs_ss_im,
+                            value_type* VXCz_SS_im, int64_t ldvxcz_ss_im,
+                            value_type* VXCy_SS_im, int64_t ldvxcy_ss_im,
+                            value_type* VXCx_SS_im, int64_t ldvxcx_ss_im, value_type* EXC, value_type *N_EL,
                             host_task_iterator task_begin, host_task_iterator task_end,
                             XCDeviceData& device_data ) {
-  
+  std::cout<<"exc_vxc_local_work_ with VXCsss"<<std::endl;
   // Get integrate and keep data on device
   const bool do_vxc = VXCs;
-  exc_vxc_local_work_( basis, Ps, ldps, Pz, ldpz, Py, ldpy, Px, ldpx, task_begin, task_end, device_data, do_vxc );
+  exc_vxc_local_work_( basis, Ps, ldps, Pz, ldpz, Py, ldpy, Px, ldpx, 
+                            Ps_SS, ldps_ss, Pz_SS, ldpz_ss, Py_SS, ldpy_ss, Px_SS, ldpx_ss,
+                            Ps_SS_imag, Pz_SS_imag, Py_SS_imag, Px_SS_imag,
+                            task_begin, task_end, device_data, do_vxc );
   auto rt  = detail::as_device_runtime(this->load_balancer_->runtime());
   rt.device_backend()->master_queue_synchronize();
-
+    std::cout<<"about to // Receive XC terms from host"<<std::endl;
   // Receive XC terms from host
   this->timer_.time_op("XCIntegrator.DeviceToHostCopy_EXC_VXC",[&](){
-    device_data.retrieve_exc_vxc_integrands( EXC, N_EL, VXCs, ldvxcs, VXCz, ldvxcz, VXCy, ldvxcy, VXCx, ldvxcx ); 
+    device_data.retrieve_exc_vxc_integrands( EXC, N_EL, VXCs, ldvxcs, VXCz, ldvxcz, VXCy, ldvxcy, VXCx, ldvxcx,
+                                                                VXCs_SS, ldvxcs_ss, VXCz_SS, ldvxcz_ss,
+                                                                VXCy_SS, ldvxcy_ss, VXCx_SS, ldvxcx_ss,
+                                                                VXCs_SS_im, ldvxcs_ss_im, VXCz_SS_im, ldvxcz_ss_im,
+                                                                VXCy_SS_im, ldvxcy_ss_im, VXCx_SS_im, ldvxcx_ss_im   ); 
   });
 
 }

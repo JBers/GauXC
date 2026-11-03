@@ -27,16 +27,16 @@ struct AoSScheme1Base : public detail::LocalDeviceWorkDriverPIMPL {
   void eval_uvars_lda( XCDeviceData*, integrator_ks_scheme ) override final;
   void eval_uvars_gga( XCDeviceData*, integrator_ks_scheme ) override final;
   void eval_uvars_mgga( XCDeviceData*, integrator_ks_scheme, bool ) override final;
-  void eval_vvars_lda ( XCDeviceData*, density_id ) override final;
-  void eval_vvars_gga ( XCDeviceData*, density_id ) override final;
-  void eval_vvars_mgga( XCDeviceData*, density_id, bool ) override final;
+  void eval_vvars_lda ( XCDeviceData*, integrator_ks_scheme, density_id ) override final;
+  void eval_vvars_gga ( XCDeviceData*, integrator_ks_scheme, density_id ) override final;
+  void eval_vvars_mgga( XCDeviceData*, integrator_ks_scheme,density_id, bool ) override final;
 
   void eval_tmat_lda( XCDeviceData*, integrator_ks_scheme ) override final;
   void eval_tmat_gga( XCDeviceData*, integrator_ks_scheme ) override final;
   void eval_tmat_mgga( XCDeviceData*, integrator_ks_scheme, bool ) override final;
-  void eval_vvars_lda_trial ( XCDeviceData*, density_id ) override final;
-  void eval_vvars_gga_trial ( XCDeviceData*, density_id ) override final;
-  void eval_vvars_mgga_trial( XCDeviceData*, density_id, bool ) override final;
+  void eval_vvars_lda_trial ( XCDeviceData*, integrator_ks_scheme, density_id ) override final;
+  void eval_vvars_gga_trial ( XCDeviceData*, integrator_ks_scheme, density_id ) override final;
+  void eval_vvars_mgga_trial( XCDeviceData*, integrator_ks_scheme, density_id, bool ) override final;
 
   void eval_zmat_lda_vxc( XCDeviceData*, integrator_ks_scheme, density_id ) override final;
   void eval_zmat_gga_vxc( XCDeviceData*, integrator_ks_scheme, density_id ) override final;
@@ -77,13 +77,20 @@ struct AoSScheme1Base : public detail::LocalDeviceWorkDriverPIMPL {
   // Overridable APIs
   template<bool is_trial>
   void eval_xmat_impl(double fac, XCDeviceData*, bool do_grad, density_id );
+  template<bool is_trial>
+  void eval_xmat_dks_impl(double fac, XCDeviceData*, bool do_grad, density_id );
   template<bool is_fxc>
   void inc_potential_impl(XCDeviceData*, density_id, bool do_m);
+  template<bool is_fxc>
+  void inc_potential_dks_impl(XCDeviceData*, density_id, bool do_m);
   virtual void eval_xmat( double fac, XCDeviceData*, bool , density_id ) override;
   virtual void eval_xmat_trial( double fac, XCDeviceData*, bool , density_id ) override;
+  virtual void eval_xmat_dks( double fac, XCDeviceData*, bool , density_id ) override;
   virtual void eval_exx_fmat( XCDeviceData* ) override;
   virtual void inc_vxc( XCDeviceData*, density_id, bool ) override;
   virtual void inc_fxc( XCDeviceData*, density_id, bool ) override;
+  virtual void inc_vxc_dks( XCDeviceData*, density_id, bool ) override;
+  virtual void inc_fxc_dks( XCDeviceData*, density_id, bool ) override;
   virtual void inc_exx_k( XCDeviceData* ) override;
 
 

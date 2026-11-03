@@ -68,22 +68,23 @@ public:
   void eval_collocation_laplacian( XCDeviceData* );
   void eval_collocation_lapgrad( XCDeviceData* );
   void eval_xmat( double fac, XCDeviceData*, bool do_grad, density_id den );
+  void eval_xmat_dks( double fac, XCDeviceData*, bool do_grad, density_id den );
   void eval_xmat_trial( double fac, XCDeviceData*, bool do_grad, density_id den );
   void save_xmat( XCDeviceData*, bool grad, density_id den );
   
   void eval_uvars_lda ( XCDeviceData*, integrator_ks_scheme ) ;
   void eval_uvars_gga ( XCDeviceData*, integrator_ks_scheme ) ;
   void eval_uvars_mgga( XCDeviceData*, integrator_ks_scheme, bool ) ;
-  void eval_vvars_lda ( XCDeviceData*, density_id ) ;
-  void eval_vvars_gga ( XCDeviceData*, density_id ) ;
-  void eval_vvars_mgga( XCDeviceData*, density_id, bool ) ;
+  void eval_vvars_lda ( XCDeviceData*, integrator_ks_scheme, density_id ) ;
+  void eval_vvars_gga ( XCDeviceData*, integrator_ks_scheme, density_id ) ;
+  void eval_vvars_mgga( XCDeviceData*, integrator_ks_scheme, density_id, bool ) ;
 
   void eval_tmat_lda ( XCDeviceData*, integrator_ks_scheme ) ;
   void eval_tmat_gga ( XCDeviceData*, integrator_ks_scheme ) ;
   void eval_tmat_mgga( XCDeviceData*, integrator_ks_scheme, bool ) ;
-  void eval_vvars_lda_trial ( XCDeviceData*, density_id ) ;
-  void eval_vvars_gga_trial ( XCDeviceData*, density_id ) ;
-  void eval_vvars_mgga_trial( XCDeviceData*, density_id, bool ) ;
+  void eval_vvars_lda_trial ( XCDeviceData*, integrator_ks_scheme, density_id ) ;
+  void eval_vvars_gga_trial ( XCDeviceData*, integrator_ks_scheme, density_id ) ;
+  void eval_vvars_mgga_trial( XCDeviceData*, integrator_ks_scheme, density_id, bool ) ;
 
 
   void eval_kern_exc_vxc_lda( const functional_type&, XCDeviceData* );
@@ -111,6 +112,8 @@ public:
   void inc_nel( XCDeviceData* );
   void inc_vxc( XCDeviceData*, density_id, bool do_m = false );
   void inc_fxc( XCDeviceData*, density_id, bool do_m = false );
+  void inc_vxc_dks( XCDeviceData*, density_id, bool do_m = false );
+  void inc_fxc_dks( XCDeviceData*, density_id, bool do_m = false );
   void inc_exc_grad_lda( XCDeviceData*, integrator_ks_scheme, bool );
   void inc_exc_grad_gga( XCDeviceData*, integrator_ks_scheme, bool );
   void inc_exc_grad_mgga( XCDeviceData*, integrator_ks_scheme , bool, bool );

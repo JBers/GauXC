@@ -35,15 +35,24 @@ enum integrator_ks_scheme : uint32_t {
   _UNDEF_SCHEME             = 0,
   RKS                       = 1,
   UKS                       = 2,
-  GKS                       = 3
+  GKS                       = 3,
+  DKS                       = 4
 };
 
 enum density_id : uint32_t {
   _UNDEF_DEN      = 0,
-  DEN_S           = 1,    // RKS, UKS, GKS
-  DEN_Z           = 2,    // UKS, GKS
-  DEN_Y           = 3,    // GKS
-  DEN_X           = 4     // GKS
+  DEN_S           = 1,    // RKS, UKS, GKS, DKS
+  DEN_Z           = 2,    // UKS, GKS, DKS
+  DEN_Y           = 3,    // GKS, DKS
+  DEN_X           = 4,    // GKS, DKS
+  DEN_S_SS        = 5,    // DKS
+  DEN_Z_SS        = 6,    // DKS
+  DEN_Y_SS        = 7,    // DKS
+  DEN_X_SS        = 8,    // DKS
+  DEN_S_SS_IM     = 9,    // DKS
+  DEN_Z_SS_IM     = 10,   // DKS
+  DEN_Y_SS_IM     = 11,   // DKS
+  DEN_X_SS_IM     = 12,   // DKS
 };
 
 struct integrator_term_tracker {
@@ -117,7 +126,8 @@ struct required_term_storage {
       // 2*npts for S,Z densities, 2*npts for interleaved density
       if( ref_tracker.ks_scheme == UKS ) return 4*npts;
       // Same as above, but also X,Y densities
-      if( ref_tracker.ks_scheme == GKS ) return 6*npts;  
+      if( ref_tracker.ks_scheme == GKS 
+       or ref_tracker.ks_scheme == DKS) return 6*npts;  
     }
     return 0ul;
   }
@@ -126,7 +136,8 @@ struct required_term_storage {
       // 3*npts for each density in play
       if( ref_tracker.ks_scheme == RKS ) return 3*npts;
       if( ref_tracker.ks_scheme == UKS ) return 6*npts;
-      if( ref_tracker.ks_scheme == GKS ) return 12*npts;
+      if( ref_tracker.ks_scheme == GKS
+       or ref_tracker.ks_scheme == DKS ) return 12*npts;
     }
     return 0ul;
   }
@@ -134,7 +145,8 @@ struct required_term_storage {
     if( grid_gamma ) {
       if(  ref_tracker.ks_scheme == RKS ) return npts;
       if(  ref_tracker.ks_scheme == UKS 
-        or ref_tracker.ks_scheme == GKS ) return 6*npts;
+        or ref_tracker.ks_scheme == GKS
+        or ref_tracker.ks_scheme == DKS ) return 6*npts;
     }
     return 0ul;
   }
@@ -169,7 +181,8 @@ struct required_term_storage {
     if( grid_vrho ) {
       if(   ref_tracker.ks_scheme == RKS ) return npts;
       if(   ref_tracker.ks_scheme == UKS 
-        or  ref_tracker.ks_scheme == GKS ) return 4*npts;
+        or  ref_tracker.ks_scheme == GKS
+        or  ref_tracker.ks_scheme == DKS ) return 4*npts;
     }
     return 0ul;
   }
@@ -177,12 +190,14 @@ struct required_term_storage {
     if( grid_vgamma ) {
       if(   ref_tracker.ks_scheme == RKS ) return npts;
       if(   ref_tracker.ks_scheme == UKS 
-        or  ref_tracker.ks_scheme == GKS ) return 6*npts;
+        or  ref_tracker.ks_scheme == GKS
+        or  ref_tracker.ks_scheme == DKS ) return 6*npts;
     }
     return 0ul;
   }
   inline size_t grid_HK_size(size_t npts){
-    if( ref_tracker.ks_scheme == GKS ) {
+    if( ref_tracker.ks_scheme == GKS 
+     or ref_tracker.ks_scheme == DKS ) {
       if( ref_tracker.xc_approx == GGA ) return 6*npts;
       if( ref_tracker.xc_approx == LDA ) return 3*npts;
     }
@@ -371,6 +386,7 @@ struct required_term_storage {
   bool task_zmat          = false;
   bool task_xmat          = false;
   bool task_xmat_grad     = false;
+  bool task_xmat_dks      = false;
   bool task_xmat_persist  = false;
   bool task_fmat          = false;
   bool task_gmat          = false;
@@ -398,6 +414,9 @@ struct required_term_storage {
   }
   inline size_t task_xmat_grad_size(size_t nbe, size_t npts) {
     return PRDVL(task_xmat_grad, 3 * nbe * npts);
+  }
+  inline size_t task_xmat_dks_size(size_t nbe, size_t npts) {
+    return PRDVL(task_xmat_dks, 6 * nbe * npts);
   }
   inline size_t task_xmat_persist_size(size_t nbe, size_t npts) {
     // TODO Make this more robust
@@ -538,6 +557,7 @@ struct required_term_storage {
       const bool is_mgga = is_xc and (need_tau or need_lapl);
       const bool is_grad = tracker.exc_grad;
       const bool is_rks  = tracker.ks_scheme == RKS;
+      const bool is_dks  = tracker.ks_scheme == DKS;
 
       grid_den      = true;
       grid_den_grad = is_gga or is_mgga or is_grad;
@@ -551,13 +571,14 @@ struct required_term_storage {
       grid_vlapl    = need_lapl;
 
       task_bfn          = true;
-      task_bfn_grad     = is_gga or  is_mgga or is_grad;
-      task_bfn_hess     = (is_gga or is_mgga) and is_grad;
+      task_bfn_grad     = is_gga or  is_mgga or is_grad or is_dks;
+      task_bfn_hess     = ((is_gga or is_mgga) and is_grad) or (is_dks and is_gga);
       task_bfn_lapl     = need_lapl;
       task_bfn_lapgrad  = need_lapl and is_grad;
       task_zmat         = true;
       task_xmat         = true;
-      task_xmat_grad    = is_mgga or (is_gga and is_grad);
+      task_xmat_grad    = is_mgga or (is_gga and is_grad) or is_dks;
+      task_xmat_dks     = is_dks;
       task_xmat_persist = is_grad and not is_rks;
       task_nbe_scr      = true;
 
@@ -685,9 +706,14 @@ struct XCDeviceData {
 
   // Send persistent data from host to device
   virtual void send_static_data_weights( const Molecule& mol, const MolMeta& meta ) = 0;
-  virtual void send_static_data_density_basis( const double* Ps, int32_t ldps, 
-    const double* Pz, int32_t ldpz, const double* Py, int32_t ldpy, 
-    const double* Px, int32_t ldpx, const BasisSet<double>& basis ) = 0;
+  virtual void send_static_data_density_basis(
+    const double* Ps, int32_t ldps, const double* Pz, int32_t ldpz,
+    const double* Py, int32_t ldpy, const double* Px, int32_t ldpx,
+    const double* Ps_SS, int32_t ldps_ss, const double* Pz_SS, int32_t ldpz_ss,
+    const double* Py_SS, int32_t ldpy_ss, const double* Px_SS, int32_t ldpx_ss,
+    const double* Ps_SS_imag, int32_t ldps_ss_im, const double* Pz_SS_imag, int32_t ldpz_ss_im,
+    const double* Py_SS_imag, int32_t ldpy_ss_im, const double* Px_SS_imag, int32_t ldpx_ss_im,
+    const BasisSet<double>& basis ) = 0;
   virtual void send_static_data_trial_density(
     const double* tPs, int32_t ldtps, const double* tPz, int32_t ldtpz,
     const double* tPy, int32_t ldtpy, const double* tPx, int32_t ldtpx ) = 0;
@@ -740,7 +766,13 @@ struct XCDeviceData {
    */
   virtual void retrieve_exc_vxc_integrands( double* EXC, double* N_EL,
     double* VXCs, int32_t ldvxcs, double* VXCz, int32_t ldvxcz,
-    double* VXCy, int32_t ldvxcy, double* VXCx, int32_t ldvxcx ) = 0;
+    double* VXCy, int32_t ldvxcy, double* VXCx, int32_t ldvxcx,
+
+    double* VXCs_ss, int32_t ldvxcs_ss, double* VXCz_ss, int32_t ldvxcz_ss,
+    double* VXCy_ss, int32_t ldvxcy_ss, double* VXCx_ss, int32_t ldvxcx_ss,
+
+    double* VXCs_ss_im, int32_t ldvxcs_ss_im, double* VXCz_ss_im, int32_t ldvxcz_ss_im,
+    double* VXCy_ss_im, int32_t ldvxcy_ss_im, double* VXCx_ss_im, int32_t ldvxcx_ss_im ) = 0;
 
   virtual void retrieve_fxc_contraction_integrands( double* N_EL,
     double* FXCs, int32_t ldfxcs, double* FXCz, int32_t ldfxcz,
@@ -772,6 +804,17 @@ struct XCDeviceData {
   virtual double* vxc_s_device_data() = 0;
   virtual double* vxc_y_device_data() = 0;
   virtual double* vxc_x_device_data() = 0;
+
+  virtual double* vxc_z_ss_device_data() = 0;
+  virtual double* vxc_s_ss_device_data() = 0;
+  virtual double* vxc_y_ss_device_data() = 0;
+  virtual double* vxc_x_ss_device_data() = 0;
+
+  virtual double* vxc_z_ss_im_device_data() = 0;
+  virtual double* vxc_s_ss_im_device_data() = 0;
+  virtual double* vxc_y_ss_im_device_data() = 0;
+  virtual double* vxc_x_ss_im_device_data() = 0;
+
   virtual double* exc_device_data() = 0;
   virtual double* nel_device_data() = 0;
   virtual double* exx_k_device_data() = 0;

@@ -4,7 +4,7 @@ from collocation_angular import generate_spherical_angular, generate_cartesian_a
 
 from io import StringIO
 
-L_max = 4
+L_max = 6
 if len(sys.argv) > 1: L_max = int(sys.argv[1])
 
 #sphr_bf_body = []
@@ -42,7 +42,7 @@ for L in range( L_max + 1 ):
 
 
 
-template_fname = 'templates/collocation_angular_template.hpp'
+template_fname = '../templates/collocation_angular_template.hpp'
 
 #sphr_var_dict = { 'L_max' : L_max, 'body' : sphr_bf_body, 'body_d1' : sphr_bf_d1_body, 'name' : 'spherical' }
 sphr_unnorm_var_dict = { 'L_max' : L_max, 'body' : sphr_unnorm_bf_body, 'body_d1' : sphr_unnorm_bf_d1_body, 'name' : 'spherical_unnorm' }
@@ -90,7 +90,7 @@ for x in sqrt_finds:
 old_sys_out = sys.stdout
 
 sys.stdout = constant_expand = StringIO()
-expander.expandFile( 'templates/collocation_device_constants_template.hpp',
+expander.expandFile( '../templates/collocation_device_constants_template.hpp',
   external_definitions={ "const_lines" : constant_lines } )
 
 sys.stdout = old_sys_out
@@ -98,10 +98,10 @@ sys.stdout = old_sys_out
 constant_expand = constant_expand.getvalue()
 
 
-cart_header_fname = "collocation_angular_cartesian.hpp"
+cart_header_fname = "../collocation_angular_cartesian.hpp"
 #sphr_header_fname = "collocation_angular_spherical.hpp"
-sphr_unnorm_header_fname = "collocation_angular_spherical_unnorm.hpp"
-cons_header_fname = "collocation_device_constants.hpp"
+sphr_unnorm_header_fname = "../collocation_angular_spherical_unnorm.hpp"
+cons_header_fname = "../collocation_device_constants.hpp"
 
 cart_header_file = open( cart_header_fname, 'w' )
 #sphr_header_file = open( sphr_header_fname, 'w' )

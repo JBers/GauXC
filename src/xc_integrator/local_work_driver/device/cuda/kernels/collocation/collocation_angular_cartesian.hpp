@@ -324,6 +324,268 @@ GPGAUEVAL_INLINE __device__ void collocation_cartesian_angular_4_deriv1(
 
 }
 
+template <typename T>
+GPGAUEVAL_INLINE __device__ void collocation_cartesian_angular_5(
+  int32_t          npts,
+  const T          bf,
+  const T          x,
+  const T          y,
+  const T          z,
+  T* __restrict__  eval
+) {
+
+  eval[npts * 0] = bf*x*x*x*x*x;
+  eval[npts * 1] = bf*x*x*x*x*y;
+  eval[npts * 2] = bf*x*x*x*x*z;
+  eval[npts * 3] = bf*x*x*x*y*y;
+  eval[npts * 4] = bf*x*x*x*y*z;
+  eval[npts * 5] = bf*x*x*x*z*z;
+  eval[npts * 6] = bf*x*x*y*y*y;
+  eval[npts * 7] = bf*x*x*y*y*z;
+  eval[npts * 8] = bf*x*x*y*z*z;
+  eval[npts * 9] = bf*x*x*z*z*z;
+  eval[npts * 10] = bf*x*y*y*y*y;
+  eval[npts * 11] = bf*x*y*y*y*z;
+  eval[npts * 12] = bf*x*y*y*z*z;
+  eval[npts * 13] = bf*x*y*z*z*z;
+  eval[npts * 14] = bf*x*z*z*z*z;
+  eval[npts * 15] = bf*y*y*y*y*y;
+  eval[npts * 16] = bf*y*y*y*y*z;
+  eval[npts * 17] = bf*y*y*y*z*z;
+  eval[npts * 18] = bf*y*y*z*z*z;
+  eval[npts * 19] = bf*y*z*z*z*z;
+  eval[npts * 20] = bf*z*z*z*z*z;
+
+}
+
+template <typename T>
+GPGAUEVAL_INLINE __device__ void collocation_cartesian_angular_5_deriv1(
+  const int32_t   npts,
+  const T         bf,
+  const T         bf_x,
+  const T         bf_y,
+  const T         bf_z,
+  const T         x,
+  const T         y,
+  const T         z,
+  T* __restrict__ eval_x,
+  T* __restrict__ eval_y,
+  T* __restrict__ eval_z
+) {
+
+  eval_x[npts * 0] = x*x*x*x*(5*bf + bf_x*x);
+  eval_x[npts * 1] = x*x*x*y*(4*bf + bf_x*x);
+  eval_x[npts * 2] = x*x*x*z*(4*bf + bf_x*x);
+  eval_x[npts * 3] = x*x*y*y*(3*bf + bf_x*x);
+  eval_x[npts * 4] = x*x*y*z*(3*bf + bf_x*x);
+  eval_x[npts * 5] = x*x*z*z*(3*bf + bf_x*x);
+  eval_x[npts * 6] = x*y*y*y*(2*bf + bf_x*x);
+  eval_x[npts * 7] = x*y*y*z*(2*bf + bf_x*x);
+  eval_x[npts * 8] = x*y*z*z*(2*bf + bf_x*x);
+  eval_x[npts * 9] = x*z*z*z*(2*bf + bf_x*x);
+  eval_x[npts * 10] = y*y*y*y*(bf + bf_x*x);
+  eval_x[npts * 11] = y*y*y*z*(bf + bf_x*x);
+  eval_x[npts * 12] = y*y*z*z*(bf + bf_x*x);
+  eval_x[npts * 13] = y*z*z*z*(bf + bf_x*x);
+  eval_x[npts * 14] = z*z*z*z*(bf + bf_x*x);
+  eval_x[npts * 15] = bf_x*y*y*y*y*y;
+  eval_x[npts * 16] = bf_x*y*y*y*y*z;
+  eval_x[npts * 17] = bf_x*y*y*y*z*z;
+  eval_x[npts * 18] = bf_x*y*y*z*z*z;
+  eval_x[npts * 19] = bf_x*y*z*z*z*z;
+  eval_x[npts * 20] = bf_x*z*z*z*z*z;
+
+  eval_y[npts * 0] = bf_y*x*x*x*x*x;
+  eval_y[npts * 1] = x*x*x*x*(bf + bf_y*y);
+  eval_y[npts * 2] = bf_y*x*x*x*x*z;
+  eval_y[npts * 3] = x*x*x*y*(2*bf + bf_y*y);
+  eval_y[npts * 4] = x*x*x*z*(bf + bf_y*y);
+  eval_y[npts * 5] = bf_y*x*x*x*z*z;
+  eval_y[npts * 6] = x*x*y*y*(3*bf + bf_y*y);
+  eval_y[npts * 7] = x*x*y*z*(2*bf + bf_y*y);
+  eval_y[npts * 8] = x*x*z*z*(bf + bf_y*y);
+  eval_y[npts * 9] = bf_y*x*x*z*z*z;
+  eval_y[npts * 10] = x*y*y*y*(4*bf + bf_y*y);
+  eval_y[npts * 11] = x*y*y*z*(3*bf + bf_y*y);
+  eval_y[npts * 12] = x*y*z*z*(2*bf + bf_y*y);
+  eval_y[npts * 13] = x*z*z*z*(bf + bf_y*y);
+  eval_y[npts * 14] = bf_y*x*z*z*z*z;
+  eval_y[npts * 15] = y*y*y*y*(5*bf + bf_y*y);
+  eval_y[npts * 16] = y*y*y*z*(4*bf + bf_y*y);
+  eval_y[npts * 17] = y*y*z*z*(3*bf + bf_y*y);
+  eval_y[npts * 18] = y*z*z*z*(2*bf + bf_y*y);
+  eval_y[npts * 19] = z*z*z*z*(bf + bf_y*y);
+  eval_y[npts * 20] = bf_y*z*z*z*z*z;
+
+  eval_z[npts * 0] = bf_z*x*x*x*x*x;
+  eval_z[npts * 1] = bf_z*x*x*x*x*y;
+  eval_z[npts * 2] = x*x*x*x*(bf + bf_z*z);
+  eval_z[npts * 3] = bf_z*x*x*x*y*y;
+  eval_z[npts * 4] = x*x*x*y*(bf + bf_z*z);
+  eval_z[npts * 5] = x*x*x*z*(2*bf + bf_z*z);
+  eval_z[npts * 6] = bf_z*x*x*y*y*y;
+  eval_z[npts * 7] = x*x*y*y*(bf + bf_z*z);
+  eval_z[npts * 8] = x*x*y*z*(2*bf + bf_z*z);
+  eval_z[npts * 9] = x*x*z*z*(3*bf + bf_z*z);
+  eval_z[npts * 10] = bf_z*x*y*y*y*y;
+  eval_z[npts * 11] = x*y*y*y*(bf + bf_z*z);
+  eval_z[npts * 12] = x*y*y*z*(2*bf + bf_z*z);
+  eval_z[npts * 13] = x*y*z*z*(3*bf + bf_z*z);
+  eval_z[npts * 14] = x*z*z*z*(4*bf + bf_z*z);
+  eval_z[npts * 15] = bf_z*y*y*y*y*y;
+  eval_z[npts * 16] = y*y*y*y*(bf + bf_z*z);
+  eval_z[npts * 17] = y*y*y*z*(2*bf + bf_z*z);
+  eval_z[npts * 18] = y*y*z*z*(3*bf + bf_z*z);
+  eval_z[npts * 19] = y*z*z*z*(4*bf + bf_z*z);
+  eval_z[npts * 20] = z*z*z*z*(5*bf + bf_z*z);
+
+}
+
+template <typename T>
+GPGAUEVAL_INLINE __device__ void collocation_cartesian_angular_6(
+  int32_t          npts,
+  const T          bf,
+  const T          x,
+  const T          y,
+  const T          z,
+  T* __restrict__  eval
+) {
+
+  eval[npts * 0] = bf*x*x*x*x*x*x;
+  eval[npts * 1] = bf*x*x*x*x*x*y;
+  eval[npts * 2] = bf*x*x*x*x*x*z;
+  eval[npts * 3] = bf*x*x*x*x*y*y;
+  eval[npts * 4] = bf*x*x*x*x*y*z;
+  eval[npts * 5] = bf*x*x*x*x*z*z;
+  eval[npts * 6] = bf*x*x*x*y*y*y;
+  eval[npts * 7] = bf*x*x*x*y*y*z;
+  eval[npts * 8] = bf*x*x*x*y*z*z;
+  eval[npts * 9] = bf*x*x*x*z*z*z;
+  eval[npts * 10] = bf*x*x*y*y*y*y;
+  eval[npts * 11] = bf*x*x*y*y*y*z;
+  eval[npts * 12] = bf*x*x*y*y*z*z;
+  eval[npts * 13] = bf*x*x*y*z*z*z;
+  eval[npts * 14] = bf*x*x*z*z*z*z;
+  eval[npts * 15] = bf*x*y*y*y*y*y;
+  eval[npts * 16] = bf*x*y*y*y*y*z;
+  eval[npts * 17] = bf*x*y*y*y*z*z;
+  eval[npts * 18] = bf*x*y*y*z*z*z;
+  eval[npts * 19] = bf*x*y*z*z*z*z;
+  eval[npts * 20] = bf*x*z*z*z*z*z;
+  eval[npts * 21] = bf*y*y*y*y*y*y;
+  eval[npts * 22] = bf*y*y*y*y*y*z;
+  eval[npts * 23] = bf*y*y*y*y*z*z;
+  eval[npts * 24] = bf*y*y*y*z*z*z;
+  eval[npts * 25] = bf*y*y*z*z*z*z;
+  eval[npts * 26] = bf*y*z*z*z*z*z;
+  eval[npts * 27] = bf*z*z*z*z*z*z;
+
+}
+
+template <typename T>
+GPGAUEVAL_INLINE __device__ void collocation_cartesian_angular_6_deriv1(
+  const int32_t   npts,
+  const T         bf,
+  const T         bf_x,
+  const T         bf_y,
+  const T         bf_z,
+  const T         x,
+  const T         y,
+  const T         z,
+  T* __restrict__ eval_x,
+  T* __restrict__ eval_y,
+  T* __restrict__ eval_z
+) {
+
+  eval_x[npts * 0] = x*x*x*x*x*(6*bf + bf_x*x);
+  eval_x[npts * 1] = x*x*x*x*y*(5*bf + bf_x*x);
+  eval_x[npts * 2] = x*x*x*x*z*(5*bf + bf_x*x);
+  eval_x[npts * 3] = x*x*x*y*y*(4*bf + bf_x*x);
+  eval_x[npts * 4] = x*x*x*y*z*(4*bf + bf_x*x);
+  eval_x[npts * 5] = x*x*x*z*z*(4*bf + bf_x*x);
+  eval_x[npts * 6] = x*x*y*y*y*(3*bf + bf_x*x);
+  eval_x[npts * 7] = x*x*y*y*z*(3*bf + bf_x*x);
+  eval_x[npts * 8] = x*x*y*z*z*(3*bf + bf_x*x);
+  eval_x[npts * 9] = x*x*z*z*z*(3*bf + bf_x*x);
+  eval_x[npts * 10] = x*y*y*y*y*(2*bf + bf_x*x);
+  eval_x[npts * 11] = x*y*y*y*z*(2*bf + bf_x*x);
+  eval_x[npts * 12] = x*y*y*z*z*(2*bf + bf_x*x);
+  eval_x[npts * 13] = x*y*z*z*z*(2*bf + bf_x*x);
+  eval_x[npts * 14] = x*z*z*z*z*(2*bf + bf_x*x);
+  eval_x[npts * 15] = y*y*y*y*y*(bf + bf_x*x);
+  eval_x[npts * 16] = y*y*y*y*z*(bf + bf_x*x);
+  eval_x[npts * 17] = y*y*y*z*z*(bf + bf_x*x);
+  eval_x[npts * 18] = y*y*z*z*z*(bf + bf_x*x);
+  eval_x[npts * 19] = y*z*z*z*z*(bf + bf_x*x);
+  eval_x[npts * 20] = z*z*z*z*z*(bf + bf_x*x);
+  eval_x[npts * 21] = bf_x*y*y*y*y*y*y;
+  eval_x[npts * 22] = bf_x*y*y*y*y*y*z;
+  eval_x[npts * 23] = bf_x*y*y*y*y*z*z;
+  eval_x[npts * 24] = bf_x*y*y*y*z*z*z;
+  eval_x[npts * 25] = bf_x*y*y*z*z*z*z;
+  eval_x[npts * 26] = bf_x*y*z*z*z*z*z;
+  eval_x[npts * 27] = bf_x*z*z*z*z*z*z;
+
+  eval_y[npts * 0] = bf_y*x*x*x*x*x*x;
+  eval_y[npts * 1] = x*x*x*x*x*(bf + bf_y*y);
+  eval_y[npts * 2] = bf_y*x*x*x*x*x*z;
+  eval_y[npts * 3] = x*x*x*x*y*(2*bf + bf_y*y);
+  eval_y[npts * 4] = x*x*x*x*z*(bf + bf_y*y);
+  eval_y[npts * 5] = bf_y*x*x*x*x*z*z;
+  eval_y[npts * 6] = x*x*x*y*y*(3*bf + bf_y*y);
+  eval_y[npts * 7] = x*x*x*y*z*(2*bf + bf_y*y);
+  eval_y[npts * 8] = x*x*x*z*z*(bf + bf_y*y);
+  eval_y[npts * 9] = bf_y*x*x*x*z*z*z;
+  eval_y[npts * 10] = x*x*y*y*y*(4*bf + bf_y*y);
+  eval_y[npts * 11] = x*x*y*y*z*(3*bf + bf_y*y);
+  eval_y[npts * 12] = x*x*y*z*z*(2*bf + bf_y*y);
+  eval_y[npts * 13] = x*x*z*z*z*(bf + bf_y*y);
+  eval_y[npts * 14] = bf_y*x*x*z*z*z*z;
+  eval_y[npts * 15] = x*y*y*y*y*(5*bf + bf_y*y);
+  eval_y[npts * 16] = x*y*y*y*z*(4*bf + bf_y*y);
+  eval_y[npts * 17] = x*y*y*z*z*(3*bf + bf_y*y);
+  eval_y[npts * 18] = x*y*z*z*z*(2*bf + bf_y*y);
+  eval_y[npts * 19] = x*z*z*z*z*(bf + bf_y*y);
+  eval_y[npts * 20] = bf_y*x*z*z*z*z*z;
+  eval_y[npts * 21] = y*y*y*y*y*(6*bf + bf_y*y);
+  eval_y[npts * 22] = y*y*y*y*z*(5*bf + bf_y*y);
+  eval_y[npts * 23] = y*y*y*z*z*(4*bf + bf_y*y);
+  eval_y[npts * 24] = y*y*z*z*z*(3*bf + bf_y*y);
+  eval_y[npts * 25] = y*z*z*z*z*(2*bf + bf_y*y);
+  eval_y[npts * 26] = z*z*z*z*z*(bf + bf_y*y);
+  eval_y[npts * 27] = bf_y*z*z*z*z*z*z;
+
+  eval_z[npts * 0] = bf_z*x*x*x*x*x*x;
+  eval_z[npts * 1] = bf_z*x*x*x*x*x*y;
+  eval_z[npts * 2] = x*x*x*x*x*(bf + bf_z*z);
+  eval_z[npts * 3] = bf_z*x*x*x*x*y*y;
+  eval_z[npts * 4] = x*x*x*x*y*(bf + bf_z*z);
+  eval_z[npts * 5] = x*x*x*x*z*(2*bf + bf_z*z);
+  eval_z[npts * 6] = bf_z*x*x*x*y*y*y;
+  eval_z[npts * 7] = x*x*x*y*y*(bf + bf_z*z);
+  eval_z[npts * 8] = x*x*x*y*z*(2*bf + bf_z*z);
+  eval_z[npts * 9] = x*x*x*z*z*(3*bf + bf_z*z);
+  eval_z[npts * 10] = bf_z*x*x*y*y*y*y;
+  eval_z[npts * 11] = x*x*y*y*y*(bf + bf_z*z);
+  eval_z[npts * 12] = x*x*y*y*z*(2*bf + bf_z*z);
+  eval_z[npts * 13] = x*x*y*z*z*(3*bf + bf_z*z);
+  eval_z[npts * 14] = x*x*z*z*z*(4*bf + bf_z*z);
+  eval_z[npts * 15] = bf_z*x*y*y*y*y*y;
+  eval_z[npts * 16] = x*y*y*y*y*(bf + bf_z*z);
+  eval_z[npts * 17] = x*y*y*y*z*(2*bf + bf_z*z);
+  eval_z[npts * 18] = x*y*y*z*z*(3*bf + bf_z*z);
+  eval_z[npts * 19] = x*y*z*z*z*(4*bf + bf_z*z);
+  eval_z[npts * 20] = x*z*z*z*z*(5*bf + bf_z*z);
+  eval_z[npts * 21] = bf_z*y*y*y*y*y*y;
+  eval_z[npts * 22] = y*y*y*y*y*(bf + bf_z*z);
+  eval_z[npts * 23] = y*y*y*y*z*(2*bf + bf_z*z);
+  eval_z[npts * 24] = y*y*y*z*z*(3*bf + bf_z*z);
+  eval_z[npts * 25] = y*y*z*z*z*(4*bf + bf_z*z);
+  eval_z[npts * 26] = y*z*z*z*z*(5*bf + bf_z*z);
+  eval_z[npts * 27] = z*z*z*z*z*(6*bf + bf_z*z);
+
+}
+
 
 template <typename T>
 GPGAUEVAL_INLINE __device__ void collocation_cartesian_angular(
@@ -355,6 +617,14 @@ GPGAUEVAL_INLINE __device__ void collocation_cartesian_angular(
       } else if( l == 4 ) {
   
         collocation_cartesian_angular_4( npts, bf, x, y, z, eval );
+
+      } else if( l == 5 ) {
+  
+        collocation_cartesian_angular_5( npts, bf, x, y, z, eval );
+
+      } else if( l == 6 ) {
+  
+        collocation_cartesian_angular_6( npts, bf, x, y, z, eval );
 
     } else {
       assert( false && "L < L_MAX" );
@@ -405,6 +675,16 @@ GPGAUEVAL_INLINE __device__ void collocation_cartesian_angular_deriv1(
   
         collocation_cartesian_angular_4( npts, bf, x, y, z, eval );
         collocation_cartesian_angular_4_deriv1( npts, bf, bf_x, bf_y, bf_z, x, y, z, eval_x, eval_y, eval_z );
+
+      } else if( l == 5 ) {
+  
+        collocation_cartesian_angular_5( npts, bf, x, y, z, eval );
+        collocation_cartesian_angular_5_deriv1( npts, bf, bf_x, bf_y, bf_z, x, y, z, eval_x, eval_y, eval_z );
+
+      } else if( l == 6 ) {
+  
+        collocation_cartesian_angular_6( npts, bf, x, y, z, eval );
+        collocation_cartesian_angular_6_deriv1( npts, bf, bf_x, bf_y, bf_z, x, y, z, eval_x, eval_y, eval_z );
 
     } else {
       assert( false && "L < L_MAX" );

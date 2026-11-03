@@ -68,6 +68,14 @@ struct XCDeviceAoSData : public XCDeviceStackData {
     double* xmatZ_dy_device = nullptr;
     double* xmatZ_dz_device = nullptr;
 
+    // X mat DKS
+    double * xmat_k_ij_device = nullptr;
+    double * xmat_k_ji_device = nullptr;
+    double * xmat_j_ik_device = nullptr;
+    double * xmat_j_ki_device = nullptr;
+    double * xmat_i_jk_device = nullptr;
+    double * xmat_i_kj_device = nullptr;
+
     // EXX Intermediates
     double* fmat_exx_device = nullptr;
     double* gmat_exx_device = nullptr;

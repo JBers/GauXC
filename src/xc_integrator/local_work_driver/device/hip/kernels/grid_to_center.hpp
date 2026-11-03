@@ -9,6 +9,7 @@
  *
  * See LICENSE.txt for details
  */
+#include "hip/hip_runtime.h"
 #pragma once
 
 namespace GauXC {

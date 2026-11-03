@@ -67,6 +67,9 @@ size_t XCDeviceAoSData::get_mem_req( integrator_term_tracker terms,
     // X Matrix Gradient
     reqt.task_xmat_grad_size( nbe_bfn, npts ) * sizeof(double) +
 
+    // X Matrix DKS
+    reqt.task_xmat_dks_size( nbe_bfn, npts ) * sizeof(double) +
+
     // Persistent X Mat
     reqt.task_xmat_persist_size( nbe_bfn, npts ) * sizeof(double) +
 
@@ -215,6 +218,15 @@ XCDeviceAoSData::device_buffer_t XCDeviceAoSData::allocate_dynamic_stack(
     aos_stack.xmat_dx_device = mem.aligned_alloc<double>( bfn_msz, csl);
     aos_stack.xmat_dy_device = mem.aligned_alloc<double>( bfn_msz, csl);
     aos_stack.xmat_dz_device = mem.aligned_alloc<double>( bfn_msz, csl);
+  }
+
+  if(reqt.task_xmat_dks) {
+    aos_stack.xmat_k_ij_device = mem.aligned_alloc<double>( bfn_msz, csl );
+    aos_stack.xmat_k_ji_device = mem.aligned_alloc<double>( bfn_msz, csl );
+    aos_stack.xmat_j_ik_device = mem.aligned_alloc<double>( bfn_msz, csl );
+    aos_stack.xmat_j_ki_device = mem.aligned_alloc<double>( bfn_msz, csl );
+    aos_stack.xmat_i_jk_device = mem.aligned_alloc<double>( bfn_msz, csl );
+    aos_stack.xmat_i_kj_device = mem.aligned_alloc<double>( bfn_msz, csl );
   }
 
   // Persistent X Matrix Gradient
@@ -514,11 +526,19 @@ void XCDeviceAoSData::pack_and_send(
     buffer_adaptor xmatZ_dx_mem( aos_stack.xmatZ_dx_device, total_nbe_bfn_npts );
     buffer_adaptor xmatZ_dy_mem( aos_stack.xmatZ_dy_device, total_nbe_bfn_npts );
     buffer_adaptor xmatZ_dz_mem( aos_stack.xmatZ_dz_device, total_nbe_bfn_npts );
+
+    buffer_adaptor xmat_k_ij_mem( aos_stack.xmat_k_ij_device, total_nbe_bfn_npts );
+    buffer_adaptor xmat_k_ji_mem( aos_stack.xmat_k_ji_device, total_nbe_bfn_npts );
+    buffer_adaptor xmat_j_ik_mem( aos_stack.xmat_j_ik_device, total_nbe_bfn_npts );
+    buffer_adaptor xmat_j_ki_mem( aos_stack.xmat_j_ki_device, total_nbe_bfn_npts );
+    buffer_adaptor xmat_i_jk_mem( aos_stack.xmat_i_jk_device, total_nbe_bfn_npts );
+    buffer_adaptor xmat_i_kj_mem( aos_stack.xmat_i_kj_device, total_nbe_bfn_npts );
     
     const bool is_rks = terms.ks_scheme == RKS;
     const bool is_uks = terms.ks_scheme == UKS;
     const bool is_gks = terms.ks_scheme == GKS;
-    const bool is_pol  = is_uks or is_gks;
+    const bool is_dks = terms.ks_scheme == DKS;
+    const bool is_pol  = is_uks or is_gks or is_dks;
     const bool is_gga = terms.xc_approx == GGA;
     const int den_fac   = is_pol ? 2 : 1;
     const int gamma_fac = is_pol ? 3 : 1;
@@ -755,6 +775,16 @@ void XCDeviceAoSData::pack_and_send(
         task.xmat_z = xmat_dz_mem.aligned_alloc<double>( nbe_bfn * npts, csl);
       }
 
+      // X Matrix DKS
+      if( reqt.task_xmat_dks ) {
+        task.xmat_k_ij = xmat_k_ij_mem.aligned_alloc<double>( nbe_bfn * npts, csl);
+        task.xmat_k_ji = xmat_k_ji_mem.aligned_alloc<double>( nbe_bfn * npts, csl);
+        task.xmat_j_ik = xmat_j_ik_mem.aligned_alloc<double>( nbe_bfn * npts, csl);
+        task.xmat_j_ki = xmat_j_ki_mem.aligned_alloc<double>( nbe_bfn * npts, csl);
+        task.xmat_i_jk = xmat_i_jk_mem.aligned_alloc<double>( nbe_bfn * npts, csl);
+        task.xmat_i_kj = xmat_i_kj_mem.aligned_alloc<double>( nbe_bfn * npts, csl);
+      }
+
       // Persistent X matrix
       if( reqt.task_xmat_persist ) {
         task.xmatS   = xmatS_mem.aligned_alloc<double>( nbe_bfn * npts, csl);
@@ -777,7 +807,7 @@ void XCDeviceAoSData::pack_and_send(
         if(is_pol) {
           task.den          = den_interleaved_mem.aligned_alloc<double>(npts*2, csl); //Interleaved memory
           task.den_z        = den_z_mem.aligned_alloc<double>( npts, csl);
-          if ( is_gks ) {
+          if ( is_gks or is_dks ) {
             task.den_y        = den_y_mem.aligned_alloc<double>( npts, csl);
             task.den_x        = den_x_mem.aligned_alloc<double>( npts, csl);
           }
@@ -792,7 +822,7 @@ void XCDeviceAoSData::pack_and_send(
           task.dden_zx    = dden_zx_mem.aligned_alloc<double>( npts, csl );
           task.dden_zy    = dden_zy_mem.aligned_alloc<double>( npts, csl );
           task.dden_zz    = dden_zz_mem.aligned_alloc<double>( npts, csl );
-          if( is_gks ) {
+          if( is_gks or is_dks ) {
             task.dden_yx    = dden_yx_mem.aligned_alloc<double>( npts, csl );
             task.dden_yy    = dden_yy_mem.aligned_alloc<double>( npts, csl );
             task.dden_yz    = dden_yz_mem.aligned_alloc<double>( npts, csl );
@@ -868,7 +898,7 @@ void XCDeviceAoSData::pack_and_send(
 
       
       // H, K terms (GKS)
-      if( is_gks ) {
+      if( is_gks or is_dks ) {
         task.K_x    = K_x_mem.aligned_alloc<double>( npts, csl );
         task.K_y    = K_y_mem.aligned_alloc<double>( npts, csl );
         task.K_z    = K_z_mem.aligned_alloc<double>( npts, csl );
@@ -898,7 +928,7 @@ void XCDeviceAoSData::pack_and_send(
           task.tden_s = tden_s_mem.aligned_alloc<double>( npts, csl );
           if(is_pol) {
             task.tden_z = tden_z_mem.aligned_alloc<double>( npts, csl );
-            if(is_gks) {
+            if(is_gks or is_dks ) {
               task.tden_y = tden_y_mem.aligned_alloc<double>( npts, csl );
               task.tden_x = tden_x_mem.aligned_alloc<double>( npts, csl );
             }
@@ -913,7 +943,7 @@ void XCDeviceAoSData::pack_and_send(
             task.tdden_zx = tdden_zx_mem.aligned_alloc<double>( npts, csl );
             task.tdden_zy = tdden_zy_mem.aligned_alloc<double>( npts, csl );
             task.tdden_zz = tdden_zz_mem.aligned_alloc<double>( npts, csl );
-            if(is_gks) {
+            if(is_gks or is_dks ) {
               task.tdden_yx = tdden_yx_mem.aligned_alloc<double>( npts, csl );
               task.tdden_yy = tdden_yy_mem.aligned_alloc<double>( npts, csl );
               task.tdden_yz = tdden_yz_mem.aligned_alloc<double>( npts, csl );

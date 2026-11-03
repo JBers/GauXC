@@ -20,12 +20,16 @@ target_sources(gauxc PRIVATE
   kernels/hip_ssf_1d.hip
   kernels/hip_ssh_2d.hip
   #cuda_aos_scheme1_weights.cu # cuda_ssf_2d w/ CudaAoSScheme1 constants
+  hip_aos_scheme1_weights.hip
   kernels/pack_submat.hip
   kernels/hipblas_extensions.hip
   kernels/uvvars.hip
   kernels/zmat_vxc.hip
+  kernels/zmat_fxc.hip
   kernels/hip_inc_potential.hip
   kernels/symmetrize_mat.hip
+  kernels/increment_exc_grad.hip
+  kernels/exx_ek_screening_bfn_stats.hip
 
 )
 

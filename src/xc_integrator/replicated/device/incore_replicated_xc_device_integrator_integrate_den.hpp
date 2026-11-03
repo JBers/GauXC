@@ -107,7 +107,9 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
   const auto nshells = basis.nshells();
   device_data.reset_allocations();
   device_data.allocate_static_data_den( nbf, nshells );
-  device_data.send_static_data_density_basis( P, ldp, nullptr, 0, nullptr, 0, nullptr, 0,  basis );
+  device_data.send_static_data_density_basis( P, ldp, nullptr, 0, nullptr, 0, nullptr, 0, 
+    nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0,
+    nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, basis );
 
   // Zero integrands
   device_data.zero_den_integrands();
@@ -134,7 +136,7 @@ void IncoreReplicatedXCDeviceIntegrator<ValueType>::
 
     // Evaluate the density
     const bool do_vvar_grad = false;
-    lwd->eval_vvars_lda( &device_data, DEN_S );
+    lwd->eval_vvars_lda( &device_data, enabled_terms.ks_scheme, DEN_S );
 
     // Do scalar N_EL integration
     lwd->inc_nel( &device_data );

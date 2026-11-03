@@ -83,6 +83,11 @@ void LocalDeviceWorkDriver::NAME( XCDeviceData* device_data, integrator_ks_schem
   throw_if_invalid_pimpl(pimpl_);                               \
   pimpl_->NAME(device_data, track, b, den);                               \
 }
+#define FWD_TO_PIMPL_KS_SCHEME_DEN_ID_BOOL(NAME) \
+void LocalDeviceWorkDriver::NAME( XCDeviceData* device_data, integrator_ks_scheme track, density_id den, bool b ) { \
+  throw_if_invalid_pimpl(pimpl_);                               \
+  pimpl_->NAME(device_data, track, den, b);                               \
+}
 
 FWD_TO_PIMPL(partition_weights)         // Partition weights
 
@@ -96,16 +101,16 @@ FWD_TO_PIMPL(eval_collocation_lapgrad)  // Collocation Laplacian gradient
 FWD_TO_PIMPL_KS_SCHEME(eval_uvars_lda)            // U variables LDA (rho)
 FWD_TO_PIMPL_KS_SCHEME(eval_uvars_gga)            // U variables GGA (gamma)
 FWD_TO_PIMPL_KS_SCHEME_BOOL(eval_uvars_mgga)      // U variables MGGA (tau, lapl)
-FWD_TO_PIMPL_DEN_ID(eval_vvars_lda)               // V variables LDA (density)
-FWD_TO_PIMPL_DEN_ID(eval_vvars_gga)               // V variables GGA (density + grad)
-FWD_TO_PIMPL_DEN_ID_BOOL(eval_vvars_mgga)         // V variables MGGA (density + grad + tau + lapl)
+FWD_TO_PIMPL_KS_SCHEME_DEN_ID(eval_vvars_lda)               // V variables LDA (density)
+FWD_TO_PIMPL_KS_SCHEME_DEN_ID(eval_vvars_gga)               // V variables GGA (density + grad)
+FWD_TO_PIMPL_KS_SCHEME_DEN_ID_BOOL(eval_vvars_mgga)         // V variables MGGA (density + grad + tau + lapl)
 
 FWD_TO_PIMPL_KS_SCHEME(eval_tmat_lda)            // T variables LDA (trho)
 FWD_TO_PIMPL_KS_SCHEME(eval_tmat_gga)            // T variables GGA (tgamma)
 FWD_TO_PIMPL_KS_SCHEME_BOOL(eval_tmat_mgga)      // T variables MGGA (ttau, tlapl)
-FWD_TO_PIMPL_DEN_ID(eval_vvars_lda_trial)               // V variables LDA (trial density)
-FWD_TO_PIMPL_DEN_ID(eval_vvars_gga_trial)               // V variables GGA (trial density + grad)
-FWD_TO_PIMPL_DEN_ID_BOOL(eval_vvars_mgga_trial)         // V variables MGGA (trial density + grad + tau + lapl)
+FWD_TO_PIMPL_KS_SCHEME_DEN_ID(eval_vvars_lda_trial)               // V variables LDA (trial density)
+FWD_TO_PIMPL_KS_SCHEME_DEN_ID(eval_vvars_gga_trial)               // V variables GGA (trial density + grad)
+FWD_TO_PIMPL_KS_SCHEME_DEN_ID_BOOL(eval_vvars_mgga_trial)         // V variables MGGA (trial density + grad + tau + lapl)
 
 FWD_TO_PIMPL_KS_SCHEME_DEN_ID(eval_zmat_lda_vxc)         // Eval Z Matrix LDA VXC
 FWD_TO_PIMPL_KS_SCHEME_DEN_ID(eval_zmat_gga_vxc)         // Eval Z Matrix GGA VXC
@@ -126,6 +131,9 @@ FWD_TO_PIMPL(inc_exc)
 FWD_TO_PIMPL(inc_nel)
 FWD_TO_PIMPL_DEN_ID_BOOL(inc_vxc)            // Increment VXC_I by Z
 FWD_TO_PIMPL_DEN_ID_BOOL(inc_fxc)            // Increment FXC_I by Z
+
+FWD_TO_PIMPL_DEN_ID_BOOL(inc_vxc_dks)            // Increment VXC_I by Z
+FWD_TO_PIMPL_DEN_ID_BOOL(inc_fxc_dks)            // Increment FXC_I by Z
 
 FWD_TO_PIMPL(inc_exx_k)     
 FWD_TO_PIMPL_KS_SCHEME_BOOL(inc_exc_grad_lda)
@@ -151,6 +159,10 @@ void LocalDeviceWorkDriver::save_xmat( XCDeviceData* device_data, bool do_grad, 
 void LocalDeviceWorkDriver::eval_xmat_trial( double fac, XCDeviceData* device_data, bool do_grad, density_id den ) {
   throw_if_invalid_pimpl(pimpl_);
   pimpl_->eval_xmat_trial(fac, device_data, do_grad, den);
+}
+void LocalDeviceWorkDriver::eval_xmat_dks( double fac, XCDeviceData* device_data, bool do_grad, density_id den ) {
+  throw_if_invalid_pimpl(pimpl_);
+  pimpl_->eval_xmat_dks(fac, device_data, do_grad, den);
 }
 
 void LocalDeviceWorkDriver::eval_exx_gmat( XCDeviceData* device_data, 

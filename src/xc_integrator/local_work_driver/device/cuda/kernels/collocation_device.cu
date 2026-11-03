@@ -21,7 +21,7 @@
 
 #include "device_specific/cuda_device_constants.hpp"
 
-#define GAUXC_CUDA_MAX_L 4
+#define GAUXC_CUDA_MAX_L 6
 
 namespace GauXC {
 
@@ -260,7 +260,9 @@ uint32_t max_threads_shell_to_task_collocation( int32_t l, bool pure ) {
       case 2: return util::cuda_kernel_max_threads_per_block( collocation_device_shell_to_task_kernel_spherical_2 );      
       case 3: return util::cuda_kernel_max_threads_per_block( collocation_device_shell_to_task_kernel_spherical_3 );      
       case 4: return util::cuda_kernel_max_threads_per_block( collocation_device_shell_to_task_kernel_spherical_4 );      
-      default: GAUXC_GENERIC_EXCEPTION("CUDA L_MAX = 4");
+      case 5: return util::cuda_kernel_max_threads_per_block( collocation_device_shell_to_task_kernel_spherical_5 );      
+      case 6: return util::cuda_kernel_max_threads_per_block( collocation_device_shell_to_task_kernel_spherical_6 );      
+      default: GAUXC_GENERIC_EXCEPTION("CUDA L_MAX = 6");
     }
   } else {
     switch(l) {
@@ -270,7 +272,9 @@ uint32_t max_threads_shell_to_task_collocation( int32_t l, bool pure ) {
       case 2: return util::cuda_kernel_max_threads_per_block( collocation_device_shell_to_task_kernel_cartesian_2 );      
       case 3: return util::cuda_kernel_max_threads_per_block( collocation_device_shell_to_task_kernel_cartesian_3 );      
       case 4: return util::cuda_kernel_max_threads_per_block( collocation_device_shell_to_task_kernel_cartesian_4 );      
-      default: GAUXC_GENERIC_EXCEPTION("CUDA L_MAX = 4");
+      case 5: return util::cuda_kernel_max_threads_per_block( collocation_device_shell_to_task_kernel_cartesian_5 );      
+      case 6: return util::cuda_kernel_max_threads_per_block( collocation_device_shell_to_task_kernel_cartesian_6 );      
+      default: GAUXC_GENERIC_EXCEPTION("CUDA L_MAX = 6");
     }
   }
   return 0;
@@ -302,7 +306,13 @@ void dispatch_shell_to_task_collocation( cudaStream_t stream, int32_t l,
       case 4:
         collocation_device_shell_to_task_kernel_spherical_4<<<block,threads,0,stream>>>( nshells, std::forward<Args>(args)... );
         break;      
-      default: GAUXC_GENERIC_EXCEPTION("CUDA L_MAX = 4");
+      case 5:
+        collocation_device_shell_to_task_kernel_spherical_5<<<block,threads,0,stream>>>( nshells, std::forward<Args>(args)... );
+        break;      
+      case 6:
+        collocation_device_shell_to_task_kernel_spherical_6<<<block,threads,0,stream>>>( nshells, std::forward<Args>(args)... );
+        break;      
+      default: GAUXC_GENERIC_EXCEPTION("CUDA L_MAX = 6");
     }
   } else {
     switch(l) {      
@@ -321,7 +331,13 @@ void dispatch_shell_to_task_collocation( cudaStream_t stream, int32_t l,
       case 4:
         collocation_device_shell_to_task_kernel_cartesian_4<<<block,threads,0,stream>>>( nshells, std::forward<Args>(args)... );
         break;      
-      default: GAUXC_GENERIC_EXCEPTION("CUDA L_MAX = 4");
+      case 5:
+        collocation_device_shell_to_task_kernel_cartesian_5<<<block,threads,0,stream>>>( nshells, std::forward<Args>(args)... );
+        break;      
+      case 6:
+        collocation_device_shell_to_task_kernel_cartesian_6<<<block,threads,0,stream>>>( nshells, std::forward<Args>(args)... );
+        break;      
+      default: GAUXC_GENERIC_EXCEPTION("CUDA L_MAX = 6");
     }
   }
 }
@@ -357,7 +373,9 @@ uint32_t max_threads_shell_to_task_collocation_gradient( int32_t l, bool pure ) 
       case 2: return util::cuda_kernel_max_threads_per_block( collocation_device_shell_to_task_kernel_spherical_gradient_2 );      
       case 3: return util::cuda_kernel_max_threads_per_block( collocation_device_shell_to_task_kernel_spherical_gradient_3 );      
       case 4: return util::cuda_kernel_max_threads_per_block( collocation_device_shell_to_task_kernel_spherical_gradient_4 );      
-      default: GAUXC_GENERIC_EXCEPTION("CUDA L_MAX = 4");
+      case 5: return util::cuda_kernel_max_threads_per_block( collocation_device_shell_to_task_kernel_spherical_gradient_5 );      
+      case 6: return util::cuda_kernel_max_threads_per_block( collocation_device_shell_to_task_kernel_spherical_gradient_6 );      
+      default: GAUXC_GENERIC_EXCEPTION("CUDA L_MAX = 6");
     }
   } else {
     switch(l) {      
@@ -366,7 +384,9 @@ uint32_t max_threads_shell_to_task_collocation_gradient( int32_t l, bool pure ) 
       case 2: return util::cuda_kernel_max_threads_per_block( collocation_device_shell_to_task_kernel_cartesian_gradient_2 );      
       case 3: return util::cuda_kernel_max_threads_per_block( collocation_device_shell_to_task_kernel_cartesian_gradient_3 );      
       case 4: return util::cuda_kernel_max_threads_per_block( collocation_device_shell_to_task_kernel_cartesian_gradient_4 );      
-      default: GAUXC_GENERIC_EXCEPTION("CUDA L_MAX = 4");
+      case 5: return util::cuda_kernel_max_threads_per_block( collocation_device_shell_to_task_kernel_cartesian_gradient_5 );      
+      case 6: return util::cuda_kernel_max_threads_per_block( collocation_device_shell_to_task_kernel_cartesian_gradient_6 );      
+      default: GAUXC_GENERIC_EXCEPTION("CUDA L_MAX = 6");
     }
   }
   return 0;
@@ -398,7 +418,13 @@ void dispatch_shell_to_task_collocation_gradient( cudaStream_t stream, int32_t l
       case 4:
         collocation_device_shell_to_task_kernel_spherical_gradient_4<<<block,threads,0,stream>>>( nshells, std::forward<Args>(args)... );
         break;      
-      default: GAUXC_GENERIC_EXCEPTION("CUDA L_MAX = 4");
+      case 5:
+        collocation_device_shell_to_task_kernel_spherical_gradient_5<<<block,threads,0,stream>>>( nshells, std::forward<Args>(args)... );
+        break;      
+      case 6:
+        collocation_device_shell_to_task_kernel_spherical_gradient_6<<<block,threads,0,stream>>>( nshells, std::forward<Args>(args)... );
+        break;      
+      default: GAUXC_GENERIC_EXCEPTION("CUDA L_MAX = 6");
     }
   } else {
     switch(l) {      
@@ -417,7 +443,13 @@ void dispatch_shell_to_task_collocation_gradient( cudaStream_t stream, int32_t l
       case 4:
         collocation_device_shell_to_task_kernel_cartesian_gradient_4<<<block,threads,0,stream>>>( nshells, std::forward<Args>(args)... );
         break;      
-      default: GAUXC_GENERIC_EXCEPTION("CUDA L_MAX = 4");
+      case 5:
+        collocation_device_shell_to_task_kernel_cartesian_gradient_5<<<block,threads,0,stream>>>( nshells, std::forward<Args>(args)... );
+        break;      
+      case 6:
+        collocation_device_shell_to_task_kernel_cartesian_gradient_6<<<block,threads,0,stream>>>( nshells, std::forward<Args>(args)... );
+        break;      
+      default: GAUXC_GENERIC_EXCEPTION("CUDA L_MAX = 6");
     }
   }
 
@@ -454,7 +486,9 @@ uint32_t max_threads_shell_to_task_collocation_hessian( int32_t l, bool pure ) {
       case 2: return util::cuda_kernel_max_threads_per_block( collocation_device_shell_to_task_kernel_spherical_hessian_2 );      
       case 3: return util::cuda_kernel_max_threads_per_block( collocation_device_shell_to_task_kernel_spherical_hessian_3 );      
       case 4: return util::cuda_kernel_max_threads_per_block( collocation_device_shell_to_task_kernel_spherical_hessian_4 );      
-      default: GAUXC_GENERIC_EXCEPTION("CUDA L_MAX = 4");
+      case 5: return util::cuda_kernel_max_threads_per_block( collocation_device_shell_to_task_kernel_spherical_hessian_5 );      
+      case 6: return util::cuda_kernel_max_threads_per_block( collocation_device_shell_to_task_kernel_spherical_hessian_6 );      
+      default: GAUXC_GENERIC_EXCEPTION("CUDA L_MAX = 6");
     }
   } else {
     switch(l) {      
@@ -463,7 +497,9 @@ uint32_t max_threads_shell_to_task_collocation_hessian( int32_t l, bool pure ) {
       case 2: return util::cuda_kernel_max_threads_per_block( collocation_device_shell_to_task_kernel_cartesian_hessian_2 );      
       case 3: return util::cuda_kernel_max_threads_per_block( collocation_device_shell_to_task_kernel_cartesian_hessian_3 );      
       case 4: return util::cuda_kernel_max_threads_per_block( collocation_device_shell_to_task_kernel_cartesian_hessian_4 );      
-      default: GAUXC_GENERIC_EXCEPTION("CUDA L_MAX = 4");
+      case 5: return util::cuda_kernel_max_threads_per_block( collocation_device_shell_to_task_kernel_cartesian_hessian_5 );      
+      case 6: return util::cuda_kernel_max_threads_per_block( collocation_device_shell_to_task_kernel_cartesian_hessian_6 );      
+      default: GAUXC_GENERIC_EXCEPTION("CUDA L_MAX = 6");
     }
   }
   return 0;
@@ -495,7 +531,13 @@ void dispatch_shell_to_task_collocation_hessian( cudaStream_t stream, int32_t l,
       case 4:
         collocation_device_shell_to_task_kernel_spherical_hessian_4<<<block,threads,0,stream>>>( nshells, std::forward<Args>(args)... );
         break;      
-      default: GAUXC_GENERIC_EXCEPTION("CUDA L_MAX = 4");
+      case 5:
+        collocation_device_shell_to_task_kernel_spherical_hessian_5<<<block,threads,0,stream>>>( nshells, std::forward<Args>(args)... );
+        break;      
+      case 6:
+        collocation_device_shell_to_task_kernel_spherical_hessian_6<<<block,threads,0,stream>>>( nshells, std::forward<Args>(args)... );
+        break;      
+      default: GAUXC_GENERIC_EXCEPTION("CUDA L_MAX = 6");
     }
   } else {
     switch(l) {      
@@ -514,7 +556,13 @@ void dispatch_shell_to_task_collocation_hessian( cudaStream_t stream, int32_t l,
       case 4:
         collocation_device_shell_to_task_kernel_cartesian_hessian_4<<<block,threads,0,stream>>>( nshells, std::forward<Args>(args)... );
         break;      
-      default: GAUXC_GENERIC_EXCEPTION("CUDA L_MAX = 4");
+      case 5:
+        collocation_device_shell_to_task_kernel_cartesian_hessian_5<<<block,threads,0,stream>>>( nshells, std::forward<Args>(args)... );
+        break;      
+      case 6:
+        collocation_device_shell_to_task_kernel_cartesian_hessian_6<<<block,threads,0,stream>>>( nshells, std::forward<Args>(args)... );
+        break;      
+      default: GAUXC_GENERIC_EXCEPTION("CUDA L_MAX = 6");
     }
   }
 
@@ -555,7 +603,11 @@ uint32_t max_threads_shell_to_task_collocation_laplacian( int32_t l, bool pure )
       
       case 4: return util::cuda_kernel_max_threads_per_block( collocation_device_shell_to_task_kernel_spherical_laplacian_4 );
       
-      default: GAUXC_GENERIC_EXCEPTION("CUDA L_MAX = 4");
+      case 5: return util::cuda_kernel_max_threads_per_block( collocation_device_shell_to_task_kernel_spherical_laplacian_5 );
+      
+      case 6: return util::cuda_kernel_max_threads_per_block( collocation_device_shell_to_task_kernel_spherical_laplacian_6 );
+      
+      default: GAUXC_GENERIC_EXCEPTION("CUDA L_MAX = 6");
     }
   } else {
     switch(l) {      
@@ -564,7 +616,9 @@ uint32_t max_threads_shell_to_task_collocation_laplacian( int32_t l, bool pure )
       case 2: return util::cuda_kernel_max_threads_per_block( collocation_device_shell_to_task_kernel_cartesian_laplacian_2 );      
       case 3: return util::cuda_kernel_max_threads_per_block( collocation_device_shell_to_task_kernel_cartesian_laplacian_3 );      
       case 4: return util::cuda_kernel_max_threads_per_block( collocation_device_shell_to_task_kernel_cartesian_laplacian_4 );      
-      default: GAUXC_GENERIC_EXCEPTION("CUDA L_MAX = 4");
+      case 5: return util::cuda_kernel_max_threads_per_block( collocation_device_shell_to_task_kernel_cartesian_laplacian_5 );      
+      case 6: return util::cuda_kernel_max_threads_per_block( collocation_device_shell_to_task_kernel_cartesian_laplacian_6 );      
+      default: GAUXC_GENERIC_EXCEPTION("CUDA L_MAX = 6");
     }
   }
   return 0;
@@ -601,7 +655,13 @@ void dispatch_shell_to_task_collocation_laplacian( cudaStream_t stream, int32_t 
       case 4:
         collocation_device_shell_to_task_kernel_spherical_laplacian_4<<<block,threads,0,stream>>>( nshells, std::forward<Args>(args)... );
         break;      
-      default: GAUXC_GENERIC_EXCEPTION("CUDA L_MAX = 4");
+      case 5:
+        collocation_device_shell_to_task_kernel_spherical_laplacian_5<<<block,threads,0,stream>>>( nshells, std::forward<Args>(args)... );
+        break;      
+      case 6:
+        collocation_device_shell_to_task_kernel_spherical_laplacian_6<<<block,threads,0,stream>>>( nshells, std::forward<Args>(args)... );
+        break;      
+      default: GAUXC_GENERIC_EXCEPTION("CUDA L_MAX = 6");
     }
   } else {
     switch(l) {      
@@ -620,7 +680,13 @@ void dispatch_shell_to_task_collocation_laplacian( cudaStream_t stream, int32_t 
       case 4:
         collocation_device_shell_to_task_kernel_cartesian_laplacian_4<<<block,threads,0,stream>>>( nshells, std::forward<Args>(args)... );
         break;      
-      default: GAUXC_GENERIC_EXCEPTION("CUDA L_MAX = 4");
+      case 5:
+        collocation_device_shell_to_task_kernel_cartesian_laplacian_5<<<block,threads,0,stream>>>( nshells, std::forward<Args>(args)... );
+        break;      
+      case 6:
+        collocation_device_shell_to_task_kernel_cartesian_laplacian_6<<<block,threads,0,stream>>>( nshells, std::forward<Args>(args)... );
+        break;      
+      default: GAUXC_GENERIC_EXCEPTION("CUDA L_MAX = 6");
     }
   }
 
@@ -663,7 +729,11 @@ uint32_t max_threads_shell_to_task_collocation_lapgrad( int32_t l, bool pure ) {
       
       case 4: return util::cuda_kernel_max_threads_per_block( collocation_device_shell_to_task_kernel_spherical_lapgrad_4 );
       
-      default: GAUXC_GENERIC_EXCEPTION("CUDA L_MAX = 4");
+      case 5: return util::cuda_kernel_max_threads_per_block( collocation_device_shell_to_task_kernel_spherical_lapgrad_5 );
+      
+      case 6: return util::cuda_kernel_max_threads_per_block( collocation_device_shell_to_task_kernel_spherical_lapgrad_6 );
+      
+      default: GAUXC_GENERIC_EXCEPTION("CUDA L_MAX = 6");
     }
   } else {
     switch(l) {      
@@ -672,7 +742,9 @@ uint32_t max_threads_shell_to_task_collocation_lapgrad( int32_t l, bool pure ) {
       case 2: return util::cuda_kernel_max_threads_per_block( collocation_device_shell_to_task_kernel_cartesian_lapgrad_2 );      
       case 3: return util::cuda_kernel_max_threads_per_block( collocation_device_shell_to_task_kernel_cartesian_lapgrad_3 );      
       case 4: return util::cuda_kernel_max_threads_per_block( collocation_device_shell_to_task_kernel_cartesian_lapgrad_4 );      
-      default: GAUXC_GENERIC_EXCEPTION("CUDA L_MAX = 4");
+      case 5: return util::cuda_kernel_max_threads_per_block( collocation_device_shell_to_task_kernel_cartesian_lapgrad_5 );      
+      case 6: return util::cuda_kernel_max_threads_per_block( collocation_device_shell_to_task_kernel_cartesian_lapgrad_6 );      
+      default: GAUXC_GENERIC_EXCEPTION("CUDA L_MAX = 6");
     }
   }
   return 0;
@@ -709,7 +781,13 @@ void dispatch_shell_to_task_collocation_lapgrad( cudaStream_t stream, int32_t l,
       case 4:
         collocation_device_shell_to_task_kernel_spherical_lapgrad_4<<<block,threads,0,stream>>>( nshells, std::forward<Args>(args)... );
         break;      
-      default: GAUXC_GENERIC_EXCEPTION("CUDA L_MAX = 4");
+      case 5:
+        collocation_device_shell_to_task_kernel_spherical_lapgrad_5<<<block,threads,0,stream>>>( nshells, std::forward<Args>(args)... );
+        break;      
+      case 6:
+        collocation_device_shell_to_task_kernel_spherical_lapgrad_6<<<block,threads,0,stream>>>( nshells, std::forward<Args>(args)... );
+        break;      
+      default: GAUXC_GENERIC_EXCEPTION("CUDA L_MAX = 6");
     }
   } else {
     switch(l) {      
@@ -728,7 +806,13 @@ void dispatch_shell_to_task_collocation_lapgrad( cudaStream_t stream, int32_t l,
       case 4:
         collocation_device_shell_to_task_kernel_cartesian_lapgrad_4<<<block,threads,0,stream>>>( nshells, std::forward<Args>(args)... );
         break;      
-      default: GAUXC_GENERIC_EXCEPTION("CUDA L_MAX = 4");
+      case 5:
+        collocation_device_shell_to_task_kernel_cartesian_lapgrad_5<<<block,threads,0,stream>>>( nshells, std::forward<Args>(args)... );
+        break;      
+      case 6:
+        collocation_device_shell_to_task_kernel_cartesian_lapgrad_6<<<block,threads,0,stream>>>( nshells, std::forward<Args>(args)... );
+        break;      
+      default: GAUXC_GENERIC_EXCEPTION("CUDA L_MAX = 6");
     }
   }
 
@@ -753,7 +837,7 @@ void eval_collocation_shell_to_task_lapgrad(
     dispatch_shell_to_task_collocation_lapgrad( stream, l, pure,
       ntask_average, nshells, shell_to_task_device, device_tasks );
     auto stat = cudaGetLastError();
-    GAUXC_CUDA_ERROR("LAPGRAD", stat);
+    GAUXC_CUDA_ERROR("LAP", stat);
   }
 
 

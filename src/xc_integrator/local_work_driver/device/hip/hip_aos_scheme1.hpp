@@ -22,6 +22,11 @@ struct HipAoSScheme1 {
   static constexpr uint32_t weight_thread_block = 640;
   static constexpr uint32_t weight_thread_block_per_sm = 2;
   static constexpr uint32_t max_submat_blocks = 10;
+
+  struct ObaraSaika {
+    static constexpr int points_per_subtask = 256;
+  };
+
 };
 
 }
@@ -31,6 +36,7 @@ struct HipAoSScheme1 : public Base {
 
   // API Overrides
   void partition_weights( XCDeviceData* ) override final;
+  void eval_weight_1st_deriv_contracted( XCDeviceData*, XCWeightAlg ) override final;
 
   std::unique_ptr<XCDeviceData> create_device_data(const DeviceRuntimeEnvironment&) override final;
 
@@ -42,7 +48,9 @@ extern template struct HipAoSScheme1<AoSScheme1Base>;
 #ifdef GAUXC_HAS_MAGMA
 extern template struct HipAoSScheme1<AoSScheme1MAGMABase>;
 #endif
-
+#ifdef GAUXC_HAS_CUTLASS
+extern template struct HipAoSScheme1<AoSScheme1CUTLASSBase>;
+#endif
 
 template <typename Base>
 struct HipAoSScheme1<Base>::Data : public Base::Data {
@@ -63,6 +71,8 @@ extern template struct HipAoSScheme1<AoSScheme1Base>::Data;
 #ifdef GAUXC_HAS_MAGMA
 extern template struct HipAoSScheme1<AoSScheme1MAGMABase>::Data;
 #endif
-
+#ifdef GAUXC_HAS_CUTLASS
+extern template struct HipAoSScheme1<AoSScheme1CUTLASSBase>::Data;
+#endif
 
 }
