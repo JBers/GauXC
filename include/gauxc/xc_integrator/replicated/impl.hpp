@@ -131,7 +131,7 @@ typename ReplicatedXCIntegrator<MatrixType>::exc_vxc_type_rks
   pimpl_->eval_exc_vxc( P.rows(), P.cols(), P.data(), P.rows(),
                         VXC.data(), VXC.rows(), &EXC, ks_settings );
 
-  return std::make_tuple( EXC, VXC );
+  return std::make_tuple( EXC, std::move(VXC) );
 
 }
 
@@ -149,7 +149,7 @@ typename ReplicatedXCIntegrator<MatrixType>::exc_vxc_type_uks
                         VXCs.data(), VXCs.rows(),
                         VXCz.data(), VXCz.rows(), &EXC, ks_settings );
 
-  return std::make_tuple( EXC, VXCs, VXCz );
+  return std::make_tuple( EXC, std::move(VXCs), std::move(VXCz));
 
 }
 
@@ -174,7 +174,7 @@ typename ReplicatedXCIntegrator<MatrixType>::exc_vxc_type_gks
                         VXCy.data(), VXCy.rows(),
                         VXCx.data(), VXCx.rows(), &EXC, ks_settings );
 
-  return std::make_tuple( EXC, VXCs, VXCz, VXCy, VXCx);
+  return std::make_tuple( EXC, std::move(VXCs), std::move(VXCz), std::move(VXCy), std::move(VXCx));
 
 }
 
@@ -225,7 +225,9 @@ typename ReplicatedXCIntegrator<MatrixType>::exc_vxc_type_dks
                         VXCy_SS_im.data(), VXCy_SS_im.rows(),
                         VXCx_SS_im.data(), VXCx_SS_im.rows(), &EXC, ks_settings );
                         
-  return std::make_tuple( EXC, VXCs, VXCz, VXCy, VXCx, VXCs_SS, VXCz_SS, VXCy_SS, VXCx_SS, VXCs_SS_im, VXCz_SS_im, VXCy_SS_im, VXCx_SS_im);
+  return std::make_tuple( EXC, std::move(VXCs), std::move(VXCz), std::move(VXCy), std::move(VXCx), 
+      std::move(VXCs_SS), std::move(VXCz_SS), std::move(VXCy_SS), std::move(VXCx_SS),
+      std::move(VXCs_SS_im), std::move(VXCz_SS_im), std::move(VXCy_SS_im), std::move(VXCx_SS_im));
 
 }
 
