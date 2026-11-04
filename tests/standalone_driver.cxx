@@ -122,18 +122,18 @@ int main(int argc, char** argv) {
     OPTIONAL_KEYWORD( "EXX.TOL_K", sn_link_settings.k_tol,      double );
 
 
-    // #ifdef GAUXC_HAS_DEVICE
-    // std::map< std::string, ExecutionSpace > exec_space_map = {
-    //   { "HOST",   ExecutionSpace::Host },
-    //   { "DEVICE", ExecutionSpace::Device }
-    // };
+    #ifdef GAUXC_HAS_DEVICE
+    std::map< std::string, ExecutionSpace > exec_space_map = {
+      { "HOST",   ExecutionSpace::Host },
+      { "DEVICE", ExecutionSpace::Device }
+    };
 
-    // auto lb_exec_space = exec_space_map.at(lb_exec_space_str);
-    // auto int_exec_space = exec_space_map.at(int_exec_space_str);
-    // #else
-    // auto lb_exec_space  = ExecutionSpace::Host;
-    // auto int_exec_space = ExecutionSpace::Host;
-    // #endif
+    auto lb_exec_space = exec_space_map.at(lb_exec_space_str);
+    auto int_exec_space = exec_space_map.at(int_exec_space_str);
+    #else
+    auto lb_exec_space  = ExecutionSpace::Host;
+    auto int_exec_space = ExecutionSpace::Host;
+    #endif
 
     if( !world_rank ) {
       std::cout << std::boolalpha;
