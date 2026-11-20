@@ -18,7 +18,7 @@ namespace GauXC {
 
 __global__ void symmetrize_matrix_device( size_t N, double* A, size_t LDA ) {
 
-  constexpr uint32_t block_size = hip::warp_size;
+  constexpr uint32_t block_size = 32;
 
   __shared__ double buffer[block_size][block_size+1];  // Pad shared memory to resolve shared memory
 
