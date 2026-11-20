@@ -55,7 +55,7 @@ __global__ void compute_grid_to_center_dist(
 
       // do the computation
       #pragma unroll 2
-      for (int k = threadIdx.y; k < hip::warp_size; k+=hip::warp_size/2) {
+      for (int k = threadIdx.y; k < hip::warp_size; k+=blockDim.y) {
         const int iPt_sm = k;
         const int iPt = i * hip::warp_size + iPt_sm;
         const double rx = point_buffer[iPt_sm].x - coord_reg.x;

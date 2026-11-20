@@ -97,9 +97,10 @@ __global__ void symmetrize_matrix_inc_device( size_t N, double* A, size_t LDA ) 
 
 void symmetrize_matrix( int32_t N, double* A, size_t LDA, device_queue queue ) {
   hipStream_t stream = queue.queue_as<util::hip_stream>();
-  const size_t num_blocks = ((N + hip::warp_size - 1) / hip::warp_size);
+  constexpr uint32_t block_size = 32;
+  const size_t num_blocks = ((N + block_size - 1) / block_size);
   // Warp size must equal max_warps_per_thread_block must equal 32
-  dim3 threads(hip::warp_size, hip::max_warps_per_thread_block), blocks(num_blocks);
+  dim3 threads(block_size, block_size), blocks(num_blocks);
   symmetrize_matrix_device<<<blocks, threads, 0, stream>>>(N, A, LDA);
 }
 
